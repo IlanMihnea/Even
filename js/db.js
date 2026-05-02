@@ -4,7 +4,7 @@
 // Supabase Project URL and anon public key.
 // ============================================
 
-const SUPABASE_URL = 'sb_publishable_h5ZFl8-pHpJHnQzOOKklSA_GJM6x9AC';
+const SUPABASE_URL = 'https://fzlbdfwsejqsdcahwffx.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ6bGJkZndzZWpxc2RjYWh3ZmZ4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc3NTA5MzQsImV4cCI6MjA5MzMyNjkzNH0.I0miwZ8B2tPgZrv0mAvgfHyFU9yVUhOWA27QMilKs4A';
 
 const _supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
