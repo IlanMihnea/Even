@@ -1,20 +1,15 @@
 // ============================================
-// LISTINGS.JS - Filtrare/sortare/paginare reutilizabile
-// Configurat per categorie via window.LISTING_CONFIG
+// LISTINGS.JS - Filtrare/sortare/paginare
 // ============================================
 
 const PAGE_SIZE = 6;
 let currentPage = 1;
 let activeFilters = {};
 let sortBy = 'default';
+let allItems = [];
 
 function getCategoryData() {
-  switch (LISTING_CONFIG.category) {
-    case 'rezidential': return rezidential;
-    case 'comercial': return comercial;
-    case 'terenuri': return terenuri;
-    default: return [];
-  }
+  return allItems;
 }
 
 function getDetailPage() {
@@ -227,7 +222,6 @@ function renderList() {
       </div>`;
   } else {
     grid.innerHTML = pageItems.map(renderCard).join('');
-    // Scroll reveal pentru carduri randate
     setTimeout(() => {
       grid.querySelectorAll('.prop-card').forEach((card, i) => {
         card.classList.add('reveal');
@@ -371,7 +365,7 @@ function initFiltersUI() {
         <input type="number" data-filter-input="locuriParcare" placeholder="ex: 5">
       </div>
       <div class="filter-group">
-        <div class="filter-group-title">Înălțime liberă min (m) - depozite</div>
+        <div class="filter-group-title">Înălțime liberă min (m)</div>
         <input type="number" step="0.1" data-filter-input="inaltimeLibera" placeholder="ex: 8">
       </div>
     `;
@@ -421,13 +415,11 @@ function initFiltersUI() {
     `;
   }
 
-  // Marchează default active pill ""
   document.querySelectorAll('[data-filter]').forEach(group => {
     const def = group.querySelector('[data-value=""]');
     if (def) def.classList.add('active');
   });
 
-  // Listeneri pill
   document.querySelectorAll('.pill-list').forEach(group => {
     group.addEventListener('click', e => {
       if (!e.target.matches('.pill')) return;
@@ -442,7 +434,6 @@ function initFiltersUI() {
     });
   });
 
-  // Inputs cu debounce
   const debouncedRender = debounce(() => {
     document.querySelectorAll('[data-filter-input]').forEach(el => {
       const name = el.dataset.filterInput;
@@ -460,7 +451,6 @@ function initFiltersUI() {
   document.querySelectorAll('[data-filter-input]').forEach(el => el.addEventListener('input', debouncedRender));
   document.querySelectorAll('[data-filter-check]').forEach(el => el.addEventListener('change', debouncedRender));
 
-  // Aplică query string params
   applyQueryParams();
 }
 
@@ -468,7 +458,6 @@ function applyQueryParams() {
   const params = getAllQueryParams();
   Object.entries(params).forEach(([k, v]) => {
     activeFilters[k] = v;
-    // Set UI
     const inp = document.querySelector(`[data-filter-input="${k}"]`);
     if (inp) inp.value = v;
     const pillGroup = document.querySelector(`[data-filter="${k}"]`);
@@ -493,11 +482,23 @@ function resetFilters() {
   renderList();
 }
 
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
   initFiltersUI();
   document.getElementById('sortSelect').addEventListener('change', (e) => {
     sortBy = e.target.value;
     renderList();
   });
+
+  const grid = document.getElementById('listingsGrid');
+  grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:48px;color:var(--gray-500)"><i class="fa-solid fa-spinner fa-spin"></i> Se încarcă...</div>';
+
+  try {
+    allItems = await getProperties(LISTING_CONFIG.category);
+  } catch (err) {
+    console.error('Listings load error:', err);
+    grid.innerHTML = '<div class="empty-state" style="grid-column:1/-1"><i class="fa-regular fa-circle-exclamation"></i><h3>Eroare la încărcare</h3><p>Încearcă să reîmprospătezi pagina.</p></div>';
+    return;
+  }
+
   renderList();
 });

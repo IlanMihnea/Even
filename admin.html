@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="ro">
 <head>
   <meta charset="UTF-8">
@@ -21,8 +21,8 @@
       <p>Autentifică-te pentru a accesa dashboard-ul de management</p>
       <form onsubmit="doLogin(event)">
         <div class="form-group">
-          <label>Utilizator</label>
-          <input type="text" id="username" required placeholder="admin">
+          <label>Email</label>
+          <input type="email" id="username" required placeholder="admin@even.ro">
         </div>
         <div class="form-group">
           <label>Parolă</label>
@@ -30,9 +30,7 @@
         </div>
         <button type="submit" class="btn btn-primary btn-full">Autentificare</button>
       </form>
-      <div class="login-hint">
-        <i class="fa-solid fa-info-circle"></i> Demo: utilizator <strong>admin</strong> / parolă <strong>admin</strong>
-      </div>
+      <div class="login-hint"></div>
     </div>
   </section>
 
@@ -108,7 +106,8 @@
     <span class="toast-msg">Acțiune efectuată</span>
   </div>
 
-  <script src="js/data.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/db.js"></script>
   <script src="js/main.js"></script>
   <script src="js/admin.js"></script>
 </body>

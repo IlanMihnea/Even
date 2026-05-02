@@ -5,15 +5,14 @@
 let currentProperty = null;
 let currentImageIdx = 0;
 
-function getPropById(id, category) {
-  const sets = { rezidential, comercial, terenuri };
-  return sets[category].find(p => p.id === id);
+async function getPropById(id, category) {
+  return await getPropertyById(id, category);
 }
 
 // ---------- RENDER REZIDENTIAL ----------
 function renderRezidential(p) {
-  const agent = getAgentById(p.agentId);
-  document.title = `${p.titlu} - CasaNova`;
+  const agent = p.agent;
+  document.title = `${p.titlu} - EVEN`;
 
   document.getElementById('breadcrumbs').innerHTML = `
     <a href="index.html">Acasă</a> / <a href="listings-rezidential.html">Rezidențial</a> / ${p.titlu}
@@ -121,9 +120,9 @@ function renderRezidential(p) {
 
 // ---------- RENDER COMERCIAL ----------
 function renderComercial(p) {
-  const agent = getAgentById(p.agentId);
+  const agent = p.agent;
   const tipLabels = { birouri: 'Birouri', retail: 'Retail', depozit: 'Depozit/Hală', industrial: 'Industrial', showroom: 'Showroom' };
-  document.title = `${p.titlu} - CasaNova`;
+  document.title = `${p.titlu} - EVEN`;
 
   document.getElementById('breadcrumbs').innerHTML = `
     <a href="index.html">Acasă</a> / <a href="listings-comercial.html">Comercial</a> / ${p.titlu}
@@ -187,7 +186,7 @@ function renderComercial(p) {
 
 // ---------- RENDER TEREN ----------
 function renderTeren(p) {
-  const agent = getAgentById(p.agentId);
+  const agent = p.agent;
   const tipLabels = {
     'intravilan-rezidential': 'Intravilan rezidențial',
     'intravilan-comercial': 'Intravilan comercial',
@@ -200,7 +199,7 @@ function renderTeren(p) {
     { k: 'gaz', i: 'fa-fire', t: 'Gaz' },
     { k: 'canalizare', i: 'fa-toilet', t: 'Canalizare' }
   ];
-  document.title = `${p.titlu} - CasaNova`;
+  document.title = `${p.titlu} - EVEN`;
 
   document.getElementById('breadcrumbs').innerHTML = `
     <a href="index.html">Acasă</a> / <a href="listings-terenuri.html">Terenuri</a> / ${p.titlu}
@@ -317,7 +316,7 @@ function renderSidebar(agent, p) {
           <a href="tel:${agent.telefon}"><i class="fa-solid fa-phone"></i> ${agent.telefon}</a>
           <a href="mailto:${agent.email}"><i class="fa-solid fa-envelope"></i> Trimite email</a>
         </div>
-        <button class="btn btn-primary btn-full" onclick="alert('Apel către ' + '${agent.nume}' + ' inițiat (demo)')"><i class="fa-solid fa-phone"></i> Sună acum</button>
+        <button class="btn btn-primary btn-full" onclick="alert('Apel către ' + '${agent.nume}' + ' inițiat')"><i class="fa-solid fa-phone"></i> Sună acum</button>
       </div>
 
       <div class="contact-form-card">
@@ -344,7 +343,7 @@ function renderSidebar(agent, p) {
       </div>
 
       <div style="text-align:center;font-size:13px;color:var(--gray-500)">
-        <i class="fa-solid fa-shield-halved" style="color:var(--gold)"></i> Anunț verificat de echipa CasaNova
+        <i class="fa-solid fa-shield-halved" style="color:var(--gold)"></i> Anunț verificat de echipa EVEN
       </div>
     </aside>
   `;
@@ -383,17 +382,23 @@ function calcRate() {
 }
 
 // ---------- INIT ----------
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
   const id = getQueryParam('id');
   const category = PROPERTY_PAGE.category;
+  const contentEl = document.getElementById('detailContent');
+
   if (!id) {
-    document.getElementById('detailContent').innerHTML = '<div class="empty-state"><i class="fa-regular fa-circle-question"></i><h3>Proprietate inexistentă</h3></div>';
+    contentEl.innerHTML = '<div class="empty-state"><i class="fa-regular fa-circle-question"></i><h3>Proprietate inexistentă</h3></div>';
     return;
   }
-  const p = getPropById(id, category);
+
+  contentEl.innerHTML = '<div style="text-align:center;padding:80px;color:var(--gray-500)"><i class="fa-solid fa-spinner fa-spin fa-2x"></i></div>';
+
+  const p = await getPropById(id, category);
   currentProperty = p;
+
   if (!p) {
-    document.getElementById('detailContent').innerHTML = '<div class="empty-state"><i class="fa-regular fa-circle-question"></i><h3>Proprietate inexistentă</h3></div>';
+    contentEl.innerHTML = '<div class="empty-state"><i class="fa-regular fa-circle-question"></i><h3>Proprietate inexistentă</h3></div>';
     return;
   }
 

@@ -139,11 +139,23 @@ function setFluxTab(flux) {
   renderFilters();
 }
 
-function renderFeaturedProperties() {
+async function renderFeaturedProperties() {
   const grid = document.getElementById('featuredGrid');
   if (!grid) return;
-  const featured = rezidential.slice(0, 4);
-  grid.innerHTML = featured.map(p => renderHomePropCard(p)).join('');
+  try {
+    const props = await getProperties('rezidential');
+    grid.innerHTML = props.slice(0, 4).map(p => renderHomePropCard(p)).join('');
+    setTimeout(() => {
+      grid.querySelectorAll('.prop-card').forEach((card, i) => {
+        card.classList.add('reveal');
+        if (i < 4) card.classList.add(`reveal-delay-${i + 1}`);
+      });
+      if (typeof initScrollReveal === 'function') initScrollReveal();
+    }, 20);
+  } catch (err) {
+    console.error('Featured properties error:', err);
+    grid.innerHTML = '<p style="color:var(--gray-500);text-align:center;padding:24px">Proprietățile nu au putut fi încărcate.</p>';
+  }
 }
 
 function renderHomePropCard(p) {
@@ -180,33 +192,38 @@ function renderHomePropCard(p) {
   `;
 }
 
-function renderHomeProjects() {
+async function renderHomeProjects() {
   const grid = document.getElementById('projectsHomeGrid');
   if (!grid) return;
-  grid.innerHTML = proiecte.map(p => `
-    <a class="project-card project-compact" href="project-detail.html?id=${p.id}">
-      <div class="project-card-img">
-        <div class="img-placeholder"></div>
-        <div class="status-tag">
-          <span class="status-dot status-${p.status}"></span> ${formatStatus(p.status)}
+  try {
+    const projects = await getProjects();
+    grid.innerHTML = projects.map(p => `
+      <a class="project-card project-compact" href="project-detail.html?id=${p.id}">
+        <div class="project-card-img">
+          <div class="img-placeholder"></div>
+          <div class="status-tag">
+            <span class="status-dot status-${p.status}"></span> ${formatStatus(p.status)}
+          </div>
+          <div class="available-tag">${p.unitatiDisponibile} unități disponibile</div>
         </div>
-        <div class="available-tag">${p.unitatiDisponibile} unități disponibile</div>
-      </div>
-      <div class="project-card-body">
-        <div class="project-dev">${p.dezvoltator}</div>
-        <h3>${p.nume}</h3>
-        <div class="project-loc"><i class="fa-solid fa-location-dot"></i> ${p.cartier}, ${p.oras}</div>
-        <div class="project-price-range">
-          ${formatPrice(p.intervalPret.min)} - ${formatPrice(p.intervalPret.max)}
-          <span>preț unitate</span>
+        <div class="project-card-body">
+          <div class="project-dev">${p.dezvoltator}</div>
+          <h3>${p.nume}</h3>
+          <div class="project-loc"><i class="fa-solid fa-location-dot"></i> ${p.cartier}, ${p.oras}</div>
+          <div class="project-price-range">
+            ${formatPrice(p.intervalPret.min)} - ${formatPrice(p.intervalPret.max)}
+            <span>preț unitate</span>
+          </div>
+          <div class="project-meta">
+            <span>Livrare <strong>${formatLivrare(p.dataLivrare)}</strong></span>
+            <span>Progres <strong>${p.progres}%</strong></span>
+          </div>
         </div>
-        <div class="project-meta">
-          <span>Livrare <strong>${formatLivrare(p.dataLivrare)}</strong></span>
-          <span>Progres <strong>${p.progres}%</strong></span>
-        </div>
-      </div>
-    </a>
-  `).join('');
+      </a>
+    `).join('');
+  } catch (err) {
+    console.error('Projects error:', err);
+  }
 }
 
 function formatStatus(s) {
@@ -218,12 +235,11 @@ function formatLivrare(d) {
   return date.toLocaleDateString('ro-RO', { month: 'short', year: 'numeric' });
 }
 
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
   document.querySelectorAll('.flux-tab').forEach(tab => {
     tab.addEventListener('click', () => setFluxTab(tab.dataset.flux));
   });
   renderFilters();
-  renderFeaturedProperties();
-  renderHomeProjects();
+  await Promise.all([renderFeaturedProperties(), renderHomeProjects()]);
   setTimeout(() => initScrollReveal(), 50);
 });

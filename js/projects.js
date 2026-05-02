@@ -3,6 +3,7 @@
 // ============================================
 
 let projectFilters = {};
+let allProjects = [];
 
 function statusLabel(s) {
   return { 'pre-vanzare': 'Pre-vânzare', 'construire': 'În construcție', 'finalizat': 'Finalizat' }[s] || s;
@@ -16,7 +17,7 @@ function formatLivrareLong(d) {
 function renderProjectsList() {
   const grid = document.getElementById('projectsGrid');
   if (!grid) return;
-  let filtered = [...proiecte];
+  let filtered = [...allProjects];
   const f = projectFilters;
   if (f.oras) filtered = filtered.filter(p => p.oras.toLowerCase().includes(f.oras.toLowerCase()));
   if (f.status) filtered = filtered.filter(p => p.status === f.status);
@@ -69,7 +70,6 @@ function initProjectsListing() {
     el.addEventListener('input', debouncedRender);
     el.addEventListener('change', debouncedRender);
   });
-  // Apply query params
   Object.entries(getAllQueryParams()).forEach(([k, v]) => {
     const el = document.querySelector(`[data-pf="${k}"]`);
     if (el) { el.value = v; projectFilters[k] = v; }
@@ -81,7 +81,7 @@ function initProjectsListing() {
 let unitFilters = {};
 
 function renderProjectDetail(p) {
-  document.title = `${p.nume} - CasaNova`;
+  document.title = `${p.nume} - EVEN`;
 
   document.getElementById('projectHero').innerHTML = `
     <div class="img-placeholder" style="position:absolute;inset:0"></div>
@@ -124,10 +124,8 @@ function renderProjectDetail(p) {
     </ul>
   `;
 
-  // Galerie placeholder
   document.getElementById('projectGallery').innerHTML = renderGalleryProj(p.imagini);
 
-  // Dezvoltator
   const initials = p.dezvoltator.split(' ').map(s => s[0]).join('').slice(0, 2);
   document.getElementById('developerBlock').innerHTML = `
     <h2>Dezvoltator</h2>
@@ -137,16 +135,14 @@ function renderProjectDetail(p) {
         <h3 style="margin-bottom:6px">${p.dezvoltator}</h3>
         <p style="font-size:14px;color:var(--gray-500);margin-bottom:8px">Proiecte anterioare:</p>
         <div style="display:flex;gap:8px;flex-wrap:wrap">
-          ${p.dezvoltatorProiecte.map(pr => `<span class="badge badge-proiect">${pr}</span>`).join('')}
+          ${(p.dezvoltatorProiecte || []).map(pr => `<span class="badge badge-proiect">${pr}</span>`).join('')}
         </div>
       </div>
     </div>
   `;
 
-  // Timeline
   renderTimeline(p);
 
-  // Plan plată
   document.getElementById('paymentPlanWrap').innerHTML = `
     <h2>Plan de plată</h2>
     <p style="color:var(--gray-500);margin-bottom:20px">Avans inițial: <strong>${p.planPlata.avans}%</strong> · Restul în tranșe pe etape de construcție</p>
@@ -160,10 +156,8 @@ function renderProjectDetail(p) {
     </div>
   `;
 
-  // Unități
   renderUnitsTable(p);
 
-  // Form interes
   document.getElementById('interestForm').innerHTML = `
     <h2>Mă interesează acest proiect</h2>
     <p style="color:var(--gray-500);margin-bottom:20px">Lasă-ne datele tale și un consultant te va contacta în maxim 24 ore cu lista completă de unități și prețuri actualizate.</p>
@@ -260,13 +254,7 @@ function renderUnitsTable(p) {
     <table class="units-table">
       <thead>
         <tr>
-          <th>Nr. unitate</th>
-          <th>Tip</th>
-          <th>Etaj</th>
-          <th>Suprafață</th>
-          <th>Preț</th>
-          <th>Status</th>
-          <th></th>
+          <th>Nr. unitate</th><th>Tip</th><th>Etaj</th><th>Suprafață</th><th>Preț</th><th>Status</th><th></th>
         </tr>
       </thead>
       <tbody>
@@ -281,7 +269,7 @@ function renderUnitsTable(p) {
               <td><span class="unit-status ${u.status}">${u.status}</span></td>
               <td>
                 ${u.status === 'disponibil' ?
-                  `<button class="btn btn-outline" style="padding:6px 14px;font-size:12px" onclick="alert('Solicitare detalii pentru ' + '${u.numar}')">Detalii</button>` :
+                  `<button class="btn btn-outline" style="padding:6px 14px;font-size:12px" onclick="alert('Solicitare detalii pentru ${u.numar}')">Detalii</button>` :
                   ''
                 }
               </td>
@@ -292,18 +280,14 @@ function renderUnitsTable(p) {
   `;
 
   document.querySelectorAll('[data-uf]').forEach(el => {
-    el.addEventListener('input', () => {
+    const handler = () => {
       const k = el.dataset.uf;
       if (el.value) unitFilters[k] = el.value;
       else delete unitFilters[k];
       renderUnitsTable(p);
-    });
-    el.addEventListener('change', () => {
-      const k = el.dataset.uf;
-      if (el.value) unitFilters[k] = el.value;
-      else delete unitFilters[k];
-      renderUnitsTable(p);
-    });
+    };
+    el.addEventListener('input', handler);
+    el.addEventListener('change', handler);
   });
 }
 
@@ -313,13 +297,32 @@ function submitInterest(e, projName) {
   e.target.reset();
 }
 
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
   const page = document.body.dataset.subpage;
+
   if (page === 'projects-list') {
+    const grid = document.getElementById('projectsGrid');
+    grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:48px;color:var(--gray-500)"><i class="fa-solid fa-spinner fa-spin"></i> Se încarcă...</div>';
+    try {
+      allProjects = await getProjects();
+    } catch (err) {
+      console.error('Projects load error:', err);
+    }
     initProjectsListing();
+
   } else if (page === 'project-detail') {
     const id = getQueryParam('id');
-    const proj = proiecte.find(p => p.id === id) || proiecte[0];
-    renderProjectDetail(proj);
+    const heroEl = document.getElementById('projectHero');
+    if (heroEl) heroEl.innerHTML = '<div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:white"><i class="fa-solid fa-spinner fa-spin fa-2x"></i></div>';
+
+    let proj = null;
+    if (id) {
+      proj = await getProjectById(id);
+    }
+    if (!proj) {
+      const projects = await getProjects();
+      proj = projects[0];
+    }
+    if (proj) renderProjectDetail(proj);
   }
 });
