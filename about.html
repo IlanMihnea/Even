@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Despre noi | EVEN</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500;1,600&family=DM+Sans:wght@400;500;600;700&family=Syne:wght@600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="css/main.css">
+  <link rel="stylesheet" href="css/animations.css">
+  <link rel="stylesheet" href="css/about.css">
+</head>
+<body data-page="about">
+
+  <header id="navbar" class="navbar"></header>
+
+  <section class="about-hero">
+    <div class="container">
+      <span class="label">Despre EVEN</span>
+      <h1>Construim încredere,<br>nu doar tranzacții</h1>
+      <p>Suntem agenția imobiliară care înțelege că în spatele fiecărei proprietăți este o poveste — și care își ia angajamentul să o respecte cu profesionalism, transparență și empatie reală.</p>
+    </div>
+  </section>
+
+  <!-- VIZIUNE -->
+  <section class="vision-section">
+    <div class="container">
+      <div class="vision-grid">
+        <div class="vision-text">
+          <h2>Viziunea noastră</h2>
+          <p>Piața imobiliară din România a fost prea mult timp dominată de opacitate, comisioane neclare și agenți care nu pun clientul pe primul loc. Noi schimbăm acest paradigm.</p>
+          <p>Ne propunem ca în 2030 să fim agenția cu cea mai înaltă rată de recomandare din țară — pentru că fiecare client să devină ambasadorul nostru natural.</p>
+          <p>Fiecare tranzacție este un test pentru reputația noastră. Pierdem un comision astăzi pentru a câștiga o relație pe viață.</p>
+        </div>
+        <div class="vision-statement">
+          <blockquote>O casă nu e un produs. E spațiul în care îți construiești familia, cariera, amintirile. Merită un partener pe măsură.</blockquote>
+          <div class="quote-author">— Echipa EVEN</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- VALORI -->
+  <section class="values-section">
+    <div class="container">
+      <h2 class="section-title">Valorile noastre</h2>
+      <p class="section-subtitle">3 piloni care ne ghidează fiecare interacțiune cu clienții și partenerii noștri.</p>
+
+      <div class="values-grid">
+        <div class="value-card">
+          <div class="value-icon"><i class="fa-solid fa-shield-halved"></i></div>
+          <h3>Transparență totală</h3>
+          <p>Comision clar de la prima discuție. Fiecare detaliu juridic, tehnic sau financiar îți este explicat. Fără surprize, fără cosmetizări.</p>
+        </div>
+        <div class="value-card">
+          <div class="value-icon"><i class="fa-solid fa-handshake"></i></div>
+          <h3>Profesionalism real</h3>
+          <p>Agenții noștri sunt formați continuu — cunosc legislația, cadastrul, finanțarea și piața. Răspunsuri profesioniste, nu evaluări vagi.</p>
+        </div>
+        <div class="value-card">
+          <div class="value-icon"><i class="fa-solid fa-heart"></i></div>
+          <h3>Empatie autentică</h3>
+          <p>Înțelegem că în spatele fiecărei căutări de proprietate există emoție: o familie nouă, o nouă etapă în carieră, o investiție care contează. Te tratăm pe măsură.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ECHIPA -->
+  <section class="team-section" id="echipa">
+    <div class="container">
+      <h2 class="section-title">Echipa noastră</h2>
+      <p class="section-subtitle">Specialiști dedicați pe fiecare categorie de proprietate — pentru ca tu să primești expertiza potrivită nevoii tale.</p>
+
+      <div class="team-grid" id="teamGrid"></div>
+    </div>
+  </section>
+
+  <!-- CIFRELE -->
+  <section class="numbers-section">
+    <div class="container">
+      <h2 class="section-title">Cifrele noastre</h2>
+      <p class="section-subtitle">Rezultate care vorbesc de la sine — la fiecare nivel al activității noastre.</p>
+
+      <div class="numbers-grid">
+        <div class="number-card">
+          <div class="number" data-target="2400">0</div>
+          <div class="number-label">Proprietăți vândute</div>
+        </div>
+        <div class="number-card">
+          <div class="number" data-target="1850">0</div>
+          <div class="number-label">Clienți mulțumiți</div>
+        </div>
+        <div class="number-card no-plus">
+          <div class="number" data-target="12">0</div>
+          <div class="number-label">Ani experiență</div>
+        </div>
+        <div class="number-card no-plus">
+          <div class="number" data-target="8">0</div>
+          <div class="number-label">Orașe acoperite</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer id="footer" class="footer"></footer>
+
+  <script src="js/data.js"></script>
+  <script src="js/main.js"></script>
+  <script>
+    // RENDER ECHIPA
+    document.addEventListener('DOMContentLoaded', () => {
+      const grid = document.getElementById('teamGrid');
+      grid.innerHTML = agenti.map(a => {
+        const initials = a.nume.split(' ').map(n => n[0]).join('');
+        return `
+          <div class="team-card">
+            <div class="team-foto">
+              <div class="initials">${initials}</div>
+            </div>
+            <div class="team-info">
+              <h3>${a.nume}</h3>
+              <div class="role">${a.rol}</div>
+              <div class="bio">${a.bio}</div>
+              <div class="social">
+                <a href="mailto:${a.email}" title="Email"><i class="fa-solid fa-envelope"></i></a>
+                <a href="tel:${a.telefon}" title="Telefon"><i class="fa-solid fa-phone"></i></a>
+                <a href="#" title="LinkedIn"><i class="fa-brands fa-linkedin-in"></i></a>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      // COUNTERS ANIMATE
+      const counters = document.querySelectorAll('.number[data-target]');
+      const animate = (el) => {
+        const target = +el.dataset.target;
+        const duration = 1500;
+        const start = performance.now();
+        const tick = (t) => {
+          const p = Math.min((t - start) / duration, 1);
+          const eased = 1 - Math.pow(1 - p, 3);
+          el.textContent = Math.floor(eased * target).toLocaleString('ro-RO');
+          if (p < 1) requestAnimationFrame(tick);
+          else el.textContent = target.toLocaleString('ro-RO');
+        };
+        requestAnimationFrame(tick);
+      };
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(e => {
+          if (e.isIntersecting) {
+            animate(e.target);
+            observer.unobserve(e.target);
+          }
+        });
+      }, { threshold: 0.4 });
+      counters.forEach(c => observer.observe(c));
+    });
+  </script>
+</body>
+</html>

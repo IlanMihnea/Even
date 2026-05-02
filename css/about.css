@@ -1,0 +1,263 @@
+/* ============================================
+   ABOUT.CSS
+   ============================================ */
+
+.about-hero {
+  padding: 80px 0 60px;
+  background: linear-gradient(135deg, var(--linen) 0%, var(--warm-white) 100%);
+  text-align: center;
+}
+.about-hero .label {
+  display: inline-block;
+  padding: 6px 14px;
+  background: rgba(95, 138, 130, 0.12);
+  color: var(--sage);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.13em;
+  border-radius: 20px;
+  margin-bottom: 20px;
+  font-weight: 700;
+  border: 1px solid rgba(95, 138, 130, 0.2);
+}
+.about-hero h1 {
+  font-size: 3rem;
+  margin-bottom: 16px;
+}
+.about-hero p {
+  font-size: 1.15rem;
+  color: var(--gray-500);
+  max-width: 720px;
+  margin: 0 auto;
+  line-height: 1.7;
+}
+
+/* VIZIUNEA */
+.vision-section {
+  padding: 80px 0;
+}
+.vision-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 64px;
+  align-items: center;
+}
+.vision-text p {
+  color: var(--gray-600);
+  margin-bottom: 16px;
+  font-size: 15px;
+  line-height: 1.8;
+}
+.vision-statement {
+  background: var(--navy);
+  color: var(--white);
+  padding: 48px;
+  border-radius: var(--r-lg);
+  position: relative;
+  overflow: hidden;
+}
+.vision-statement::before {
+  content: """;
+  position: absolute;
+  top: -20px;
+  left: 30px;
+  font-size: 8rem;
+  color: var(--gold);
+  opacity: 0.3;
+  line-height: 1;
+  font-family: serif;
+}
+.vision-statement blockquote {
+  font-family: var(--font-heading);
+  font-size: 1.4rem;
+  font-weight: 500;
+  line-height: 1.5;
+  position: relative;
+  z-index: 1;
+}
+.vision-statement .quote-author {
+  margin-top: 24px;
+  font-size: 13px;
+  color: var(--gold);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+/* VALORI */
+.values-section {
+  padding: 80px 0;
+  background: var(--gray-50);
+}
+.values-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 32px;
+  margin-top: 48px;
+}
+.value-card {
+  text-align: center;
+  padding: 40px 28px;
+  background: var(--white);
+  border-radius: var(--r-lg);
+  border-top: 3px solid var(--gold);
+  transition: var(--transition);
+}
+.value-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-md);
+}
+.value-icon {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--gold), var(--gold-light));
+  color: var(--navy);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 20px;
+  font-size: 28px;
+}
+.value-card h3 {
+  font-size: 1.2rem;
+  margin-bottom: 12px;
+}
+.value-card p {
+  color: var(--gray-500);
+  font-size: 14px;
+}
+
+/* ECHIPA */
+.team-section {
+  padding: 80px 0;
+}
+.team-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 28px;
+  margin-top: 48px;
+}
+.team-card {
+  text-align: center;
+  background: var(--white);
+  border: 1px solid var(--gray-100);
+  border-radius: var(--r-lg);
+  overflow: hidden;
+  transition: var(--transition);
+}
+.team-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-md);
+}
+.team-foto {
+  width: 100%;
+  padding-top: 100%;
+  position: relative;
+  background: linear-gradient(135deg, var(--gray-200), var(--gray-100));
+}
+.team-foto img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.team-foto .initials {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-heading);
+  font-size: 4rem;
+  color: var(--gold);
+  font-weight: 700;
+  background: var(--navy);
+}
+.team-info {
+  padding: 24px 20px;
+}
+.team-info h3 {
+  font-size: 1.1rem;
+  margin-bottom: 4px;
+}
+.team-info .role {
+  color: var(--gold);
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-weight: 600;
+  margin-bottom: 12px;
+}
+.team-info .bio {
+  font-size: 13px;
+  color: var(--gray-500);
+  line-height: 1.6;
+}
+.team-info .social {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 16px;
+}
+.team-info .social a {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: var(--gray-100);
+  color: var(--gray-500);
+  font-size: 13px;
+}
+.team-info .social a:hover {
+  background: var(--navy);
+  color: var(--white);
+}
+
+/* CIFRELE */
+.numbers-section {
+  padding: 80px 0;
+  background: var(--navy);
+  color: var(--white);
+}
+.numbers-section h2 { color: var(--white); }
+.numbers-section .section-subtitle { color: rgba(255,255,255,0.7); }
+.numbers-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 32px;
+  text-align: center;
+  margin-top: 48px;
+}
+.number-card {
+  padding: 32px 16px;
+}
+.number-card .number {
+  font-family: var(--font-heading);
+  font-size: 3.5rem;
+  font-weight: 700;
+  color: var(--gold);
+  line-height: 1;
+  margin-bottom: 12px;
+}
+.number-card .number::after {
+  content: "+";
+  color: var(--gold);
+  margin-left: 4px;
+}
+.number-card.no-plus .number::after { content: ""; }
+.number-card .number-label {
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: rgba(255,255,255,0.7);
+}
+
+@media (max-width: 900px) {
+  .vision-grid { grid-template-columns: 1fr; gap: 32px; }
+  .values-grid { grid-template-columns: 1fr; }
+  .numbers-grid { grid-template-columns: repeat(2, 1fr); }
+  .number-card .number { font-size: 2.5rem; }
+}

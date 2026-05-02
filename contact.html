@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Contact | EVEN</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500;1,600&family=DM+Sans:wght@400;500;600;700&family=Syne:wght@600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="css/main.css">
+  <link rel="stylesheet" href="css/animations.css">
+  <style>
+    .contact-layout {
+      display: grid;
+      grid-template-columns: 1.2fr 1fr;
+      gap: 48px;
+      padding: 64px 0;
+    }
+    .contact-info-card {
+      background: var(--navy);
+      color: var(--white);
+      padding: 40px;
+      border-radius: var(--r-lg);
+    }
+    .contact-info-card h2 { color: var(--white); }
+    .contact-info-card .info-row {
+      display: flex;
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+    .contact-info-card .info-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: var(--gold);
+      color: var(--navy);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .contact-info-card .info-content h4 {
+      color: var(--white);
+      font-size: 14px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 4px;
+    }
+    .contact-info-card .info-content p { color: rgba(255,255,255,0.8); font-size: 14px; }
+    .contact-info-card .social {
+      display: flex;
+      gap: 12px;
+      margin-top: 32px;
+      padding-top: 24px;
+      border-top: 1px solid rgba(255,255,255,0.1);
+    }
+    .contact-info-card .social a {
+      width: 44px;
+      height: 44px;
+      background: rgba(255,255,255,0.1);
+      color: var(--white);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .contact-info-card .social a:hover { background: var(--gold); color: var(--navy); }
+
+    .contact-form-block {
+      background: var(--white);
+      border: 1px solid var(--gray-100);
+      border-radius: var(--r-lg);
+      padding: 40px;
+    }
+
+    .map-iframe-wrap {
+      margin: 0 0 64px 0;
+      border-radius: var(--r-lg);
+      overflow: hidden;
+      box-shadow: var(--shadow-md);
+    }
+    .map-iframe-wrap iframe {
+      width: 100%;
+      height: 380px;
+      border: 0;
+      display: block;
+    }
+
+    @media (max-width: 900px) {
+      .contact-layout { grid-template-columns: 1fr; gap: 24px; padding: 32px 0; }
+    }
+  </style>
+</head>
+<body data-page="contact">
+
+  <header id="navbar" class="navbar"></header>
+
+  <section class="page-header">
+    <div class="container">
+      <div class="breadcrumbs"><a href="index.html">Acasă</a> / Contact</div>
+      <h1>Hai să vorbim</h1>
+      <p class="subtitle">Suntem aici să răspundem oricărei întrebări — fie că vrei să cumperi, să vinzi sau doar să te orientezi pe piață.</p>
+    </div>
+  </section>
+
+  <div class="container">
+    <div class="contact-layout">
+      <div class="contact-form-block">
+        <h2 style="margin-bottom: 8px">Scrie-ne</h2>
+        <p style="color: var(--gray-500); margin-bottom: 24px">Răspundem în maxim 4 ore lucrătoare.</p>
+        <form onsubmit="submitContact(event)">
+          <div class="form-group">
+            <label>Nume complet</label>
+            <input type="text" required placeholder="ex: Andrei Popescu">
+          </div>
+          <div class="form-group">
+            <label>Email</label>
+            <input type="email" required placeholder="email@exemplu.ro">
+          </div>
+          <div class="form-group">
+            <label>Telefon</label>
+            <input type="tel" placeholder="07xx xxx xxx">
+          </div>
+          <div class="form-group">
+            <label>Subiect</label>
+            <select required>
+              <option value="">— Selectează subiect —</option>
+              <optgroup label="Cumpărare">
+                <option>Caut apartament rezidențial</option>
+                <option>Caut casă / vilă</option>
+                <option>Caut spațiu comercial</option>
+                <option>Caut teren pentru construcție</option>
+                <option>Mă interesează un proiect nou</option>
+              </optgroup>
+              <optgroup label="Închiriere">
+                <option>Caut apartament de închiriat</option>
+                <option>Caut spațiu comercial de închiriat</option>
+              </optgroup>
+              <optgroup label="Vânzare proprietate">
+                <option>Vreau să vând o proprietate</option>
+                <option>Vreau evaluare gratuită</option>
+              </optgroup>
+              <optgroup label="Altele">
+                <option>Colaborare profesională</option>
+                <option>Carieră în EVEN</option>
+                <option>Altă întrebare</option>
+              </optgroup>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Mesajul tău</label>
+            <textarea required placeholder="Spune-ne ce cauți sau ce te interesează..."></textarea>
+          </div>
+          <div class="form-group" style="display:flex;align-items:center;gap:8px">
+            <input type="checkbox" id="acord" required style="width:auto">
+            <label for="acord" style="margin:0;font-size:13px">Sunt de acord cu prelucrarea datelor conform GDPR</label>
+          </div>
+          <button type="submit" class="btn btn-primary btn-full"><i class="fa-solid fa-paper-plane"></i> Trimite mesajul</button>
+        </form>
+      </div>
+
+      <div class="contact-info-card">
+        <h2 style="margin-bottom: 24px">Cum ne găsești</h2>
+
+        <div class="info-row">
+          <div class="info-icon"><i class="fa-solid fa-location-dot"></i></div>
+          <div class="info-content">
+            <h4>Adresă sediu</h4>
+            <p>Str. Aviatorilor nr. 33<br>Sector 1, București, 011852</p>
+          </div>
+        </div>
+
+        <div class="info-row">
+          <div class="info-icon"><i class="fa-solid fa-phone"></i></div>
+          <div class="info-content">
+            <h4>Telefon</h4>
+            <p>+40 21 555 0000<br>+40 722 333 444 (mobil)</p>
+          </div>
+        </div>
+
+        <div class="info-row">
+          <div class="info-icon"><i class="fa-solid fa-envelope"></i></div>
+          <div class="info-content">
+            <h4>Email</h4>
+            <p>contact@even.ro<br>vanzari@even.ro</p>
+          </div>
+        </div>
+
+        <div class="info-row">
+          <div class="info-icon"><i class="fa-regular fa-clock"></i></div>
+          <div class="info-content">
+            <h4>Program</h4>
+            <p>Luni – Vineri: 09:00 – 19:00<br>Sâmbătă: 10:00 – 14:00<br>Duminică: închis</p>
+          </div>
+        </div>
+
+        <div class="social">
+          <a href="#" aria-label="Facebook"><i class="fa-brands fa-facebook-f"></i></a>
+          <a href="#" aria-label="Instagram"><i class="fa-brands fa-instagram"></i></a>
+          <a href="#" aria-label="LinkedIn"><i class="fa-brands fa-linkedin-in"></i></a>
+          <a href="#" aria-label="YouTube"><i class="fa-brands fa-youtube"></i></a>
+        </div>
+      </div>
+    </div>
+
+    <div class="map-iframe-wrap">
+      <iframe
+        src="https://www.openstreetmap.org/export/embed.html?bbox=26.085%2C44.464%2C26.105%2C44.476&amp;layer=mapnik&amp;marker=44.470%2C26.095"
+        title="Locație EVEN București"
+        loading="lazy">
+      </iframe>
+    </div>
+  </div>
+
+  <footer id="footer" class="footer"></footer>
+
+  <script src="js/data.js"></script>
+  <script src="js/main.js"></script>
+  <script>
+    function submitContact(e) {
+      e.preventDefault();
+      alert('Mulțumim pentru mesaj! Te contactăm în maxim 4 ore lucrătoare.');
+      e.target.reset();
+    }
+  </script>
+</body>
+</html>

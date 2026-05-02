@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard | EVEN</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500;1,600&family=DM+Sans:wght@400;500;600;700&family=Syne:wght@600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="css/main.css">
+  <link rel="stylesheet" href="css/animations.css">
+  <link rel="stylesheet" href="css/admin.css">
+</head>
+<body data-page="admin">
+
+  <header id="navbar" class="navbar"></header>
+
+  <!-- LOGIN SCREEN -->
+  <section class="admin-login" id="loginScreen">
+    <div class="login-card">
+      <h2><i class="fa-solid fa-lock" style="color:var(--gold);margin-right:8px"></i>Acces Admin</h2>
+      <p>Autentifică-te pentru a accesa dashboard-ul de management</p>
+      <form onsubmit="doLogin(event)">
+        <div class="form-group">
+          <label>Utilizator</label>
+          <input type="text" id="username" required placeholder="admin">
+        </div>
+        <div class="form-group">
+          <label>Parolă</label>
+          <input type="password" id="password" required placeholder="••••••">
+        </div>
+        <button type="submit" class="btn btn-primary btn-full">Autentificare</button>
+      </form>
+      <div class="login-hint">
+        <i class="fa-solid fa-info-circle"></i> Demo: utilizator <strong>admin</strong> / parolă <strong>admin</strong>
+      </div>
+    </div>
+  </section>
+
+  <!-- DASHBOARD -->
+  <main class="admin-layout" id="dashboard" style="display:none">
+    <div class="container">
+      <div class="admin-header">
+        <div>
+          <h1>Dashboard administrare</h1>
+          <p style="color:var(--gray-500);font-size:14px">Privire de ansamblu asupra portofoliului EVEN</p>
+        </div>
+        <div class="user-info">
+          <span><i class="fa-solid fa-user-tie"></i> admin@even.ro</span>
+          <button class="btn btn-outline" onclick="doLogout()"><i class="fa-solid fa-right-from-bracket"></i> Logout</button>
+        </div>
+      </div>
+
+      <div class="stats-grid" id="statsGrid"></div>
+
+      <!-- PROPRIETĂȚI -->
+      <div class="admin-section">
+        <div class="admin-section-header">
+          <h2>Proprietăți în portofoliu</h2>
+          <button class="btn btn-gold" onclick="openAddModal()"><i class="fa-solid fa-plus"></i> Adaugă proprietate</button>
+        </div>
+        <div class="admin-tabs" id="adminTabs"></div>
+        <div id="tableWrap"></div>
+      </div>
+
+      <!-- AGENȚI -->
+      <div class="admin-section">
+        <div class="admin-section-header">
+          <h2>Agenți</h2>
+          <button class="btn btn-outline" onclick="alert('Adaugă agent (demo)')"><i class="fa-solid fa-plus"></i> Adaugă agent</button>
+        </div>
+        <div id="agentsWrap"></div>
+      </div>
+    </div>
+  </main>
+
+  <!-- MODAL ADD -->
+  <div class="modal" id="addModal">
+    <div class="modal-card">
+      <div class="modal-close" onclick="closeAddModal()"><i class="fa-solid fa-xmark"></i></div>
+      <h2>Adaugă proprietate nouă</h2>
+      <p class="modal-sub">Selectează categoria pentru a vedea câmpurile specifice.</p>
+
+      <div class="cat-selector">
+        <div class="cat-pill active" data-cat="rezidential" onclick="setFormCategory('rezidential')">
+          <i class="fa-solid fa-home"></i>Rezidențial
+        </div>
+        <div class="cat-pill" data-cat="comercial" onclick="setFormCategory('comercial')">
+          <i class="fa-solid fa-building"></i>Comercial
+        </div>
+        <div class="cat-pill" data-cat="terenuri" onclick="setFormCategory('terenuri')">
+          <i class="fa-solid fa-map"></i>Teren
+        </div>
+      </div>
+
+      <form onsubmit="submitNewProperty(event)">
+        <div id="dynamicForm"></div>
+        <div style="display:flex;gap:12px;margin-top:24px">
+          <button type="button" class="btn btn-outline" onclick="closeAddModal()">Anulează</button>
+          <button type="submit" class="btn btn-primary"><i class="fa-solid fa-check"></i> Salvează proprietatea</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- TOAST -->
+  <div class="toast" id="toast">
+    <i class="fa-solid fa-circle-check"></i>
+    <span class="toast-msg">Acțiune efectuată</span>
+  </div>
+
+  <script src="js/data.js"></script>
+  <script src="js/main.js"></script>
+  <script src="js/admin.js"></script>
+</body>
+</html>
