@@ -1,6 +1,0 @@
-.DS_Store
-Thumbs.db
-*.log
-.env.local
-.env
-node_modules
