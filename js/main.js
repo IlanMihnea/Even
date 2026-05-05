@@ -79,7 +79,7 @@ function renderFooter() {
             <img src="design/logomark-even.svg" class="logo-mark-svg logo-svg-footer" alt="">
             <img src="design/logotype-even.svg" class="logo-type-svg logo-svg-footer" alt="EVEN">
           </a>
-          <p>Agenția imobiliară care redefinește modul în care românii cumpără, vând și închiriază proprietăți.</p>
+          <p>Strategie înainte de anunț. Evaluare corectă. Implicare reală în fiecare tranzacție.</p>
           <div class="footer-social">
             <a href="#" aria-label="Facebook"><i class="fa-brands fa-facebook-f"></i></a>
             <a href="#" aria-label="Instagram"><i class="fa-brands fa-instagram"></i></a>
@@ -107,9 +107,9 @@ function renderFooter() {
         </div>
         <div class="footer-contact">
           <h4>Contact</h4>
-          <p><i class="fa-solid fa-location-dot"></i>Str. Aviatorilor 33, București</p>
-          <p><i class="fa-solid fa-phone"></i>+40 21 555 0000</p>
-          <p><i class="fa-solid fa-envelope"></i>contact@even.ro</p>
+          <p><i class="fa-solid fa-location-dot"></i>Banul Antonache 71, Floreasca</p>
+          <p><i class="fa-solid fa-phone"></i>0745 609 366</p>
+          <p><i class="fa-solid fa-envelope"></i>ilan@even-imobiliare.ro</p>
           <p><i class="fa-regular fa-clock"></i>Lun-Vin: 09:00-19:00</p>
         </div>
       </div>
