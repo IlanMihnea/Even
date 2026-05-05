@@ -1,0 +1,57 @@
+﻿<!DOCTYPE html>
+<html lang="ro">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Terenuri intravilan, extravilan, agricol | EVEN</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500;1,600&family=DM+Sans:wght@400;500;600;700&family=Syne:wght@600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="css/main.css">
+  <link rel="stylesheet" href="css/animations.css">
+  <link rel="stylesheet" href="css/listings.css">
+  <link rel="stylesheet" href="css/homepage.css">
+</head>
+<body data-page="terenuri">
+
+  <header id="navbar" class="navbar"></header>
+
+  <section class="page-header flux-terenuri">
+    <div class="container">
+      <div class="breadcrumbs"><a href="index.html">Acasă</a> / Terenuri</div>
+      <h1>Terenuri</h1>
+      <p class="subtitle">Pentru construcție casă, dezvoltare imobiliară sau investiții agricole — toate informațiile cadastrale verificate.</p>
+    </div>
+  </section>
+
+  <div class="container">
+    <div class="listings-layout">
+      <aside class="filter-sidebar" id="filterSidebar"></aside>
+
+      <div class="listings-content">
+        <div class="listings-header">
+          <div class="results-count" id="resultsCount"></div>
+          <div class="sort-box">
+            <label>Sortează:</label>
+            <select id="sortSelect">
+              <option value="default">Recomandate</option>
+              <option value="pret-asc">Preț crescător</option>
+              <option value="pret-desc">Preț descrescător</option>
+              <option value="suprafata-desc">Suprafață mare</option>
+            </select>
+          </div>
+        </div>
+        <div class="listings-grid" id="listingsGrid"></div>
+        <div class="pagination" id="pagination"></div>
+      </div>
+    </div>
+  </div>
+
+  <footer id="footer" class="footer"></footer>
+
+  <script>const LISTING_CONFIG = { category: 'terenuri' };</script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/db.js"></script>
+  <script src="js/main.js"></script>
+  <script src="js/listings.js"></script>
+</body>
+</html>

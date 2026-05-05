@@ -1,6 +1,14 @@
 .DS_Store
 Thumbs.db
 *.log
+node_modules
 .env.local
 .env
-node_modules
+
+# Fișiere locale / temp
+*.zip
+hormozi_leads_summary.md
+hormozi_offers_summary.md
+generate-images.js
+frontend-design.md
+.claude/

@@ -1,5 +1,6 @@
 {
+  "outputDirectory": "project",
   "functions": {
-    "api/contact.js": { "maxDuration": 10 }
+    "api/**/*.js": { "runtime": "nodejs20.x" }
   }
 }
