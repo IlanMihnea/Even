@@ -2,6 +2,112 @@
    ADMIN.CSS
    ============================================ */
 
+/* ----- Filter bar above tables ----- */
+.admin-filter-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+  margin: 16px 0;
+  padding: 14px;
+  background: var(--gray-50, #f9f9f9);
+  border-radius: 8px;
+}
+.admin-filter-bar input,
+.admin-filter-bar select {
+  padding: 9px 12px;
+  border: 1px solid var(--gray-200, #e5e5e5);
+  border-radius: 6px;
+  font-size: 14px;
+  background: #fff;
+}
+.admin-filter-bar input[type="text"] { flex: 1; min-width: 240px; }
+
+/* ----- Leads table ----- */
+.leads-table tr.lead-new td:first-child {
+  border-left: 3px solid var(--gold, #C8A96E);
+}
+.lead-tip {
+  display: inline-block;
+  padding: 3px 10px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  border-radius: 999px;
+}
+.lead-tip-contact   { background: rgba(122, 155, 146, 0.15); color: #5a8275; }
+.lead-tip-vizionare { background: rgba(200, 169, 110, 0.15); color: #9c7e3f; }
+.lead-tip-oferta    { background: rgba(59, 90, 122, 0.15);  color: #2f4d6a; }
+
+.lead-status-select {
+  padding: 6px 8px;
+  border: 1px solid var(--gray-200, #e5e5e5);
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 500;
+  background: #fff;
+  cursor: pointer;
+}
+.lead-status-select.status-nou                 { background: #fff8e6; border-color: #f0d589; color: #8a6f1f; }
+.lead-status-select.status-contactat           { background: #e8f5fe; border-color: #b6dcfa; color: #2e6699; }
+.lead-status-select.status-vizionare-programata{ background: #f0e9fb; border-color: #d0bdf2; color: #5a3da7; }
+.lead-status-select.status-oferta-trimisa      { background: #fff1e0; border-color: #ffd09a; color: #b06311; }
+.lead-status-select.status-inchis-castigat     { background: #e7f5e8; border-color: #a8d6ad; color: #2c7733; }
+.lead-status-select.status-inchis-pierdut      { background: #f3f3f3; border-color: #d0d0d0; color: #777; }
+
+.leads-badge {
+  display: inline-block;
+  margin-left: 12px;
+  padding: 3px 10px;
+  background: var(--gold, #C8A96E);
+  color: #fff;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+/* ----- Lead detail modal ----- */
+.lead-detail {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 8px 0;
+}
+.lead-detail-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--gray-100, #eee);
+}
+.lead-detail-row:last-child { border-bottom: none; }
+.lead-detail-label {
+  flex: 0 0 130px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--gray-500, #888);
+}
+.lead-detail-val {
+  flex: 1;
+  font-size: 14px;
+  color: var(--midnight, #1C2340);
+}
+.lead-detail-val a { color: var(--midnight, #1C2340); text-decoration: underline; }
+
+/* ----- Stat card extension ----- */
+.stat-card.leads .stat-icon {
+  background: var(--gold, #C8A96E);
+  color: #fff;
+}
+
+/* ----- Modal width for forms (override default) ----- */
+.modal.open { display: flex; }
+
 .imagini-preview {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));

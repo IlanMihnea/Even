@@ -98,8 +98,10 @@ function initProjectsListing() {
 
 // ---------- DETALIU PROIECT ----------
 let unitFilters = {};
+let currentProject = null;
 
 function renderProjectDetail(p) {
+  currentProject = p;
   document.title = `${p.nume} - EVEN`;
 
   document.getElementById('projectHero').innerHTML = `
@@ -314,29 +316,39 @@ async function submitInterest(e, projName) {
   e.preventDefault();
   const form = e.target;
   const inputs = form.querySelectorAll('input, select, textarea');
-  const data = {
+  const projectId = (typeof currentProject !== 'undefined' && currentProject) ? currentProject.id : null;
+  const tipUnitate = inputs[3]?.value || '';
+  const userMesaj = inputs[4]?.value || '';
+  const payload = {
     nume: inputs[0]?.value || '',
     telefon: inputs[1]?.value || '',
     email: inputs[2]?.value || '',
-    subiect: inputs[3]?.value || '',
-    mesaj: inputs[4]?.value || '',
-    kind: 'project_interest',
-    project_name: projName,
-    source_url: window.location.href
+    mesaj: `Interes proiect: ${projName}${tipUnitate ? ' · Tip unitate: ' + tipUnitate : ''}${userMesaj ? '\n\n' + userMesaj : ''}`,
+    project_id: projectId,
+    tip: 'oferta',
+    sursa: 'website'
   };
+  const btn = form.querySelector('button[type="submit"]');
+  if (btn) { btn.disabled = true; btn.dataset.orig = btn.innerHTML; btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Se trimite...'; }
   try {
-    if (typeof _supabase !== 'undefined') {
-      await _supabase.from('lead_requests').insert(data);
-    } else throw new Error();
+    const res = await fetch('/api/leads', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    if (!res.ok) throw new Error('server');
+    form.reset();
+    alert(`Mulțumim! Cererea pentru ${projName} a ajuns la noi. Te contactăm în maxim 24 de ore.`);
   } catch {
     try {
       const queue = JSON.parse(localStorage.getItem('even_lead_queue') || '[]');
-      queue.push({ ...data, created_at: new Date().toISOString() });
+      queue.push({ ...payload, created_at: new Date().toISOString() });
       localStorage.setItem('even_lead_queue', JSON.stringify(queue));
     } catch (_) {}
+    alert(`Nu am putut trimite cererea automat. Sună-ne la 0745 609 366 sau scrie-ne la ilan@even-imobiliare.ro.`);
+  } finally {
+    if (btn) { btn.disabled = false; btn.innerHTML = btn.dataset.orig || 'Trimite cererea'; }
   }
-  form.reset();
-  alert(`Mulțumim! Cererea pentru ${projName} a ajuns la noi. Te contactăm în maxim 24 de ore.`);
 }
 
 document.addEventListener('DOMContentLoaded', async () => {

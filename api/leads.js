@@ -106,6 +106,13 @@ module.exports = async function handler(req, res) {
 
   const tipLabel = TIP_LABELS[tip] || tip;
 
+  // Skip email if Resend not configured (lead is still saved → return success)
+  if (!process.env.RESEND_API_KEY) {
+    console.warn('RESEND_API_KEY not set — skipping email notification.');
+    return res.status(201).json({ ok: true, lead_id: lead.id, email_sent: false });
+  }
+
+  const FROM = process.env.RESEND_FROM || 'EVEN <onboarding@resend.dev>';
   const emailRes = await fetch('https://api.resend.com/emails', {
     method: 'POST',
     headers: {
@@ -113,7 +120,7 @@ module.exports = async function handler(req, res) {
       'Content-Type': 'application/json'
     },
     body: JSON.stringify({
-      from: 'EVEN <noreply@even.ro>',
+      from: FROM,
       to: recipients,
       reply_to: email,
       subject: `[EVEN] ${tipLabel}${titluProprietate ? ' — ' + titluProprietate : ''}`,

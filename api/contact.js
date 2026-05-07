@@ -4,6 +4,7 @@ module.exports = async function handler(req, res) {
   const { nume, email, telefon, subiect, mesaj } = req.body || {};
   if (!email || !mesaj) return res.status(400).json({ error: 'Câmpuri obligatorii lipsesc' });
 
+  const FROM = process.env.RESEND_FROM || 'EVEN <onboarding@resend.dev>';
   const r = await fetch('https://api.resend.com/emails', {
     method: 'POST',
     headers: {
@@ -11,7 +12,7 @@ module.exports = async function handler(req, res) {
       'Content-Type': 'application/json'
     },
     body: JSON.stringify({
-      from: 'EVEN <noreply@even.ro>',
+      from: FROM,
       to: [process.env.OWNER_EMAIL],
       reply_to: email,
       subject: `[EVEN] ${subiect || 'Contact nou'}`,

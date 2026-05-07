@@ -730,35 +730,37 @@ async function submitVizionare(e) {
   const btn = form.querySelector('button[type="submit"]');
   const data = Object.fromEntries(new FormData(form));
   const payload = {
-    kind: 'vizionare',
     nume: data.nume,
     email: data.email,
     telefon: data.telefon,
-    mesaj: data.mesaj || null,
+    mesaj: data.mesaj || `Cerere vizionare pentru: ${currentProperty?.titlu || 'proprietate'}`,
     property_id: currentProperty?.id || null,
-    source_url: window.location.href
+    agent_id: currentProperty?.agent?.id || null,
+    tip: 'vizionare',
+    sursa: 'website'
   };
 
   if (btn) { btn.disabled = true; btn.dataset.origLabel = btn.textContent; btn.textContent = 'Se trimite...'; }
 
   try {
-    if (typeof _supabase !== 'undefined') {
-      const { error } = await _supabase.from('lead_requests').insert(payload);
-      if (error) throw error;
-    } else {
-      throw new Error('no supabase');
+    const res = await fetch('/api/leads', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    if (!res.ok) {
+      const j = await res.json().catch(() => ({}));
+      throw new Error(j.error || 'Eroare server');
     }
     form.reset();
     showToast('Cererea a ajuns la Ilan.', 'Răspuns în maxim 2 ore lucrătoare. Te contactăm la telefonul indicat.');
   } catch (err) {
-    // Fallback: queue locally so nothing is lost
     try {
       const queue = JSON.parse(localStorage.getItem('even_lead_queue') || '[]');
       queue.push({ ...payload, created_at: new Date().toISOString() });
       localStorage.setItem('even_lead_queue', JSON.stringify(queue));
     } catch (_) {}
-    form.reset();
-    showToast('Mesajul a fost înregistrat.', 'Te contactăm în scurt timp.');
+    showToast('Trimitere automată indisponibilă.', 'Sună-ne direct la 0745 609 366.');
   } finally {
     if (btn) { btn.disabled = false; btn.textContent = btn.dataset.origLabel || 'Trimite cererea'; }
   }

@@ -213,37 +213,39 @@
       feedback.classList.remove('is-error', 'is-success');
       feedback.style.display = 'none';
 
+      const payload = {
+        nume: data.nume,
+        email: data.email,
+        telefon: data.telefon || null,
+        mesaj: `${data.subiect ? '[' + data.subiect + ']\n\n' : ''}${data.mesaj || ''}`,
+        tip: 'contact',
+        sursa: 'website'
+      };
+
       try {
-        // Try Supabase insert first
-        if (typeof _supabase !== 'undefined') {
-          const { error } = await _supabase.from('lead_requests').insert({
-            kind: 'contact',
-            nume: data.nume,
-            email: data.email,
-            telefon: data.telefon || null,
-            subiect: data.subiect,
-            mesaj: data.mesaj,
-            property_id: null
-          });
-          if (error) throw error;
-        } else {
-          throw new Error('no supabase');
+        const res = await fetch('/api/leads', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        if (!res.ok) {
+          const j = await res.json().catch(() => ({}));
+          throw new Error(j.error || 'Eroare server');
         }
         feedback.classList.add('is-success');
         feedback.style.display = 'block';
         feedback.textContent = 'Mulțumesc! Te contactez în maxim 2 ore lucrătoare.';
         form.reset();
       } catch (err) {
-        // Fallback: local queue + email link
+        // Fallback: local queue (so nothing is lost) + show error
         try {
           const queue = JSON.parse(localStorage.getItem('even_lead_queue') || '[]');
-          queue.push({ ...data, kind: 'contact', created_at: new Date().toISOString() });
+          queue.push({ ...payload, created_at: new Date().toISOString() });
           localStorage.setItem('even_lead_queue', JSON.stringify(queue));
         } catch (_) {}
-        feedback.classList.add('is-success');
+        feedback.classList.add('is-error');
         feedback.style.display = 'block';
-        feedback.textContent = 'Mesajul tău a fost înregistrat. Te contactez în scurt timp.';
-        form.reset();
+        feedback.innerHTML = 'Nu am putut trimite mesajul automat. Te rog scrie-mi direct: <a href="mailto:ilan@even-imobiliare.ro?subject=' + encodeURIComponent(data.subiect || 'Contact') + '&body=' + encodeURIComponent(data.mesaj || '') + '">ilan@even-imobiliare.ro</a> sau <a href="tel:0745609366">0745 609 366</a>.';
       } finally {
         btn.disabled = false;
         btn.innerHTML = '<span>Trimite mesajul</span><i class="fa-solid fa-arrow-right"></i>';

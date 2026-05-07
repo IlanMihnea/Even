@@ -190,6 +190,45 @@ async function deleteAgent(id) {
   if (error) throw error;
 }
 
+// ---------- ADMIN: LEADS ----------
+
+async function getAllLeads(filter = {}) {
+  let q = _supabase.from('leads')
+    .select('*, properties(titlu, categorie), projects(nume), agents(nume, email)')
+    .order('created_at', { ascending: false });
+  if (filter.status) q = q.eq('status', filter.status);
+  if (filter.tip) q = q.eq('tip', filter.tip);
+  const { data, error } = await q;
+  if (error) throw error;
+  return data || [];
+}
+
+async function updateLeadStatus(id, status, note = null) {
+  const patch = { status };
+  if (note != null) patch.note = note;
+  const { error } = await _supabase.from('leads').update(patch).eq('id', id);
+  if (error) throw error;
+}
+
+async function deleteLead(id) {
+  const { error } = await _supabase.from('leads').delete().eq('id', id);
+  if (error) throw error;
+}
+
+async function getProjectByIdAdmin(id) {
+  const { data, error } = await _supabase
+    .from('projects').select('*').eq('id', id).single();
+  if (error) return null;
+  return data;
+}
+
+async function getAllProjectsAdmin() {
+  const { data, error } = await _supabase
+    .from('projects').select('*').order('created_at', { ascending: false });
+  if (error) throw error;
+  return data || [];
+}
+
 // ---------- STORAGE: property images ----------
 
 const PROPERTY_IMAGES_BUCKET = 'property-images';
