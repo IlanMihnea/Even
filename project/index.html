@@ -1,15 +1,25 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="ro">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>EVEN — Agenție imobiliară premium București</title>
+  <title>EVEN — Imobiliare cu plan · București</title>
+  <meta name="description" content="Imobiliare cu plan. Vânzare și închiriere apartamente, comerciale și terenuri în București. Strategie înainte de listare. Doar ce merită vizitat.">
+  <link rel="canonical" href="https://even-imobiliare.ro/">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="EVEN — Imobiliare cu plan">
+  <meta property="og:description" content="Strategie înainte de listare. Doar ce merită vizitat.">
+  <meta property="og:locale" content="ro_RO">
+  <meta property="og:site_name" content="EVEN">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="theme-color" content="#1C2340">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500;1,600&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   <link rel="stylesheet" href="css/main.css">
   <link rel="stylesheet" href="css/animations.css">
+  <link rel="stylesheet" href="css/listings.css">
   <link rel="stylesheet" href="css/homepage.css">
   <link rel="stylesheet" href="css/projects.css">
 </head>
@@ -17,303 +27,474 @@
 
   <header id="navbar" class="navbar"></header>
 
+  <!-- BACKGROUND ATMOSPHERE -->
+  <div class="hp-bg-grain" aria-hidden="true"></div>
+  <div class="hp-bg-light" aria-hidden="true"></div>
+
   <!-- =========================================
-       HERO
+       MASTHEAD
        ========================================= -->
-  <section class="hero">
-    <div class="hero-video-bg">
+  <section class="hp-masthead" aria-label="Issue masthead">
+    <div class="hp-masthead-inner">
+      <span class="hp-mast-mark">— Ediția curentă —</span>
+      <span class="hp-mast-title">Even · Acasă</span>
+      <span class="hp-mast-edition">București · MMXXVI</span>
+    </div>
+  </section>
+
+  <!-- =========================================
+       HERO — video bg, editorial overlay
+       ========================================= -->
+  <section class="hp-hero">
+
+    <div class="hp-hero-video" aria-hidden="true">
       <video id="heroVideo" autoplay loop muted playsinline preload="auto">
         <source src="design/landscape.mp4" type="video/mp4">
       </video>
-      <div class="hero-video-overlay"></div>
+      <div class="hp-hero-scrim"></div>
+      <div class="hp-hero-vignette"></div>
     </div>
-    <div class="container hero-container">
 
-      <div class="hero-left">
-        <p class="hero-eyebrow hero-enter hero-enter-1">
-          <span class="eyebrow-line"></span>
-          Agenție imobiliară · București
+    <div class="hp-hero-grid">
+
+      <div class="hp-hero-text">
+        <p class="hp-eyebrow hp-eyebrow-light hp-enter hp-enter-1">
+          <span class="hp-eyebrow-rule"></span>
+          <span>Imobiliare cu plan · București</span>
         </p>
-        <h1 class="hero-enter hero-enter-2">
-          Casa ta <em>perfectă</em><br>te așteaptă.
+        <h1 class="hp-hero-h1 hp-enter hp-enter-2">
+          <span class="hp-hero-line"><span class="hp-dropcap">C</span>asa ta</span>
+          <span class="hp-hero-line"><em>perfectă</em></span>
+          <span class="hp-hero-line">te așteaptă.</span>
         </h1>
-        <p class="hero-desc hero-enter hero-enter-3">
+        <p class="hp-hero-lede hp-enter hp-enter-3">
           Proprietăți rezidențiale, comerciale, terenuri și ansambluri noi —
-          verificate, prezentate onest. Fără surprize.
+          verificate, prezentate <em>onest</em>. Fără surprize.
         </p>
-        <div class="hero-actions hero-enter hero-enter-4">
-          <a href="listings-rezidential.html" class="btn btn-primary btn-pill">
-            Caută proprietăți
+        <div class="hp-hero-actions hp-enter hp-enter-4">
+          <a href="listings-rezidential.html" class="hp-btn hp-btn-primary">
+            <span>Caută proprietăți</span>
+            <i class="fa-solid fa-arrow-right"></i>
           </a>
-          <a href="contact.html" class="btn btn-ghost-dark btn-pill">
-            Vorbește cu un agent <i class="fa-solid fa-arrow-right"></i>
+          <a href="contact.html" class="hp-btn hp-btn-ghost">
+            <span>Vorbește cu un agent</span>
           </a>
         </div>
-        <div class="hero-trust hero-enter hero-enter-5">
-          <div class="hero-trust-item">
-            <span class="trust-num">50+</span>
-            <span class="trust-label">tranzacții finalizate</span>
+        <div class="hp-hero-trust hp-enter hp-enter-5">
+          <div class="hp-trust-item">
+            <span class="hp-trust-num">50<small>+</small></span>
+            <span class="hp-trust-label">Tranzacții finalizate</span>
           </div>
-          <div class="hero-trust-divider"></div>
-          <div class="hero-trust-item">
-            <span class="trust-num">3</span>
-            <span class="trust-label">ani de activitate</span>
+          <div class="hp-trust-rule" aria-hidden="true"></div>
+          <div class="hp-trust-item">
+            <span class="hp-trust-num">3</span>
+            <span class="hp-trust-label">Ani de activitate</span>
           </div>
         </div>
       </div>
 
-      <div class="hero-right hero-enter hero-enter-3">
-        <img src="design/logomark-even.svg" class="hero-logomark" alt="">
-        <div class="hero-card-float">
-          <div class="hero-card-inner">
-            <div class="hero-card-tag">Proprietate recomandată</div>
-            <div class="hero-card-title">Apartament 3 cam. Herăstrău</div>
-            <div class="hero-card-price">185.000 €</div>
-            <div class="hero-card-meta">
-              <span><i class="fa-solid fa-vector-square"></i> 82 mp</span>
-              <span><i class="fa-solid fa-bed"></i> 3 cam.</span>
-              <span><i class="fa-solid fa-location-dot"></i> Herăstrău</span>
+      <aside class="hp-hero-feature hp-enter hp-enter-3" aria-label="Selecție recomandată">
+        <div class="hp-feature-card">
+          <div class="hp-feature-eyebrow">
+            <span>Selecție · Nº 042</span>
+            <span class="hp-feature-mark">●</span>
+          </div>
+          <div class="hp-feature-image" role="img" aria-label="Apartament Herăstrău">
+            <span class="hp-feature-tag">Apartament · 3 camere</span>
+          </div>
+          <div class="hp-feature-body">
+            <h3 class="hp-feature-title">Vedere către parc.<br>Lumină de <em>dimineață</em>.</h3>
+            <div class="hp-feature-meta">
+              <span><i class="fa-solid fa-vector-square"></i>82 m²</span>
+              <span class="hp-meta-rule"></span>
+              <span><i class="fa-solid fa-bed"></i>3 cam.</span>
+              <span class="hp-meta-rule"></span>
+              <span><i class="fa-solid fa-location-dot"></i>Herăstrău</span>
+            </div>
+            <div class="hp-feature-foot">
+              <span class="hp-feature-price">185.000 €</span>
+              <span class="hp-feature-cta">Detalii <i class="fa-solid fa-arrow-up-right-from-square"></i></span>
             </div>
           </div>
         </div>
-      </div>
+      </aside>
 
     </div>
+
   </section>
 
-  <!-- =========================================
-       SEARCH STRIP
-       ========================================= -->
-  <div class="search-strip">
-    <div class="container">
-      <div class="search-strip-inner">
-        <div class="flux-tabs">
-          <button class="flux-tab active" data-flux="rezidential">
-            <i class="fa-solid fa-home"></i> Rezidențial
-          </button>
-          <button class="flux-tab" data-flux="comercial">
-            <i class="fa-solid fa-building"></i> Comercial
-          </button>
-          <button class="flux-tab" data-flux="terenuri">
-            <i class="fa-solid fa-map"></i> Terenuri
-          </button>
-          <button class="flux-tab" data-flux="proiecte">
-            <i class="fa-solid fa-city"></i> Proiecte Noi
-          </button>
-        </div>
-        <div class="flux-filters" id="fluxFilters"></div>
-      </div>
-    </div>
+  <!-- Section mark (3 stones) -->
+  <div class="hp-section-mark" aria-hidden="true">
+    <span class="hp-stones">
+      <span class="hp-stone hp-stone-top"></span>
+      <span class="hp-stone hp-stone-mid"></span>
+      <span class="hp-stone hp-stone-base"></span>
+    </span>
   </div>
 
   <!-- =========================================
-       PROPRIETĂȚI RECOMANDATE
+       Nº I — CATALOG (search strip)
        ========================================= -->
-  <section class="section-featured">
-    <div class="container">
-      <div class="section-header reveal">
-        <div>
-          <span class="section-tag">Selecție editorială</span>
-          <h2 class="section-title">Proprietăți recomandate</h2>
+  <section class="hp-chapter hp-catalog" data-reveal>
+    <header class="hp-chapter-head">
+      <span class="hp-eyebrow">— Nº I — Caută în catalog</span>
+      <h2 class="hp-chapter-h2">Patru categorii.<br>Un singur <em>standard</em>.</h2>
+    </header>
+
+    <div class="hp-catalog-card">
+      <div class="hp-catalog-tabs" role="tablist">
+        <button class="flux-tab active" data-flux="rezidential" role="tab">
+          <span class="hp-tab-num">I</span>
+          <span class="hp-tab-label">Rezidențial</span>
+        </button>
+        <button class="flux-tab" data-flux="comercial" role="tab">
+          <span class="hp-tab-num">II</span>
+          <span class="hp-tab-label">Comercial</span>
+        </button>
+        <button class="flux-tab" data-flux="terenuri" role="tab">
+          <span class="hp-tab-num">III</span>
+          <span class="hp-tab-label">Terenuri</span>
+        </button>
+        <button class="flux-tab" data-flux="proiecte" role="tab">
+          <span class="hp-tab-num">IV</span>
+          <span class="hp-tab-label">Proiecte noi</span>
+        </button>
+      </div>
+      <div class="hp-catalog-rule" aria-hidden="true"></div>
+      <div class="hp-catalog-filters flux-filters" id="fluxFilters"></div>
+    </div>
+  </section>
+
+  <!-- Section mark -->
+  <div class="hp-section-mark" aria-hidden="true">
+    <span class="hp-stones">
+      <span class="hp-stone hp-stone-top"></span>
+      <span class="hp-stone hp-stone-mid"></span>
+      <span class="hp-stone hp-stone-base"></span>
+    </span>
+  </div>
+
+  <!-- =========================================
+       Nº II — SELECȚIE EDITORIALĂ (featured)
+       ========================================= -->
+  <section class="hp-chapter hp-featured" data-reveal>
+    <header class="hp-chapter-head hp-chapter-head-row">
+      <div>
+        <span class="hp-eyebrow">— Nº II — Curatoriere</span>
+        <h2 class="hp-chapter-h2">Selecție <em>editorială</em>.</h2>
+        <p class="hp-chapter-lede">Patru proprietăți alese pentru calitate, nu pentru volum.</p>
+      </div>
+      <a href="listings-rezidential.html" class="hp-link-arrow">
+        <span>Vezi toate</span>
+        <i class="fa-solid fa-arrow-right"></i>
+      </a>
+    </header>
+    <div class="featured-grid hp-featured-grid" id="featuredGrid"></div>
+  </section>
+
+  <!-- Section mark -->
+  <div class="hp-section-mark" aria-hidden="true">
+    <span class="hp-stones">
+      <span class="hp-stone hp-stone-top"></span>
+      <span class="hp-stone hp-stone-mid"></span>
+      <span class="hp-stone hp-stone-base"></span>
+    </span>
+  </div>
+
+  <!-- =========================================
+       Nº III — FILOSOFIE (why)
+       ========================================= -->
+  <section class="hp-chapter hp-philosophy">
+
+    <header class="hp-chapter-head" data-reveal>
+      <span class="hp-eyebrow">— Nº III — Filosofie</span>
+      <h2 class="hp-chapter-h2">Imobiliare cu <em>semnătură</em>.</h2>
+      <p class="hp-chapter-lede">
+        Nu suntem o platformă de anunțuri. Suntem consilieri care trăiesc piața,
+        cunosc fiecare zonă din interior și înțeleg că decizia ta merită mai mult
+        decât un click și o broșură.
+      </p>
+    </header>
+
+    <article class="hp-principle" data-reveal>
+      <div class="hp-principle-numeral" aria-hidden="true">I</div>
+      <div class="hp-principle-body">
+        <h3 class="hp-principle-title">Strategie înaintea anunțului</h3>
+        <div class="hp-principle-text">
+          <p>Nu listăm o proprietate fără un plan. Fiecare imobil primește o strategie de poziționare calculată și creativă, adaptată pieței de moment.</p>
+          <p>Plan, nu anunț. Strategie, nu speranță. Cifre înainte de promisiuni.</p>
         </div>
-        <a href="listings-rezidential.html" class="btn btn-outline btn-pill section-header-cta">
-          Vezi toate <i class="fa-solid fa-arrow-right"></i>
+      </div>
+      <aside class="hp-principle-pull" aria-hidden="true">
+        <span class="hp-pull-mark">&ldquo;</span>
+        <p>Plan,<br>nu <em>anunț</em>.</p>
+      </aside>
+    </article>
+
+    <article class="hp-principle" data-reveal>
+      <div class="hp-principle-numeral" aria-hidden="true">II</div>
+      <div class="hp-principle-body">
+        <h3 class="hp-principle-title">Evaluare corectă</h3>
+        <div class="hp-principle-text">
+          <p>Prețul cerut se bazează pe date reale de piață, nu pe speranțe. Evaluăm corect ca să vindem sau să închiriem rapid, la valoarea justă.</p>
+          <p>Comparabile reale, citate. Negocieri sustenabile, nu cosmetice.</p>
+        </div>
+      </div>
+      <aside class="hp-principle-pull" aria-hidden="true">
+        <span class="hp-pull-mark">&ldquo;</span>
+        <p>Date,<br>nu <em>speranțe</em>.</p>
+      </aside>
+    </article>
+
+    <article class="hp-principle" data-reveal>
+      <div class="hp-principle-numeral" aria-hidden="true">III</div>
+      <div class="hp-principle-body">
+        <h3 class="hp-principle-title">Promptitudine și profesionalism</h3>
+        <div class="hp-principle-text">
+          <p>Răspundem rapid la orice solicitare și suntem prezenți activ în fiecare etapă — de la prima discuție până la semnătura la notar.</p>
+          <p>Nu lăsăm o proprietate fără atenție. Disponibili, fără să fim insistenți.</p>
+        </div>
+      </div>
+      <aside class="hp-principle-pull" aria-hidden="true">
+        <span class="hp-pull-mark">&ldquo;</span>
+        <p>Prezenți.<br>Fără <em>presiune</em>.</p>
+      </aside>
+    </article>
+
+    <div class="hp-philosophy-cta" data-reveal>
+      <a href="about.html" class="hp-btn hp-btn-primary">
+        <span>Despre EVEN</span>
+        <i class="fa-solid fa-arrow-right"></i>
+      </a>
+    </div>
+
+  </section>
+
+  <!-- Section mark -->
+  <div class="hp-section-mark" aria-hidden="true">
+    <span class="hp-stones">
+      <span class="hp-stone hp-stone-top"></span>
+      <span class="hp-stone hp-stone-mid"></span>
+      <span class="hp-stone hp-stone-base"></span>
+    </span>
+  </div>
+
+  <!-- =========================================
+       Nº IV — PROIECTE
+       ========================================= -->
+  <section class="hp-chapter hp-projects" data-reveal>
+    <header class="hp-chapter-head hp-chapter-head-row">
+      <div>
+        <span class="hp-eyebrow">— Nº IV — Ansambluri</span>
+        <h2 class="hp-chapter-h2">Proiecte rezidențiale <em>noi</em>.</h2>
+        <p class="hp-chapter-lede">Dezvoltări selectate, livrare și progres urmărite în timp real.</p>
+      </div>
+      <a href="projects.html" class="hp-link-arrow">
+        <span>Vezi toate</span>
+        <i class="fa-solid fa-arrow-right"></i>
+      </a>
+    </header>
+    <div class="projects-grid-home hp-projects-grid" id="projectsHomeGrid"></div>
+  </section>
+
+  <!-- Section mark -->
+  <div class="hp-section-mark" aria-hidden="true">
+    <span class="hp-stones">
+      <span class="hp-stone hp-stone-top"></span>
+      <span class="hp-stone hp-stone-mid"></span>
+      <span class="hp-stone hp-stone-base"></span>
+    </span>
+  </div>
+
+  <!-- =========================================
+       Nº V — CUM LUCRĂM (process)
+       ========================================= -->
+  <section class="hp-chapter hp-process">
+
+    <header class="hp-chapter-head" data-reveal>
+      <span class="hp-eyebrow">— Nº V — Cum lucrăm</span>
+      <h2 class="hp-chapter-h2">Patru pași.<br>Un singur <em>obiectiv</em>.</h2>
+      <p class="hp-chapter-lede">Cheia în mâna ta — fără ocoluri, fără pași extra.</p>
+    </header>
+
+    <ol class="hp-process-track" data-reveal>
+
+      <li class="hp-process-step">
+        <span class="hp-process-num">01</span>
+        <h3 class="hp-process-title">Cauți</h3>
+        <p class="hp-process-desc">Folosești filtrele noastre sau ne spui direct ce vrei. Trimitem selecția personalizată în maxim 2 ore.</p>
+      </li>
+
+      <li class="hp-process-step">
+        <span class="hp-process-num">02</span>
+        <h3 class="hp-process-title">Vizionezi</h3>
+        <p class="hp-process-desc">Organizăm vizionările, îți explicăm fiecare detaliu și oferim evaluarea noastră sinceră.</p>
+      </li>
+
+      <li class="hp-process-step">
+        <span class="hp-process-num">03</span>
+        <h3 class="hp-process-title">Negociezi</h3>
+        <p class="hp-process-desc">Negociem în locul tău, pregătim documentele și te însoțim la notar. Zero surprize.</p>
+      </li>
+
+      <li class="hp-process-step">
+        <span class="hp-process-num">04</span>
+        <h3 class="hp-process-title">Te muți</h3>
+        <p class="hp-process-desc">Cheia în mână. Rămânem disponibili și după tranzacție pentru orice ai nevoie.</p>
+      </li>
+
+    </ol>
+
+  </section>
+
+  <!-- =========================================
+       Nº VI — ÎN CIFRE (stats, dark band)
+       ========================================= -->
+  <section class="hp-figures">
+    <div class="hp-figures-frame" data-reveal>
+      <span class="hp-eyebrow hp-eyebrow-light">— Nº VI — În cifre</span>
+      <h2 class="hp-figures-h2">
+        Trei ani.<br>
+        Strategie, nu <em>simple anunțuri</em>.
+      </h2>
+      <p class="hp-figures-lede">
+        Fiecare proprietate cu care lucrăm primește un plan de vânzare sau închiriere —
+        calculat, creativ și adaptat pieței.
+      </p>
+
+      <div class="hp-figures-grid">
+
+        <div class="hp-figure">
+          <div class="hp-figure-row">
+            <span class="hp-figure-num" data-target="50">0</span>
+            <span class="hp-figure-plus">+</span>
+          </div>
+          <span class="hp-figure-label">Tranzacții finalizate</span>
+        </div>
+
+        <div class="hp-figure-rule" aria-hidden="true"></div>
+
+        <div class="hp-figure">
+          <div class="hp-figure-row">
+            <span class="hp-figure-num" data-target="3">0</span>
+          </div>
+          <span class="hp-figure-label">Ani de activitate</span>
+        </div>
+
+      </div>
+
+      <p class="hp-figures-note">București · 2023 — 2026</p>
+
+      <a href="about.html" class="hp-btn hp-btn-gold">
+        <span>Despre EVEN</span>
+        <i class="fa-solid fa-arrow-right"></i>
+      </a>
+    </div>
+  </section>
+
+  <!-- =========================================
+       Nº VII — VOCI (testimonials)
+       ========================================= -->
+  <section class="hp-chapter hp-voices">
+
+    <header class="hp-chapter-head" data-reveal>
+      <span class="hp-eyebrow">— Nº VII — Voci</span>
+      <h2 class="hp-chapter-h2">Oameni mulțumiți.<br>Povești <em>adevărate</em>.</h2>
+    </header>
+
+    <div class="hp-voices-grid">
+
+      <article class="hp-voice hp-voice-lg" data-reveal>
+        <span class="hp-voice-mark">&ldquo;</span>
+        <blockquote class="hp-voice-text">
+          Am apelat la Ilan de două ori. Este o persoană foarte calmă, organizată,
+          ascultă nevoile clientului și se documentează cu ceea ce i se cere.
+          <em>Îl recomand cu toată căldura.</em>
+        </blockquote>
+        <footer class="hp-voice-author">
+          <span class="hp-voice-line"></span>
+          <span class="hp-voice-name">Ioana-Alina Vlad</span>
+        </footer>
+      </article>
+
+      <article class="hp-voice" data-reveal>
+        <span class="hp-voice-mark">&ldquo;</span>
+        <blockquote class="hp-voice-text">
+          Recomand 100%. Am colaborat foarte bine cu Ilan și Cristian în tot procesul de
+          cumpărare. Ilan mi-a răspuns foarte rapid la toate întrebările și m-a ajutat și
+          în comunicarea cu vânzătorul și notarul.
+        </blockquote>
+        <footer class="hp-voice-author">
+          <span class="hp-voice-line"></span>
+          <span class="hp-voice-name">Vali Călinescu</span>
+        </footer>
+      </article>
+
+      <article class="hp-voice" data-reveal>
+        <span class="hp-voice-mark">&ldquo;</span>
+        <blockquote class="hp-voice-text">
+          Am colaborat foarte bine cu Ilan și Cristian. Ilan ne-a răspuns foarte prompt
+          la toate întrebările avute și a fost foarte implicat în tot procesul de
+          cumpărare al apartamentului.
+        </blockquote>
+        <footer class="hp-voice-author">
+          <span class="hp-voice-line"></span>
+          <span class="hp-voice-name">Teodora Hușanu</span>
+        </footer>
+      </article>
+
+      <article class="hp-voice hp-voice-lg" data-reveal>
+        <span class="hp-voice-mark">&ldquo;</span>
+        <blockquote class="hp-voice-text">
+          Pentru prima dată am reușit să fiu impresionată de serviciile unei agenții
+          imobiliare. Domnul Ilan a fost foarte atent la toate cerințele și
+          întrebările noastre și ne-a ajutat să ne <em>găsim locuința ideală</em>.
+        </blockquote>
+        <footer class="hp-voice-author">
+          <span class="hp-voice-line"></span>
+          <span class="hp-voice-name">Cristina T.</span>
+        </footer>
+      </article>
+
+    </div>
+
+  </section>
+
+  <!-- =========================================
+       LETTER / CTA
+       ========================================= -->
+  <section class="hp-letter">
+    <div class="hp-letter-inner" data-reveal>
+
+      <span class="hp-eyebrow">— Hai să vorbim</span>
+
+      <h2 class="hp-letter-h2">
+        Găsim. Tu <em>alegi</em>.<br>
+        Noi livrăm.
+      </h2>
+
+      <p class="hp-letter-body">
+        Vorbește cu un agent EVEN azi. Fără comisioane ascunse, fără presiune —
+        un singur plan, calibrat pe ce ai nevoie.
+      </p>
+
+      <div class="hp-letter-actions">
+        <a href="contact.html" class="hp-btn hp-btn-primary">
+          <i class="fa-solid fa-phone"></i>
+          <span>Contactează un agent</span>
+        </a>
+        <a href="listings-rezidential.html" class="hp-btn hp-btn-ghost">
+          <span>Caută proprietăți</span>
+          <i class="fa-solid fa-arrow-right"></i>
         </a>
       </div>
-      <div class="featured-grid" id="featuredGrid"></div>
-    </div>
-  </section>
 
-  <!-- =========================================
-       DE CE EVEN
-       ========================================= -->
-  <section class="section-why">
-    <div class="container">
-      <div class="why-grid">
-        <div class="why-left reveal-left">
-          <span class="section-tag">Filosofia noastră</span>
-          <h2 class="why-title">Imobiliare cu <em>semnătură</em>.</h2>
-          <p class="why-body">
-            Nu suntem o platformă de anunțuri. Suntem consilieri care trăiesc
-            piața, cunosc fiecare zonă din interior și înțeleg că decizia ta
-            merită mai mult decât un click și o broșură.
-          </p>
-          <a href="about.html" class="btn btn-primary btn-pill">
-            Despre noi <i class="fa-solid fa-arrow-right"></i>
-          </a>
-        </div>
-        <div class="why-right reveal-right">
-          <div class="why-feature">
-            <div class="why-feature-num">01</div>
-            <div class="why-feature-text">
-              <h3>Strategie înaintea anunțului</h3>
-              <p>Nu listăm o proprietate fără un plan. Fiecare imobil primește o strategie de poziționare calculată și creativă, adaptată pieței de moment.</p>
-            </div>
-          </div>
-          <div class="why-feature">
-            <div class="why-feature-num">02</div>
-            <div class="why-feature-text">
-              <h3>Evaluare corectă a proprietății</h3>
-              <p>Prețul cerut se bazează pe date reale de piată, nu pe speranțe. Evaluăm corect ca să vindem sau să închiriem rapid, la valoarea justă.</p>
-            </div>
-          </div>
-          <div class="why-feature">
-            <div class="why-feature-num">03</div>
-            <div class="why-feature-text">
-              <h3>Promptitudine și profesionalism</h3>
-              <p>Răspundem rapid la orice solicitare și suntem prezenți activ în fiecare etapă — de la prima discuție până la semnătura la notar.</p>
-            </div>
-          </div>
-        </div>
+      <div class="hp-letter-foot">
+        <span class="hp-foot-line"></span>
+        <span class="hp-foot-text">Even · Imobiliare cu plan</span>
+        <span class="hp-foot-line"></span>
       </div>
-    </div>
-  </section>
 
-  <!-- =========================================
-       PROIECTE NOI
-       ========================================= -->
-  <section class="section-projects">
-    <div class="container">
-      <div class="section-header reveal">
-        <div>
-          <span class="section-tag">Proiecte noi</span>
-          <h2 class="section-title">Ansambluri rezidențiale</h2>
-        </div>
-        <a href="projects.html" class="btn btn-outline btn-pill section-header-cta">
-          Vezi toate <i class="fa-solid fa-arrow-right"></i>
-        </a>
-      </div>
-      <div class="projects-grid-home" id="projectsHomeGrid"></div>
-    </div>
-  </section>
-
-  <!-- =========================================
-       CUM FUNCȚIONEAZĂ
-       ========================================= -->
-  <section class="section-process">
-    <div class="container">
-      <div class="text-center reveal">
-        <span class="section-tag">Simplu de la start</span>
-        <h2 class="section-title">Cum funcționează</h2>
-        <p class="section-subtitle">Patru pași. Un singur obiectiv: cheia în mâna ta.</p>
-      </div>
-      <div class="process-steps">
-        <div class="process-step reveal reveal-delay-1">
-          <div class="process-num-wrap"><div class="process-num">01</div></div>
-          <h3 class="process-title">Cauți</h3>
-          <p class="process-desc">Folosești filtrele noastre sau ne spui direct ce vrei. Trimitem selecția personalizată în maxim 2 ore.</p>
-        </div>
-        <div class="process-step reveal reveal-delay-2">
-          <div class="process-num-wrap"><div class="process-num">02</div></div>
-          <h3 class="process-title">Vizionezi</h3>
-          <p class="process-desc">Organizăm vizionările, îți explicăm fiecare detaliu și oferim evaluarea noastră sinceră.</p>
-        </div>
-        <div class="process-step reveal reveal-delay-3">
-          <div class="process-num-wrap"><div class="process-num">03</div></div>
-          <h3 class="process-title">Negociezi</h3>
-          <p class="process-desc">Negociem în locul tău, pregătim documentele și te însoțim la notar. Zero surprize.</p>
-        </div>
-        <div class="process-step reveal reveal-delay-4">
-          <div class="process-num-wrap"><div class="process-num">04</div></div>
-          <h3 class="process-title">Te muți</h3>
-          <p class="process-desc">Cheia în mână. Rămânem disponibili și după tranzacție pentru orice ai nevoie.</p>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- =========================================
-       STATS
-       ========================================= -->
-  <section class="section-intro">
-    <div class="container">
-      <div class="text-center reveal">
-        <h2 class="section-title">3 ani. Strategie,<br>nu simple anunțuri.</h2>
-        <p class="section-subtitle">
-          Fiecare proprietate cu care lucrăm primește un plan de vânzare sau închiriere —
-          calculat, creativ și adaptat pieței de moment.
-        </p>
-      </div>
-      <div class="intro-stats reveal reveal-delay-1">
-        <div class="intro-stat-card">
-          <div class="stat-num">50+</div>
-          <div class="stat-label">Tranzacții finalizate</div>
-        </div>
-        <div class="intro-stat-card">
-          <div class="stat-num">3</div>
-          <div class="stat-label">Ani de activitate</div>
-        </div>
-      </div>
-      <div class="text-center reveal">
-        <a href="about.html" class="btn btn-primary-dark btn-pill">
-          Despre noi <i class="fa-solid fa-arrow-right"></i>
-        </a>
-      </div>
-    </div>
-  </section>
-
-  <!-- =========================================
-       TESTIMONIALE
-       ========================================= -->
-  <section class="section-testimonials">
-    <div class="container">
-      <div class="text-center reveal">
-        <span class="section-tag">Ce spun clienții</span>
-        <h2 class="section-title">Oameni mulțumiți.<br>Povești adevărate.</h2>
-      </div>
-      <div class="testimonials-grid">
-        <div class="testimonial-card reveal reveal-delay-1">
-          <div class="testimonial-quote">"</div>
-          <p class="testimonial-text">Am apelat la Ilan de doua ori. Este o persoana foarte calma, organizata, asculta nevoile clientului si se documenteaza cu ceea ce i se cere. Il recomand cu toata caldura!</p>
-          <div class="testimonial-author">
-            <div class="testimonial-name">Ioana-Alina Vlad</div>
-          </div>
-        </div>
-        <div class="testimonial-card reveal reveal-delay-2">
-          <div class="testimonial-quote">"</div>
-          <p class="testimonial-text">Recomand 100%. Am colaborat foarte bine cu Ilan si Cristian in tot procesul de cumparare al unui apartament. Ilan mi-a raspuns foarte rapid la toate intrebarile si solicitarile de revizionare a apartamentului si m-a ajutat si in procesul de comunicare cu vanzatorul si notarul.</p>
-          <div class="testimonial-author">
-            <div class="testimonial-name">Vali Călinescu</div>
-          </div>
-        </div>
-        <div class="testimonial-card reveal reveal-delay-3">
-          <div class="testimonial-quote">"</div>
-          <p class="testimonial-text">Am colaborat foarte bine cu Ilan si Cristian. Ilan ne-a raspuns foarte prompt la toate intrebarile avute si a fost foarte implicat in tot procesul de cumparare al apartamentului. Recomand!</p>
-          <div class="testimonial-author">
-            <div class="testimonial-name">Teodora Husanu</div>
-          </div>
-        </div>
-        <div class="testimonial-card reveal reveal-delay-4">
-          <div class="testimonial-quote">"</div>
-          <p class="testimonial-text">Pentru prima data am reusit sa fiu impresionata de serviciile unei agentii imobiliare. Domnul Ilan a fost foarte atent la toate cerintele si intrebarile noastre si ne-a ajutat sa ne gasim locuinta ideala. Multumim pentru tot ❤️</p>
-          <div class="testimonial-author">
-            <div class="testimonial-name">Cristinna T.</div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- =========================================
-       CTA BAND
-       ========================================= -->
-  <section class="section-cta-band">
-    <div class="orb-cta orb-cta-1"></div>
-    <div class="orb-cta orb-cta-2"></div>
-    <div class="container">
-      <div class="cta-band-content reveal">
-        <div class="cta-band-tag">Gata să începi?</div>
-        <h2 class="cta-band-title">Găsim. Tu <em>alegi</em>.<br>Noi livrăm.</h2>
-        <p class="cta-band-sub">Vorbește cu un agent EVEN azi. Fără comisioane ascunse, fără presiune.</p>
-        <div class="cta-band-actions">
-          <a href="contact.html" class="btn btn-primary-dark btn-pill">
-            <i class="fa-solid fa-phone"></i> Contactează un agent
-          </a>
-          <a href="listings-rezidential.html" class="btn btn-outline-light btn-pill">
-            Caută proprietăți <i class="fa-solid fa-arrow-right"></i>
-          </a>
-        </div>
-      </div>
     </div>
   </section>
 
@@ -323,5 +504,40 @@
   <script src="js/db.js"></script>
   <script src="js/main.js"></script>
   <script src="js/homepage.js"></script>
+  <script>
+    // Editorial reveal-on-scroll + figures counter (independent of homepage.js loaders)
+    document.addEventListener('DOMContentLoaded', () => {
+      const nums = document.querySelectorAll('.hp-figure-num[data-target]');
+      const run = el => {
+        const target = +el.dataset.target;
+        const dur = 1800, t0 = performance.now();
+        const tick = t => {
+          const p = Math.min((t - t0) / dur, 1);
+          el.textContent = Math.floor((1 - Math.pow(1 - p, 3)) * target);
+          if (p < 1) requestAnimationFrame(tick);
+          else el.textContent = target;
+        };
+        requestAnimationFrame(tick);
+      };
+      const ioFig = new IntersectionObserver((entries) => {
+        entries.forEach(e => {
+          if (e.isIntersecting) { run(e.target); ioFig.unobserve(e.target); }
+        });
+      }, { threshold: 0.4 });
+      nums.forEach(n => ioFig.observe(n));
+
+      const reveals = document.querySelectorAll('[data-reveal]');
+      const ioRev = new IntersectionObserver((entries) => {
+        entries.forEach(e => {
+          if (e.isIntersecting) {
+            e.target.classList.add('is-revealed');
+            ioRev.unobserve(e.target);
+          }
+        });
+      }, { threshold: 0.12, rootMargin: '0px 0px -80px 0px' });
+      reveals.forEach(el => ioRev.observe(el));
+    });
+  </script>
+
 </body>
 </html>

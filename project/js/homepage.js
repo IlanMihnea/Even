@@ -145,6 +145,7 @@ async function renderFeaturedProperties() {
   try {
     const props = await getProperties('rezidential');
     grid.innerHTML = props.slice(0, 4).map(p => renderHomePropCard(p)).join('');
+    if (typeof applyFavStates === 'function') applyFavStates(grid);
     setTimeout(() => {
       grid.querySelectorAll('.prop-card').forEach((card, i) => {
         card.classList.add('reveal');
@@ -158,34 +159,52 @@ async function renderFeaturedProperties() {
   }
 }
 
+function shortPropNum(id) {
+  return String(id || '').replace(/-/g, '').slice(0, 4).toUpperCase() || '----';
+}
+
+function pricePerSqm(pret, suprafata) {
+  if (!pret || !suprafata) return '';
+  return new Intl.NumberFormat('ro-RO').format(Math.round(pret / suprafata)) + ' €/m²';
+}
+
 function renderHomePropCard(p) {
+  const link = `property-rezidential.html?id=${p.id}`;
+  const eyebrow = `${p.regim === 'vanzare' ? 'Vânzare' : 'Închiriere'} · ${p.cartier}`;
+  const meta = [
+    `${p.camere} cam.`,
+    `${p.suprafata} m²`,
+    p.etaj != null ? `Et. ${p.etaj}${p.etajTotal ? '/' + p.etajTotal : ''}` : null
+  ].filter(Boolean).join('<span class="sep"> · </span>');
+  const price = formatPrice(p.pret) + (p.regim === 'inchiriere' ? '<span class="per-month">/lună</span>' : '');
+  const sub = p.regim === 'vanzare' ? pricePerSqm(p.pret, p.suprafata) : '';
+  const photo = (p.imagini && p.imagini[0])
+    ? `<img src="${p.imagini[0]}" alt="${p.titlu}" loading="lazy">`
+    : `<div class="img-placeholder"></div>`;
+
   return `
-    <a class="prop-card reveal" href="property-rezidential.html?id=${p.id}">
-      <div class="prop-card-img">
-        <div class="img-placeholder"></div>
-        <div class="badges">
-          <span class="badge badge-${p.regim}">${p.regim === 'vanzare' ? 'Vânzare' : 'Închiriere'}</span>
-        </div>
-        <div class="card-overlay">
-          <div class="card-overlay-content">
-            <span><i class="fa-solid fa-bed"></i> ${p.camere} cam</span>
-            <span><i class="fa-solid fa-vector-square"></i> ${p.suprafata} mp</span>
-            ${p.etaj != null ? `<span><i class="fa-solid fa-stairs"></i> Et. ${p.etaj}</span>` : ''}
-            ${p.parcare ? '<span><i class="fa-solid fa-square-parking"></i></span>' : ''}
-          </div>
-        </div>
-        <div class="fav" onclick="event.preventDefault(); toggleFav(this)"><i class="fa-regular fa-heart"></i></div>
-      </div>
+    <a class="prop-card" href="${link}" aria-label="${p.titlu}">
+      <figure class="prop-card-media">
+        <div class="prop-card-img">${photo}</div>
+        <button class="prop-card-fav" type="button" data-prop-id="${p.id}"
+                onclick="event.preventDefault(); event.stopPropagation(); toggleFav(this)"
+                aria-label="Salvează la favorite">
+          <i class="fa-regular fa-heart"></i>
+        </button>
+      </figure>
       <div class="prop-card-body">
-        <div class="prop-card-price">
-          ${formatPrice(p.pret)}${p.regim === 'inchiriere' ? '<span class="per-month"> / lună</span>' : ''}
+        <div class="prop-card-eyebrow">
+          <span>${eyebrow}</span>
+          <span class="prop-card-num">Nº ${shortPropNum(p.id)}</span>
         </div>
-        <div class="prop-card-title">${p.titlu}</div>
-        <div class="prop-card-loc"><i class="fa-solid fa-location-dot"></i> ${p.cartier}, ${p.oras}</div>
-        <div class="prop-card-meta">
-          <span><i class="fa-solid fa-bed"></i> ${p.camere} cam</span>
-          <span><i class="fa-solid fa-vector-square"></i> ${p.suprafata} mp</span>
-          ${p.etaj != null ? `<span><i class="fa-solid fa-stairs"></i> Et. ${p.etaj}</span>` : ''}
+        <h3 class="prop-card-title">${p.titlu}</h3>
+        <p class="prop-card-meta">${meta}</p>
+        <div class="prop-card-foot">
+          <div>
+            <span class="prop-card-price">${price}</span>
+            ${sub ? `<span class="prop-card-price-sub">${sub}</span>` : ''}
+          </div>
+          <span class="prop-card-cta">Detalii <i class="fa-solid fa-arrow-right"></i></span>
         </div>
       </div>
     </a>

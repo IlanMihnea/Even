@@ -14,6 +14,10 @@ function formatLivrareLong(d) {
 }
 
 // ---------- LISTĂ PROIECTE ----------
+function shortPjNum(id) {
+  return String(id || '').replace(/-/g, '').slice(0, 4).toUpperCase() || '----';
+}
+
 function renderProjectsList() {
   const grid = document.getElementById('projectsGrid');
   if (!grid) return;
@@ -24,37 +28,52 @@ function renderProjectsList() {
   if (f.tipUnitate) filtered = filtered.filter(p => p.tipuriUnitati.includes(f.tipUnitate));
   if (f.pretMax) filtered = filtered.filter(p => p.intervalPret.min <= +f.pretMax);
 
-  document.getElementById('projectsCount').innerHTML = `<strong>${filtered.length}</strong> proiecte`;
+  const countEl = document.getElementById('projectsCount');
+  if (countEl) countEl.textContent = `${filtered.length} listing${filtered.length === 1 ? '' : 's'}`;
 
   if (filtered.length === 0) {
-    grid.innerHTML = '<div class="empty-state" style="grid-column:1/-1"><i class="fa-regular fa-folder-open"></i><h3>Niciun proiect găsit</h3></div>';
+    grid.innerHTML = '<div class="empty-state" style="grid-column:1/-1"><h3>Niciun proiect găsit</h3><p>Schimbă filtrele.</p></div>';
     return;
   }
 
-  grid.innerHTML = filtered.map(p => `
-    <a class="project-card" href="project-detail.html?id=${p.id}">
-      <div class="project-card-img">
-        <div class="img-placeholder"></div>
-        <div class="status-tag">
-          <span class="status-dot status-${p.status}"></span> ${statusLabel(p.status)}
+  grid.innerHTML = filtered.map(p => {
+    const photo = (p.imagini && p.imagini[0])
+      ? `<img src="${p.imagini[0]}" alt="${p.nume}" loading="lazy">`
+      : `<div class="img-placeholder"></div>`;
+    const eyebrow = `${statusLabel(p.status)} · ${p.cartier}`;
+    return `
+      <a class="prop-card pj-card" href="project-detail.html?id=${p.id}" aria-label="${p.nume}">
+        <figure class="prop-card-media">
+          <div class="prop-card-img">${photo}</div>
+        </figure>
+        <div class="prop-card-body">
+          <div class="prop-card-eyebrow">
+            <span>${eyebrow}</span>
+            <span class="prop-card-num">Nº ${shortPjNum(p.id)}</span>
+          </div>
+          <h3 class="prop-card-title">${p.nume}</h3>
+          <p class="pj-card-dev">${p.dezvoltator}</p>
+          <p class="prop-card-meta">
+            ${p.unitatiDisponibile}/${p.unitatiTotal} unități
+            <span class="sep"> · </span>
+            Livrare ${formatLivrareLong(p.dataLivrare)}
+            <span class="sep"> · </span>
+            Progres ${p.progres}%
+          </p>
+          <div class="pj-progress-bar" aria-hidden="true">
+            <span style="width:${Math.min(100, Math.max(0, p.progres))}%"></span>
+          </div>
+          <div class="prop-card-foot">
+            <div>
+              <span class="prop-card-price">${formatPrice(p.intervalPret.min)}</span>
+              <span class="prop-card-price-sub">de la · până la ${formatPrice(p.intervalPret.max)}</span>
+            </div>
+            <span class="prop-card-cta">Detalii <i class="fa-solid fa-arrow-right"></i></span>
+          </div>
         </div>
-        <div class="available-tag">${p.unitatiDisponibile} unități disponibile</div>
-      </div>
-      <div class="project-card-body">
-        <div class="project-dev">${p.dezvoltator}</div>
-        <h3>${p.nume}</h3>
-        <div class="project-loc"><i class="fa-solid fa-location-dot"></i> ${p.cartier}, ${p.oras}</div>
-        <div class="project-price-range">
-          ${formatPrice(p.intervalPret.min)} – ${formatPrice(p.intervalPret.max)}
-          <span>/ unitate</span>
-        </div>
-        <div class="project-meta">
-          <span>Livrare <strong>${formatLivrareLong(p.dataLivrare)}</strong></span>
-          <span>Progres <strong>${p.progres}%</strong></span>
-        </div>
-      </div>
-    </a>
-  `).join('');
+      </a>
+    `;
+  }).join('');
 }
 
 function initProjectsListing() {
@@ -291,10 +310,33 @@ function renderUnitsTable(p) {
   });
 }
 
-function submitInterest(e, projName) {
+async function submitInterest(e, projName) {
   e.preventDefault();
-  alert(`Mulțumim! Cererea ta pentru ${projName} a fost trimisă. Te contactăm în 24 ore.`);
-  e.target.reset();
+  const form = e.target;
+  const inputs = form.querySelectorAll('input, select, textarea');
+  const data = {
+    nume: inputs[0]?.value || '',
+    telefon: inputs[1]?.value || '',
+    email: inputs[2]?.value || '',
+    subiect: inputs[3]?.value || '',
+    mesaj: inputs[4]?.value || '',
+    kind: 'project_interest',
+    project_name: projName,
+    source_url: window.location.href
+  };
+  try {
+    if (typeof _supabase !== 'undefined') {
+      await _supabase.from('lead_requests').insert(data);
+    } else throw new Error();
+  } catch {
+    try {
+      const queue = JSON.parse(localStorage.getItem('even_lead_queue') || '[]');
+      queue.push({ ...data, created_at: new Date().toISOString() });
+      localStorage.setItem('even_lead_queue', JSON.stringify(queue));
+    } catch (_) {}
+  }
+  form.reset();
+  alert(`Mulțumim! Cererea pentru ${projName} a ajuns la noi. Te contactăm în maxim 24 de ore.`);
 }
 
 document.addEventListener('DOMContentLoaded', async () => {

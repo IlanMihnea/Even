@@ -99,64 +99,86 @@ function renderCard(p) {
   return '';
 }
 
-function renderRezCard(p, link) {
+function shortNum(id) {
+  return String(id || '').replace(/-/g, '').slice(0, 4).toUpperCase() || '----';
+}
+
+function cardPhoto(imagini, titlu) {
+  return (imagini && imagini[0])
+    ? `<img src="${imagini[0]}" alt="${titlu || ''}" loading="lazy">`
+    : `<div class="img-placeholder"></div>`;
+}
+
+function favBtn(id) {
   return `
-    <a class="prop-card" href="${link}">
-      <div class="prop-card-img">
-        <div class="img-placeholder"></div>
-        <div class="badges">
-          <span class="badge badge-${p.regim}">${p.regim === 'vanzare' ? 'Vânzare' : 'Închiriere'}</span>
-        </div>
-        <div class="card-overlay">
-          <div class="card-overlay-content">
-            <span><i class="fa-solid fa-bed"></i> ${p.camere} cam</span>
-            <span><i class="fa-solid fa-vector-square"></i> ${p.suprafata} mp</span>
-            ${p.etaj != null ? `<span><i class="fa-solid fa-stairs"></i> Et. ${p.etaj}</span>` : ''}
-            ${p.parcare ? '<span><i class="fa-solid fa-square-parking"></i></span>' : ''}
-          </div>
-        </div>
-        <div class="fav" onclick="event.preventDefault(); toggleFav(this)"><i class="fa-regular fa-heart"></i></div>
-      </div>
+    <button class="prop-card-fav" type="button" data-prop-id="${id}"
+            onclick="event.preventDefault(); event.stopPropagation(); toggleFav(this)"
+            aria-label="Salvează la favorite">
+      <i class="fa-regular fa-heart"></i>
+    </button>`;
+}
+
+function buildCard({ link, titlu, eyebrow, meta, price, sub, utilsHtml, photo, id }) {
+  return `
+    <a class="prop-card" href="${link}" aria-label="${titlu}">
+      <figure class="prop-card-media">
+        <div class="prop-card-img">${photo}</div>
+        ${favBtn(id)}
+      </figure>
       <div class="prop-card-body">
-        <div class="prop-card-price">
-          ${formatPrice(p.pret)}${p.regim === 'inchiriere' ? '<span class="per-month"> / lună</span>' : ''}
+        <div class="prop-card-eyebrow">
+          <span>${eyebrow}</span>
+          <span class="prop-card-num">Nº ${shortNum(id)}</span>
         </div>
-        <div class="prop-card-title">${p.titlu}</div>
-        <div class="prop-card-loc"><i class="fa-solid fa-location-dot"></i> ${p.cartier}, ${p.oras}</div>
-        <div class="prop-card-meta">
-          <span><i class="fa-solid fa-bed"></i> ${p.camere} cam</span>
-          <span><i class="fa-solid fa-vector-square"></i> ${p.suprafata} mp</span>
-          ${p.etaj != null ? `<span><i class="fa-solid fa-stairs"></i> Et. ${p.etaj}/${p.etajTotal}</span>` : ''}
+        <h3 class="prop-card-title">${titlu}</h3>
+        <p class="prop-card-meta">${meta}</p>
+        ${utilsHtml ? `<div class="prop-card-utils">${utilsHtml}</div>` : ''}
+        <div class="prop-card-foot">
+          <div>
+            <span class="prop-card-price">${price}</span>
+            ${sub ? `<span class="prop-card-price-sub">${sub}</span>` : ''}
+          </div>
+          <span class="prop-card-cta">Detalii <i class="fa-solid fa-arrow-right"></i></span>
         </div>
       </div>
     </a>`;
 }
 
+function renderRezCard(p, link) {
+  const eyebrow = `${p.regim === 'vanzare' ? 'Vânzare' : 'Închiriere'} · ${p.cartier}`;
+  const meta = [
+    `${p.camere} cam.`,
+    `${p.suprafata} m²`,
+    p.etaj != null ? `Et. ${p.etaj}${p.etajTotal ? '/' + p.etajTotal : ''}` : null
+  ].filter(Boolean).join('<span class="sep"> · </span>');
+  const price = formatPrice(p.pret) + (p.regim === 'inchiriere' ? '<span class="per-month">/lună</span>' : '');
+  const sub = (p.regim === 'vanzare' && p.pret && p.suprafata)
+    ? `${new Intl.NumberFormat('ro-RO').format(Math.round(p.pret / p.suprafata))} €/m²`
+    : '';
+  return buildCard({
+    link, id: p.id, titlu: p.titlu, eyebrow, meta, price, sub,
+    photo: cardPhoto(p.imagini, p.titlu)
+  });
+}
+
 function renderComCard(p, link) {
   const tipLabels = { birouri: 'Birouri', retail: 'Retail', depozit: 'Depozit', industrial: 'Industrial', showroom: 'Showroom' };
-  const pretText = p.pret ? `${p.pret} €/mp/lună` : formatPrice(p.pretTotal);
-  return `
-    <a class="prop-card card-comercial" href="${link}">
-      <div class="prop-card-img">
-        <div class="img-placeholder"></div>
-        <div class="badges">
-          <span class="badge badge-comercial">${tipLabels[p.tipSpatiu]}</span>
-          <span class="badge badge-${p.regim}">Clasa ${p.clasaCladire}</span>
-        </div>
-      </div>
-      <div class="prop-card-body">
-        <div class="prop-card-title">${tipLabels[p.tipSpatiu]} · ${p.regim === 'vanzare' ? 'Vânzare' : 'Închiriere'}</div>
-        <div class="prop-card-subtitle">${p.titlu}</div>
-        <div class="prop-card-loc"><i class="fa-solid fa-location-dot"></i> ${p.adresa}, ${p.oras}</div>
-        <div class="prop-card-price">${pretText}</div>
-        <div class="tech-specs">
-          <div><strong>${p.suprafataTotala}</strong> mp totali</div>
-          <div><strong>${p.locuriParcare}</strong> parcare</div>
-          <div><strong>${p.inaltimeLibera}m</strong> înălțime</div>
-          <div><strong>Et. ${p.etaj}</strong></div>
-        </div>
-      </div>
-    </a>`;
+  const eyebrow = `${p.regim === 'vanzare' ? 'Vânzare' : 'Închiriere'} · ${tipLabels[p.tipSpatiu] || ''}`;
+  const meta = [
+    `${p.suprafataTotala} m²`,
+    `Clasa ${p.clasaCladire}`,
+    p.etaj != null ? `Et. ${p.etaj}` : null
+  ].filter(Boolean).join('<span class="sep"> · </span>');
+  const price = p.pret
+    ? `${p.pret} €<span class="per-month">/m²/lună</span>`
+    : formatPrice(p.pretTotal);
+  const sub = p.pret && p.suprafataTotala
+    ? `~ ${new Intl.NumberFormat('ro-RO').format(p.pret * p.suprafataTotala)} €/lună`
+    : '';
+  return buildCard({
+    link, id: p.id, titlu: p.titlu, eyebrow, meta, price, sub,
+    photo: cardPhoto(p.imagini, p.titlu)
+  });
 }
 
 function renderTerCard(p, link) {
@@ -166,37 +188,28 @@ function renderTerCard(p, link) {
     'extravilan-agricol': 'Extravilan agricol',
     'industrial': 'Industrial'
   };
+  const eyebrow = `${tipLabels[p.tip] || 'Teren'} · ${p.localitate || p.judet || ''}`;
   const utilsAll = [
     { k: 'apa', i: 'fa-droplet', t: 'Apă' },
     { k: 'curent', i: 'fa-bolt', t: 'Curent' },
     { k: 'gaz', i: 'fa-fire', t: 'Gaz' },
-    { k: 'canalizare', i: 'fa-toilet', t: 'Canalizare' }
+    { k: 'canalizare', i: 'fa-toilet', t: 'Canal.' }
   ];
-  return `
-    <a class="prop-card card-teren" href="${link}">
-      <div class="prop-card-img">
-        <div class="img-placeholder"></div>
-      </div>
-      <div class="prop-card-body">
-        <span class="prop-type-chip">${tipLabels[p.tip]}</span>
-        <div class="prop-card-title">${p.titlu}</div>
-        <div class="prop-card-loc"><i class="fa-solid fa-location-dot"></i> ${p.localitate}, ${p.judet}</div>
-        <div class="utils-row">
-          ${utilsAll.map(u => `
-            <div class="util-icon ${p.utilitati.includes(u.k) ? 'active' : ''}" title="${u.t}">
-              <i class="fa-solid ${u.i}"></i>
-            </div>
-          `).join('')}
-          <div class="util-icon" title="Front stradal" style="background:transparent;color:var(--gray-500);font-weight:600;font-size:11px;width:auto;padding:0 8px">
-            FS ${p.frontStradal}m
-          </div>
-        </div>
-        <div class="price-row">
-          <div class="prop-card-price">${formatPrice(p.pretTotal)}</div>
-          <div class="price-mp">${p.pretMp} €/mp · ${p.suprafata} ${p.unitate}</div>
-        </div>
-      </div>
-    </a>`;
+  const meta = [
+    `${p.suprafata} ${p.unitate}`,
+    p.frontStradal ? `Front ${p.frontStradal}m` : null,
+    p.accesDrum ? `Acces ${p.accesDrum}` : null
+  ].filter(Boolean).join('<span class="sep"> · </span>');
+  const utilsHtml = utilsAll.map(u => `
+    <span class="prop-card-util ${(p.utilitati || []).includes(u.k) ? 'active' : ''}">
+      <i class="fa-solid ${u.i}"></i>${u.t}
+    </span>`).join('');
+  const price = formatPrice(p.pretTotal);
+  const sub = p.pretMp ? `${p.pretMp} €/m²` : '';
+  return buildCard({
+    link, id: p.id, titlu: p.titlu, eyebrow, meta, price, sub, utilsHtml,
+    photo: cardPhoto(p.imagini, p.titlu)
+  });
 }
 
 // ---------- RENDER LISTĂ ----------
@@ -222,6 +235,7 @@ function renderList() {
       </div>`;
   } else {
     grid.innerHTML = pageItems.map(renderCard).join('');
+    if (typeof applyFavStates === 'function') applyFavStates(grid);
     setTimeout(() => {
       grid.querySelectorAll('.prop-card').forEach((card, i) => {
         card.classList.add('reveal');
