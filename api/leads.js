@@ -93,7 +93,7 @@ module.exports = async function handler(req, res) {
 
   if (error) {
     console.error('Lead insert error:', error);
-    return res.status(500).json({ error: 'Eroare la salvarea cererii. Încearcă din nou.', _debug: error.message });
+    return res.status(500).json({ error: 'Eroare la salvarea cererii. Încearcă din nou.' });
   }
 
   // Email notification (non-blocking on failure — lead is already saved)
