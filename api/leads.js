@@ -146,10 +146,15 @@ module.exports = async function handler(req, res) {
     })
   }).catch(err => { console.error('Resend fetch failed:', err); return { ok: false }; });
 
+  let resendDebug = null;
   if (emailRes && !emailRes.ok) {
     const body = typeof emailRes.text === 'function' ? await emailRes.text().catch(() => '') : '';
     console.error('Resend error:', body);
+    resendDebug = { status: emailRes.status, body };
+  } else if (emailRes && emailRes.ok) {
+    const body = typeof emailRes.json === 'function' ? await emailRes.json().catch(() => null) : null;
+    resendDebug = { status: emailRes.status, body };
   }
 
-  return res.status(201).json({ ok: true, lead_id: lead.id });
+  return res.status(201).json({ ok: true, lead_id: lead.id, _resend: resendDebug });
 };
