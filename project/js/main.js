@@ -22,7 +22,6 @@ function renderNavbar(activePage = '') {
       </ul>
       <div class="nav-cta">
         <a href="contact.html" class="btn btn-outline"><i class="fa-solid fa-phone"></i> Contact</a>
-        <a href="admin.html" class="btn btn-primary">Admin</a>
         <button class="nav-toggle" id="navToggle" aria-label="Meniu"><i class="fa-solid fa-bars"></i></button>
       </div>
     </div>
@@ -34,7 +33,6 @@ function renderNavbar(activePage = '') {
       <a href="projects.html">Proiecte Noi</a>
       <a href="about.html">Despre</a>
       <a href="contact.html">Contact</a>
-      <a href="admin.html">Admin</a>
     </div>
   `;
   const toggle = document.getElementById('navToggle');
@@ -45,6 +43,34 @@ function renderNavbar(activePage = '') {
       toggle.querySelector('i').className = mobile.classList.contains('open')
         ? 'fa-solid fa-xmark'
         : 'fa-solid fa-bars';
+    });
+  }
+}
+
+// Owner-only hidden access to admin panel.
+// Two ways in:
+//   1. Keyboard:  Ctrl/Cmd + Shift + A
+//   2. Triple-click the EVEN logomark
+function initAdminAccess() {
+  document.addEventListener('keydown', (e) => {
+    if (e.shiftKey && (e.ctrlKey || e.metaKey) && (e.key === 'A' || e.key === 'a')) {
+      e.preventDefault();
+      window.location.href = 'admin.html';
+    }
+  });
+  const logo = document.querySelector('.navbar .logo');
+  if (logo) {
+    let clicks = 0;
+    let timer = null;
+    logo.addEventListener('click', (e) => {
+      clicks += 1;
+      if (timer) clearTimeout(timer);
+      timer = setTimeout(() => { clicks = 0; }, 600);
+      if (clicks >= 3) {
+        e.preventDefault();
+        clicks = 0;
+        window.location.href = 'admin.html';
+      }
     });
   }
 }
@@ -343,6 +369,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   renderNavbar(activePage);
   renderFooter();
   initNavbarScroll();
+  initAdminAccess();
   initScrollReveal();
   initScrollToTop();
   initWhatsAppButton();

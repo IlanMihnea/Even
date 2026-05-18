@@ -41,7 +41,7 @@ body[data-page="contact"] {
   font-size: 11px;
   font-weight: 600;
   text-transform: uppercase;
-  letter-spacing: 0.22em;
+  letter-spacing: 0.18em;
   color: var(--ct-sage);
   margin-bottom: 18px;
   line-height: 1;
@@ -141,7 +141,7 @@ body[data-page="contact"] {
   font-size: 11px;
   font-weight: 600;
   text-transform: uppercase;
-  letter-spacing: 0.22em;
+  letter-spacing: 0.18em;
   color: var(--ct-ink-mute);
 }
 .ct-hero-rule {
@@ -184,7 +184,7 @@ body[data-page="contact"] {
   font-size: 10px;
   font-weight: 600;
   text-transform: uppercase;
-  letter-spacing: 0.22em;
+  letter-spacing: 0.18em;
   color: var(--ct-sage);
 }
 .ct-quick-val {
@@ -202,7 +202,7 @@ body[data-page="contact"] {
   font-size: 10px;
   font-weight: 600;
   text-transform: uppercase;
-  letter-spacing: 0.20em;
+  letter-spacing: 0.16em;
   color: var(--ct-ink-soft);
   display: inline-flex;
   align-items: center;
@@ -326,7 +326,7 @@ body[data-page="contact"] {
   font-size: 12px;
   font-weight: 600;
   text-transform: uppercase;
-  letter-spacing: 0.20em;
+  letter-spacing: 0.16em;
   cursor: pointer;
   transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.4s, background 0.3s;
 }
@@ -399,7 +399,7 @@ body[data-page="contact"] {
   font-size: 10px;
   font-weight: 600;
   text-transform: uppercase;
-  letter-spacing: 0.20em;
+  letter-spacing: 0.16em;
   color: var(--ct-ink-mute);
 }
 .ct-info-val {

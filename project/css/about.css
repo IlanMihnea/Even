@@ -67,7 +67,7 @@ body[data-page="about"] {
   font-size: 11px;
   font-weight: 600;
   text-transform: uppercase;
-  letter-spacing: 0.22em;
+  letter-spacing: 0.18em;
   color: var(--ed-sage);
   line-height: 1;
 }
@@ -328,7 +328,7 @@ body[data-page="about"] {
   font-size: 10px;
   font-weight: 600;
   text-transform: uppercase;
-  letter-spacing: 0.20em;
+  letter-spacing: 0.16em;
   color: var(--ed-gold);
 }
 
@@ -496,7 +496,7 @@ body[data-page="about"] {
   font-size: 10px;
   font-weight: 600;
   text-transform: uppercase;
-  letter-spacing: 0.22em;
+  letter-spacing: 0.18em;
   color: var(--ed-ink-mute);
 }
 
@@ -976,8 +976,8 @@ body[data-page="about"] {
 
 @media (max-width: 520px) {
   .ab-mast-mark { font-size: 12px; }
-  .ab-mast-title { letter-spacing: 0.22em; }
-  .ab-mast-edition { letter-spacing: 0.20em; }
+  .ab-mast-title { letter-spacing: 0.18em; }
+  .ab-mast-edition { letter-spacing: 0.16em; }
 
   .ab-hero { padding: 40px 0 64px; }
   .ab-hero-grid { padding: 0 18px; }

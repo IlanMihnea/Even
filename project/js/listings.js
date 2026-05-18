@@ -246,6 +246,7 @@ function renderList() {
   }
 
   renderPagination(totalPages);
+  if (typeof updateMobileFilterCount === 'function') updateMobileFilterCount();
 }
 
 function renderPagination(totalPages) {
@@ -314,23 +315,29 @@ function initFiltersUI() {
         <div class="filter-group-title">Suprafață min (mp)</div>
         <input type="number" data-filter-input="suprafataMin" placeholder="ex: 60">
       </div>
-      <div class="filter-group">
-        <div class="filter-group-title">Orientare</div>
-        <div class="pill-list" data-filter="orientare">
-          <span class="pill" data-value="">Oricare</span>
-          <span class="pill" data-value="Sud">Sud</span>
-          <span class="pill" data-value="Sud-Est">Sud-Est</span>
-          <span class="pill" data-value="Est">Est</span>
-          <span class="pill" data-value="Vest">Vest</span>
+      <div class="filter-secondary">
+        <div class="filter-group">
+          <div class="filter-group-title">Orientare</div>
+          <div class="pill-list" data-filter="orientare">
+            <span class="pill" data-value="">Oricare</span>
+            <span class="pill" data-value="Sud">Sud</span>
+            <span class="pill" data-value="Sud-Est">Sud-Est</span>
+            <span class="pill" data-value="Est">Est</span>
+            <span class="pill" data-value="Vest">Vest</span>
+          </div>
+        </div>
+        <div class="filter-group">
+          <div class="filter-group-title">Facilități</div>
+          <div class="checkbox-list">
+            <label class="checkbox-item"><input type="checkbox" data-filter-check="parcare" value="true"> Cu parcare</label>
+            <label class="checkbox-item"><input type="checkbox" data-filter-check="balcon" value="true"> Cu balcon</label>
+          </div>
         </div>
       </div>
-      <div class="filter-group">
-        <div class="filter-group-title">Facilități</div>
-        <div class="checkbox-list">
-          <label class="checkbox-item"><input type="checkbox" data-filter-check="parcare" value="true"> Cu parcare</label>
-          <label class="checkbox-item"><input type="checkbox" data-filter-check="balcon" value="true"> Cu balcon</label>
-        </div>
-      </div>
+      <button type="button" class="filter-toggle-more" aria-expanded="false">
+        <span class="label">Mai multe filtre</span>
+        <i class="fa-solid fa-chevron-down"></i>
+      </button>
     `;
   } else if (LISTING_CONFIG.category === 'comercial') {
     sidebar.innerHTML = `
@@ -374,14 +381,20 @@ function initFiltersUI() {
           <input type="number" data-filter-input="suprafataMax" placeholder="max">
         </div>
       </div>
-      <div class="filter-group">
-        <div class="filter-group-title">Locuri parcare min</div>
-        <input type="number" data-filter-input="locuriParcare" placeholder="ex: 5">
+      <div class="filter-secondary">
+        <div class="filter-group">
+          <div class="filter-group-title">Locuri parcare min</div>
+          <input type="number" data-filter-input="locuriParcare" placeholder="ex: 5">
+        </div>
+        <div class="filter-group">
+          <div class="filter-group-title">Înălțime liberă min (m)</div>
+          <input type="number" step="0.1" data-filter-input="inaltimeLibera" placeholder="ex: 8">
+        </div>
       </div>
-      <div class="filter-group">
-        <div class="filter-group-title">Înălțime liberă min (m)</div>
-        <input type="number" step="0.1" data-filter-input="inaltimeLibera" placeholder="ex: 8">
-      </div>
+      <button type="button" class="filter-toggle-more" aria-expanded="false">
+        <span class="label">Mai multe filtre</span>
+        <i class="fa-solid fa-chevron-down"></i>
+      </button>
     `;
   } else if (LISTING_CONFIG.category === 'terenuri') {
     sidebar.innerHTML = `
@@ -408,24 +421,30 @@ function initFiltersUI() {
         <div class="filter-group-title">Preț max (€)</div>
         <input type="number" data-filter-input="pretMax" placeholder="ex: 200000">
       </div>
-      <div class="filter-group">
-        <div class="filter-group-title">Acces drum</div>
-        <div class="pill-list" data-filter="accesDrum">
-          <span class="pill" data-value="">Oricare</span>
-          <span class="pill" data-value="asfaltat">Asfaltat</span>
-          <span class="pill" data-value="pietruit">Pietruit</span>
-          <span class="pill" data-value="camp">Câmp</span>
+      <div class="filter-secondary">
+        <div class="filter-group">
+          <div class="filter-group-title">Acces drum</div>
+          <div class="pill-list" data-filter="accesDrum">
+            <span class="pill" data-value="">Oricare</span>
+            <span class="pill" data-value="asfaltat">Asfaltat</span>
+            <span class="pill" data-value="pietruit">Pietruit</span>
+            <span class="pill" data-value="camp">Câmp</span>
+          </div>
+        </div>
+        <div class="filter-group">
+          <div class="filter-group-title">Utilități</div>
+          <div class="pill-list" data-filter="utilitati">
+            <span class="pill" data-value="">Indiferent</span>
+            <span class="pill" data-value="toate">Toate</span>
+            <span class="pill" data-value="curent">Cu curent</span>
+            <span class="pill" data-value="gaz">Cu gaz</span>
+          </div>
         </div>
       </div>
-      <div class="filter-group">
-        <div class="filter-group-title">Utilități</div>
-        <div class="pill-list" data-filter="utilitati">
-          <span class="pill" data-value="">Indiferent</span>
-          <span class="pill" data-value="toate">Toate</span>
-          <span class="pill" data-value="curent">Cu curent</span>
-          <span class="pill" data-value="gaz">Cu gaz</span>
-        </div>
-      </div>
+      <button type="button" class="filter-toggle-more" aria-expanded="false">
+        <span class="label">Mai multe filtre</span>
+        <i class="fa-solid fa-chevron-down"></i>
+      </button>
     `;
   }
 
@@ -465,11 +484,23 @@ function initFiltersUI() {
   document.querySelectorAll('[data-filter-input]').forEach(el => el.addEventListener('input', debouncedRender));
   document.querySelectorAll('[data-filter-check]').forEach(el => el.addEventListener('change', debouncedRender));
 
+  const toggleMore = document.querySelector('.filter-toggle-more');
+  const secondary = document.querySelector('.filter-secondary');
+  if (toggleMore && secondary) {
+    toggleMore.addEventListener('click', () => {
+      const isOpen = secondary.classList.toggle('is-open');
+      toggleMore.classList.toggle('is-open', isOpen);
+      toggleMore.setAttribute('aria-expanded', String(isOpen));
+      toggleMore.querySelector('.label').textContent = isOpen ? 'Mai puține filtre' : 'Mai multe filtre';
+    });
+  }
+
   applyQueryParams();
 }
 
 function applyQueryParams() {
   const params = getAllQueryParams();
+  let touchedSecondary = false;
   Object.entries(params).forEach(([k, v]) => {
     activeFilters[k] = v;
     const inp = document.querySelector(`[data-filter-input="${k}"]`);
@@ -480,7 +511,19 @@ function applyQueryParams() {
       const pill = pillGroup.querySelector(`[data-value="${v}"]`);
       if (pill) pill.classList.add('active');
     }
+    const matched = inp || pillGroup;
+    if (matched && matched.closest('.filter-secondary')) touchedSecondary = true;
   });
+  if (touchedSecondary) {
+    const sec = document.querySelector('.filter-secondary');
+    const tog = document.querySelector('.filter-toggle-more');
+    if (sec && tog) {
+      sec.classList.add('is-open');
+      tog.classList.add('is-open');
+      tog.setAttribute('aria-expanded', 'true');
+      tog.querySelector('.label').textContent = 'Mai puține filtre';
+    }
+  }
 }
 
 function resetFilters() {
@@ -494,10 +537,70 @@ function resetFilters() {
   });
   currentPage = 1;
   renderList();
+  updateMobileFilterCount();
+}
+
+// ---------- MOBILE FILTER DRAWER ----------
+function activeFilterCount() {
+  return Object.values(activeFilters).filter(v => v !== '' && v != null).length;
+}
+
+function updateMobileFilterCount() {
+  const trigger = document.querySelector('.mobile-filter-trigger .count');
+  if (!trigger) return;
+  const n = activeFilterCount();
+  trigger.textContent = n > 0 ? String(n) : '';
+}
+
+function initMobileFilterDrawer() {
+  const sidebar = document.getElementById('filterSidebar');
+  const header = document.querySelector('.listings-header');
+  if (!sidebar || !header) return;
+
+  // Inject trigger button into header (left side)
+  const trigger = document.createElement('button');
+  trigger.type = 'button';
+  trigger.className = 'mobile-filter-trigger';
+  trigger.innerHTML = '<i class="fa-solid fa-sliders"></i> Filtre <span class="count"></span>';
+  header.insertBefore(trigger, header.firstChild);
+
+  // Inject backdrop
+  const backdrop = document.createElement('div');
+  backdrop.className = 'filter-backdrop';
+  document.body.appendChild(backdrop);
+
+  // Inject close button inside sidebar
+  const close = document.createElement('button');
+  close.type = 'button';
+  close.className = 'filter-sidebar-close';
+  close.setAttribute('aria-label', 'Închide filtrele');
+  close.innerHTML = '<i class="fa-solid fa-xmark"></i>';
+  sidebar.appendChild(close);
+
+  const openDrawer = () => {
+    sidebar.classList.add('is-mobile-open');
+    backdrop.classList.add('is-visible');
+    document.body.classList.add('filter-drawer-open');
+  };
+  const closeDrawer = () => {
+    sidebar.classList.remove('is-mobile-open');
+    backdrop.classList.remove('is-visible');
+    document.body.classList.remove('filter-drawer-open');
+  };
+
+  trigger.addEventListener('click', openDrawer);
+  backdrop.addEventListener('click', closeDrawer);
+  close.addEventListener('click', closeDrawer);
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && sidebar.classList.contains('is-mobile-open')) closeDrawer();
+  });
+
+  updateMobileFilterCount();
 }
 
 document.addEventListener('DOMContentLoaded', async () => {
   initFiltersUI();
+  initMobileFilterDrawer();
   document.getElementById('sortSelect').addEventListener('change', (e) => {
     sortBy = e.target.value;
     renderList();

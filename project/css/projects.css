@@ -41,7 +41,7 @@ body[data-page="proiecte"] {
   font-size: 11px;
   font-weight: 600;
   text-transform: uppercase;
-  letter-spacing: 0.22em;
+  letter-spacing: 0.18em;
   color: var(--pj-sage);
   margin-bottom: 16px;
   line-height: 1;
@@ -320,7 +320,7 @@ body[data-subpage="project-detail"] {
   font-size: 10px;
   font-weight: 600;
   text-transform: uppercase;
-  letter-spacing: 0.22em;
+  letter-spacing: 0.18em;
   color: var(--pj-ink-mute);
   margin-bottom: 12px;
 }
@@ -432,7 +432,7 @@ body[data-subpage="project-detail"] {
   font-family: var(--font-body);
   font-size: 11px;
   font-weight: 600;
-  letter-spacing: 0.20em;
+  letter-spacing: 0.16em;
   text-transform: uppercase;
 }
 
@@ -609,7 +609,7 @@ body[data-subpage="project-detail"] {
   font-size: 10px;
   font-weight: 600;
   text-transform: uppercase;
-  letter-spacing: 0.20em;
+  letter-spacing: 0.16em;
   color: var(--pj-ink-mute);
   text-align: left;
   padding: 16px 12px;
@@ -679,7 +679,7 @@ body[data-subpage="project-detail"] {
   font-size: 11px !important;
   font-weight: 600 !important;
   text-transform: uppercase !important;
-  letter-spacing: 0.20em !important;
+  letter-spacing: 0.16em !important;
   border: none !important;
 }
 #interestForm .btn-gold:hover {
