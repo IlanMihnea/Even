@@ -101,6 +101,7 @@ CREATE TABLE IF NOT EXISTS properties (
   disponibil_din      DATE,
   exclusivitate       BOOLEAN DEFAULT false,
   activ               BOOLEAN DEFAULT true,
+  banner              BOOLEAN NOT NULL DEFAULT false,  -- property currently on the physical QR banner
   agent_id            TEXT REFERENCES agents(id),
   created_at          TIMESTAMPTZ DEFAULT NOW(),
   updated_at          TIMESTAMPTZ DEFAULT NOW()
@@ -113,6 +114,8 @@ CREATE INDEX IF NOT EXISTS idx_properties_oras        ON properties(oras);
 CREATE INDEX IF NOT EXISTS idx_properties_pret        ON properties(pret);
 CREATE INDEX IF NOT EXISTS idx_properties_camere      ON properties(camere);
 CREATE INDEX IF NOT EXISTS idx_properties_activ       ON properties(activ);
+-- At most one property can be flagged as the QR-banner property.
+CREATE UNIQUE INDEX IF NOT EXISTS properties_single_banner ON properties(banner) WHERE banner = true;
 
 -- ── PROJECTS ─────────────────────────────────────────────────
 CREATE TABLE IF NOT EXISTS projects (

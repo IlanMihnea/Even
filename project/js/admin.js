@@ -67,6 +67,7 @@ async function showDashboard() {
     renderProjectsTable(),
     renderAgentsTable()
   ]);
+  renderBannerPanel();
 }
 
 // ---------- STATS ----------
@@ -350,6 +351,85 @@ function resetPropFilters() {
 
 function capitalize(s) { return s ? s[0].toUpperCase() + s.slice(1) : s; }
 
+// ---------- BANNER QR PANEL ----------
+
+function bannerPageUrl() {
+  const o = window.location.origin;
+  const base = (o && o.startsWith('http')) ? o : 'https://even-imobiliare.ro';
+  return base.replace(/\/$/, '') + '/banner';
+}
+
+async function renderBannerPanel() {
+  const panel = document.getElementById('bannerPanel');
+  if (!panel) return;
+
+  let props = allPropsCache;
+  if (!props || !props.length) {
+    try { props = await getAllPropertiesAdmin(); allPropsCache = props; }
+    catch { props = []; }
+  }
+  const current = props.find(p => p.banner === true && p.activ !== false);
+  const url = bannerPageUrl();
+
+  const urlRow = `
+    <div class="banner-url-row">
+      <span class="banner-url-label">Link fix al codului QR</span>
+      <code class="banner-url">${escapeHtmlAdm(url)}</code>
+      <span class="banner-url-hint">Codul QR tipărit nu se schimbă niciodată — doar proprietatea de mai jos.</span>
+    </div>`;
+
+  if (!current) {
+    panel.innerHTML = `
+      <div class="banner-empty">
+        <i class="fa-solid fa-circle-info"></i>
+        <div>
+          <strong>Nicio proprietate pe banner momentan.</strong>
+          <span>Apasă pe iconița <i class="fa-solid fa-qrcode"></i> din dreptul unei proprietăți active, mai jos, ca să o pui pe banner.</span>
+        </div>
+      </div>
+      ${urlRow}`;
+    return;
+  }
+
+  const thumb = (current.imagini && current.imagini[0])
+    ? `<img src="${escapeHtmlAdm(current.imagini[0])}" alt="">`
+    : `<div class="banner-thumb-empty"><i class="fa-solid fa-image"></i></div>`;
+  const pretTxt = current.pret != null
+    ? formatPrice(current.pret)
+    : (current.pretTotal != null ? formatPrice(current.pretTotal) : 'Preț la cerere');
+
+  panel.innerHTML = `
+    <div class="banner-current">
+      <div class="banner-thumb">${thumb}</div>
+      <div class="banner-current-info">
+        <span class="banner-tag"><i class="fa-solid fa-circle" style="font-size:7px"></i> Activă pe banner</span>
+        <strong>${escapeHtmlAdm(current.titlu || '(fără titlu)')}</strong>
+        <span class="banner-meta">${escapeHtmlAdm(categoryLabelAdm(current.categorie))} · ${escapeHtmlAdm(current.oras || current.localitate || current.judet || '')} · ${pretTxt}</span>
+      </div>
+      <div class="banner-current-actions">
+        <a class="btn btn-outline btn-sm" href="property-${current.categorie === 'terenuri' ? 'teren' : current.categorie}.html?id=${encodeURIComponent(current.id)}" target="_blank" rel="noopener">Vezi</a>
+        <button class="btn btn-outline btn-sm" onclick="toggleBanner('${current.id}', true)">Scoate de pe banner</button>
+      </div>
+    </div>
+    ${urlRow}`;
+}
+
+function categoryLabelAdm(cat) {
+  return { rezidential: 'Rezidențial', comercial: 'Comercial', terenuri: 'Teren' }[cat] || cat || '';
+}
+
+async function toggleBanner(id, isCurrentlyOn) {
+  try {
+    await setBannerProperty(isCurrentlyOn ? null : id);
+    showToast(isCurrentlyOn ? 'Proprietate scoasă de pe banner.' : 'Proprietate pusă pe banner.');
+    allPropsCache = await getAllPropertiesAdmin();
+    await renderTable();
+    renderBannerPanel();
+  } catch (err) {
+    alert('Eroare: ' + err.message);
+  }
+}
+
 async function renderTable() {
   const wrap = document.getElementById('tableWrap');
   if (!wrap) return;
@@ -443,6 +523,9 @@ async function renderTable() {
               <td>${row.activ === false ? '<span style="color:#999;font-size:12px">arhivat</span>' : '<span style="color:var(--success);font-size:12px">activ</span>'}</td>
               <td>
                 <div class="table-actions">
+                  ${row.activ === false
+                    ? ''
+                    : `<span class="icon-btn icon-btn-banner${row.banner ? ' is-on' : ''}" onclick="toggleBanner('${row.id}', ${row.banner ? 'true' : 'false'})" title="${row.banner ? 'Pe banner acum · click pentru a scoate' : 'Pune pe bannerul QR'}"><i class="fa-solid fa-qrcode"></i></span>`}
                   <span class="icon-btn" onclick="editProperty('${row.id}', '${activeAdminTab}')" title="Editează"><i class="fa-solid fa-pen"></i></span>
                   ${row.activ === false
                     ? `<span class="icon-btn" onclick="restoreProperty('${row.id}')" title="Restaurează"><i class="fa-solid fa-rotate-left"></i></span>`

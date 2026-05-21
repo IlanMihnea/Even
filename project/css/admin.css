@@ -352,6 +352,94 @@
 }
 .icon-btn:hover { background: var(--navy); color: var(--white); }
 .icon-btn.danger:hover { background: var(--danger); }
+.icon-btn-banner:hover { background: var(--gold); color: var(--navy); }
+.icon-btn-banner.is-on { background: var(--gold); color: var(--navy); }
+
+/* BANNER QR PANEL */
+.btn-sm { padding: 6px 12px; font-size: 13px; }
+.banner-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.banner-current {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+  padding: 16px;
+  background: var(--gray-50);
+  border: 1px solid var(--gray-200);
+  border-radius: var(--r-md);
+}
+.banner-thumb {
+  width: 96px;
+  height: 72px;
+  border-radius: var(--r-sm);
+  overflow: hidden;
+  flex-shrink: 0;
+  background: var(--gray-100);
+}
+.banner-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.banner-thumb-empty {
+  width: 100%; height: 100%;
+  display: flex; align-items: center; justify-content: center;
+  color: var(--gray-300); font-size: 22px;
+}
+.banner-current-info {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  flex: 1;
+  min-width: 200px;
+}
+.banner-current-info strong { font-size: 15px; color: var(--navy); }
+.banner-meta { font-size: 13px; color: var(--gray-500); }
+.banner-tag {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--success);
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+.banner-current-actions { display: flex; gap: 8px; flex-shrink: 0; }
+.banner-empty {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 16px;
+  background: var(--gray-50);
+  border: 1px dashed var(--gray-300);
+  border-radius: var(--r-md);
+}
+.banner-empty i { color: var(--gold); margin-top: 2px; }
+.banner-empty strong { display: block; color: var(--navy); font-size: 14px; margin-bottom: 2px; }
+.banner-empty span { font-size: 13px; color: var(--gray-500); }
+.banner-url-row {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 14px 16px;
+  background: var(--navy);
+  border-radius: var(--r-md);
+}
+.banner-url-label {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--gold);
+}
+.banner-url {
+  font-family: 'DM Sans', monospace;
+  font-size: 14px;
+  color: var(--white);
+  word-break: break-all;
+}
+.banner-url-hint { font-size: 12px; color: var(--stone); opacity: 0.7; }
 
 /* MODAL FORM */
 .modal {

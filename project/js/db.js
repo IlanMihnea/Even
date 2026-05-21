@@ -29,7 +29,8 @@ function toRezidential(row) {
     orientare: row.orientare, parcare: row.parcare, balcon: row.balcon,
     oras: row.oras, cartier: row.cartier, adresa: row.adresa,
     descriere: row.descriere, imagini: row.imagini || [], facilitati: row.facilitati || [],
-    agentId: row.agent_id, agent: normalizeAgent(row.agents), categorie: 'rezidential'
+    agentId: row.agent_id, agent: normalizeAgent(row.agents), categorie: 'rezidential',
+    banner: row.banner === true
   };
 }
 
@@ -41,7 +42,8 @@ function toComercial(row) {
     etaj: row.etaj, locuriParcare: row.locuri_parcare, inaltimeLibera: row.inaltime_libera,
     clasaCladire: row.clasa_cladire, oras: row.oras, cartier: row.cartier, adresa: row.adresa,
     descriere: row.descriere, imagini: row.imagini || [], specificatii: row.specificatii || {},
-    agentId: row.agent_id, agent: normalizeAgent(row.agents), categorie: 'comercial'
+    agentId: row.agent_id, agent: normalizeAgent(row.agents), categorie: 'comercial',
+    banner: row.banner === true
   };
 }
 
@@ -56,7 +58,8 @@ function toTeren(row) {
     judet: row.judet, localitate: row.localitate, adresa: row.adresa,
     descriere: row.descriere, vecinatati: row.vecinatati,
     imagini: row.imagini || [],
-    agentId: row.agent_id, agent: normalizeAgent(row.agents), categorie: 'terenuri'
+    agentId: row.agent_id, agent: normalizeAgent(row.agents), categorie: 'terenuri',
+    banner: row.banner === true
   };
 }
 
@@ -101,6 +104,20 @@ async function getPropertyById(id, categorie) {
     .single();
   if (error) return null;
   return converters[categorie](data);
+}
+
+// Property currently featured on the physical QR banner.
+// Raw row (snake_case) + joined agent — used by banner.html.
+async function getBannerProperty() {
+  const { data, error } = await _supabase
+    .from('properties')
+    .select('*, agents(*)')
+    .eq('banner', true)
+    .eq('activ', true)
+    .limit(1)
+    .maybeSingle();
+  if (error) return null;
+  return data;
 }
 
 async function getProjects() {
@@ -167,6 +184,20 @@ async function deleteProperty(id) {
   const { error } = await _supabase
     .from('properties').update({ activ: false }).eq('id', id);
   if (error) throw error;
+}
+
+// Sets which property the QR banner points to. Only one can be active:
+// clear the current flag first, then mark the chosen property.
+// Pass id = null / '' to simply clear the banner (page shows empty state).
+async function setBannerProperty(id) {
+  const { error: clearErr } = await _supabase
+    .from('properties').update({ banner: false }).eq('banner', true);
+  if (clearErr) throw clearErr;
+  if (id) {
+    const { error } = await _supabase
+      .from('properties').update({ banner: true }).eq('id', id);
+    if (error) throw error;
+  }
 }
 
 async function upsertProject(data) {
