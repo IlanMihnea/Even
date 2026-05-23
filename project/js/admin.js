@@ -355,7 +355,7 @@ function capitalize(s) { return s ? s[0].toUpperCase() + s.slice(1) : s; }
 
 function bannerPageUrl() {
   const o = window.location.origin;
-  const base = (o && o.startsWith('http')) ? o : 'https://even-imobiliare.ro';
+  const base = (o && o.startsWith('http')) ? o : 'https://www.even-imobiliare.ro';
   return base.replace(/\/$/, '') + '/banner';
 }
 

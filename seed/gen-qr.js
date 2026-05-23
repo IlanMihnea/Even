@@ -4,7 +4,7 @@
 const QRCode = require('qrcode');
 const path = require('path');
 
-const URL = process.env.BANNER_URL || 'https://even-imobiliare.ro/banner';
+const URL = process.env.BANNER_URL || 'https://www.even-imobiliare.ro/banner';
 const OUT_DIR = path.join(__dirname, '..', 'project', 'design');
 
 const opts = {
