@@ -1060,35 +1060,80 @@ function renderTeren(p) {
 }
 
 // ---------- INIT ----------
+function showFatal(contentEl, title, detail, backHref) {
+  contentEl.innerHTML = `
+    <div style="text-align:center;padding:96px 24px;font-family:var(--font-body);color:var(--ink-50);max-width:520px;margin:0 auto">
+      <p style="font-size:1.15rem;color:var(--ink);margin-bottom:8px">${escapeHtml(title)}</p>
+      ${detail ? `<p style="font-size:.85rem;color:var(--ink-50);margin-bottom:24px">${escapeHtml(detail)}</p>` : ''}
+      <a href="${backHref}" style="color:var(--sage-dk);text-decoration:none;font-size:.9rem">← Înapoi</a>
+    </div>`;
+}
+
 document.addEventListener('DOMContentLoaded', async () => {
-  ensureAtmosphere();
-  initScrollProgress();
+  const contentEl = document.getElementById('detailContent');
+  if (!contentEl) return;
+
+  try {
+    ensureAtmosphere();
+    initScrollProgress();
+  } catch (e) {
+    console.warn('[property] init effects failed', e);
+  }
 
   const id       = getQueryParam('id');
   const category = (window.PROPERTY_PAGE || {}).category;
-  const contentEl = document.getElementById('detailContent');
 
   if (!id) {
-    contentEl.innerHTML = `<div style="text-align:center;padding:96px 24px;font-family:var(--font-body);color:var(--ink-50)">
-      <p style="font-size:1.1rem">Link invalid — nu conține un ID de proprietate.</p>
-      <a href="index.html" style="color:var(--sage-dk)">← Înapoi acasă</a></div>`;
+    showFatal(contentEl, 'Link invalid — lipsește ID-ul proprietății.', null, 'index.html');
+    return;
+  }
+  if (!category) {
+    showFatal(contentEl, 'Configurare pagină invalidă.', 'PROPERTY_PAGE.category nu este setat.', 'index.html');
+    return;
+  }
+  if (typeof getPropertyById !== 'function') {
+    showFatal(contentEl, 'Nu s-a putut conecta la baza de date.', 'Reîncarcă pagina sau verifică conexiunea.', 'index.html');
     return;
   }
 
   contentEl.innerHTML = `<div style="display:flex;align-items:center;justify-content:center;height:60vh;color:rgba(28,35,64,.4)">
     <i class="fa-solid fa-spinner fa-spin fa-2x"></i></div>`;
 
-  const p = await getPropertyById(id, category);
-  currentProperty = p;
-
-  if (!p) {
-    contentEl.innerHTML = `<div style="text-align:center;padding:96px 24px;font-family:var(--font-body);color:var(--ink-50)">
-      <p style="font-size:1.1rem">Proprietatea nu mai există sau linkul este incorect.</p>
-      <a href="listings-${category}.html" style="color:var(--sage-dk)">← Înapoi la listă</a></div>`;
+  let p;
+  try {
+    const fetchPromise = getPropertyById(id, category);
+    const timeoutPromise = new Promise((_, rej) =>
+      setTimeout(() => rej(new Error('timeout')), 15000));
+    p = await Promise.race([fetchPromise, timeoutPromise]);
+  } catch (e) {
+    console.error('[property] fetch failed', e);
+    showFatal(contentEl,
+      'Nu s-a putut încărca proprietatea.',
+      e.message === 'timeout' ? 'Cererea a depășit 15 secunde. Verifică conexiunea.' : (e.message || ''),
+      `listings-${category}.html`);
     return;
   }
 
-  if (category === 'rezidential') renderRezidential(p);
-  else if (category === 'comercial') renderComercial(p);
-  else if (category === 'terenuri')  renderTeren(p);
+  currentProperty = p;
+
+  if (!p) {
+    showFatal(contentEl,
+      'Proprietatea nu mai există sau linkul este incorect.',
+      null,
+      `listings-${category}.html`);
+    return;
+  }
+
+  try {
+    if (category === 'rezidential') renderRezidential(p);
+    else if (category === 'comercial') renderComercial(p);
+    else if (category === 'terenuri')  renderTeren(p);
+    else showFatal(contentEl, `Categorie necunoscută: ${category}`, null, 'index.html');
+  } catch (e) {
+    console.error('[property] render failed', e);
+    showFatal(contentEl,
+      'Eroare la afișarea proprietății.',
+      e.message || 'Verifică consola pentru detalii.',
+      `listings-${category}.html`);
+  }
 });
