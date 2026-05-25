@@ -85,13 +85,21 @@ body[data-page="terenuri"] {
   inset: 0;
   pointer-events: none;
   background:
+    /* Stronger bottom-left scrim where the H1 + price sit */
+    linear-gradient(70deg,
+      rgba(14, 18, 36, 0.78) 0%,
+      rgba(14, 18, 36, 0.55) 28%,
+      rgba(14, 18, 36, 0.18) 55%,
+      rgba(14, 18, 36, 0) 78%),
+    /* Top → bottom for eyebrow + scroll-cue legibility */
     linear-gradient(180deg,
-      rgba(28, 35, 64, 0.55) 0%,
-      rgba(28, 35, 64, 0.15) 30%,
-      rgba(28, 35, 64, 0.10) 55%,
-      rgba(28, 35, 64, 0.65) 92%,
-      rgba(28, 35, 64, 0.85) 100%),
-    radial-gradient(ellipse at 50% 40%, transparent 0%, rgba(28, 35, 64, 0.25) 100%);
+      rgba(14, 18, 36, 0.60) 0%,
+      rgba(14, 18, 36, 0.20) 22%,
+      rgba(14, 18, 36, 0.10) 48%,
+      rgba(14, 18, 36, 0.55) 82%,
+      rgba(14, 18, 36, 0.88) 100%),
+    /* Subtle global tint to keep image sitting under brand */
+    radial-gradient(ellipse at 65% 35%, transparent 0%, rgba(14, 18, 36, 0.30) 100%);
 }
 .pp-hero-grain {
   position: absolute;
@@ -189,8 +197,11 @@ body[data-page="terenuri"] {
   line-height: 0.98;
   letter-spacing: -0.014em;
   margin: 0 0 26px;
-  color: var(--pp-stone);
-  text-shadow: 0 4px 32px rgba(0, 0, 0, 0.45);
+  color: #FBF7EE;
+  text-shadow:
+    0 1px 0 rgba(0, 0, 0, 0.35),
+    0 2px 8px rgba(0, 0, 0, 0.55),
+    0 8px 28px rgba(0, 0, 0, 0.55);
   text-wrap: balance;
   font-feature-settings: "kern", "liga", "dlig";
   animation: pp-hero-rise 1s cubic-bezier(0.22, 1, 0.36, 1) both;
@@ -206,7 +217,9 @@ body[data-page="terenuri"] {
   gap: 10px;
   font-family: var(--font-body);
   font-size: 15px;
-  color: rgba(245, 243, 238, 0.82);
+  font-weight: 500;
+  color: #F5F3EE;
+  text-shadow: 0 1px 8px rgba(0, 0, 0, 0.6);
   animation: pp-hero-rise 1s cubic-bezier(0.22, 1, 0.36, 1) 0.12s both;
 }
 .pp-hero-address i { color: var(--pp-gold); font-size: 13px; }
