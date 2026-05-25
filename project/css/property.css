@@ -668,7 +668,7 @@ body[data-page="terenuri"] .pp-breadcrumbs-host {
   width: 44px;
   height: 44px;
   border-radius: 50%;
-  background: transparent;
+  background: rgba(28, 35, 64, 0.45);
   border: 1px solid rgba(245, 243, 238, 0.4);
   color: var(--pp-stone);
   font-size: 18px;
@@ -677,6 +677,7 @@ body[data-page="terenuri"] .pp-breadcrumbs-host {
   align-items: center;
   justify-content: center;
   transition: background 0.3s, transform 0.3s;
+  z-index: 10;
 }
 .pp-lightbox-close:hover {
   background: rgba(245, 243, 238, 0.1);
@@ -689,7 +690,7 @@ body[data-page="terenuri"] .pp-breadcrumbs-host {
   width: 56px;
   height: 56px;
   border-radius: 50%;
-  background: transparent;
+  background: rgba(28, 35, 64, 0.55);
   border: 1px solid rgba(245, 243, 238, 0.3);
   color: var(--pp-stone);
   font-size: 18px;
@@ -697,7 +698,8 @@ body[data-page="terenuri"] .pp-breadcrumbs-host {
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: background 0.3s, transform 0.3s;
+  transition: background 0.3s, transform 0.3s, border-color 0.3s;
+  z-index: 10;
 }
 .pp-lightbox-prev { left: 24px; }
 .pp-lightbox-next { right: 24px; }
