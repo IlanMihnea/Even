@@ -60,6 +60,65 @@ function parseSlug(url) {
   return out;
 }
 
+// imobiliare.ro caps JSON-LD product.description at ~1000 chars (often ending
+// mid-HTML-entity like `via&...`). The full description lives elsewhere in
+// the page — typically inside one of the inline JSON blobs (Next.js / Nuxt
+// state, embedded data scripts). Walk every <script type="application/json">
+// and any other inline JSON blob, find the longest string that begins like
+// the short description we already have, and use that as the canonical body.
+function findLongestStringByPrefix(node, prefix, best) {
+  if (typeof node === 'string') {
+    if (node.length > best.value && node.startsWith(prefix)) best.value = node.length, best.text = node;
+    return;
+  }
+  if (Array.isArray(node)) { for (const n of node) findLongestStringByPrefix(n, prefix, best); return; }
+  if (node && typeof node === 'object') {
+    for (const k in node) findLongestStringByPrefix(node[k], prefix, best);
+  }
+}
+
+function extractFullDescription(html, shortDesc) {
+  if (!shortDesc) return shortDesc;
+  const stripped = shortDesc.replace(/&[#\w]*\.{0,3}$/, '').trim();
+  const prefix = stripped.slice(0, 60);
+  if (!prefix) return shortDesc;
+
+  const best = { value: shortDesc.length, text: shortDesc };
+
+  // Strategy A: every <script type="application/json"> block
+  const jsonScripts = html.match(/<script[^>]*type=["']application\/(?:ld\+)?json["'][^>]*>[\s\S]*?<\/script>/gi) || [];
+  for (const block of jsonScripts) {
+    const body = block.replace(/^<script[^>]*>/i, '').replace(/<\/script>$/i, '');
+    try {
+      const data = JSON.parse(body);
+      findLongestStringByPrefix(data, prefix, best);
+    } catch (_) { /* skip malformed */ }
+  }
+
+  // Strategy B: inline state assignments (Nuxt / Next / custom)
+  const stateRgx = /(?:window\.__NUXT__|window\.__INITIAL_STATE__|window\.__NEXT_DATA__|window\.__APOLLO_STATE__)\s*=\s*(\{[\s\S]*?\});?<\/script>/g;
+  let m;
+  while ((m = stateRgx.exec(html))) {
+    try {
+      const data = JSON.parse(m[1]);
+      findLongestStringByPrefix(data, prefix, best);
+    } catch (_) { /* skip */ }
+  }
+
+  // Strategy C: raw HTML body — find prefix and read forward to a natural end
+  if (best.text.length <= shortDesc.length + 10) {
+    const idx = html.indexOf(prefix);
+    if (idx >= 0) {
+      // grab a generous window, then strip HTML and decode
+      const window2 = html.slice(idx, idx + 8000);
+      const cleaned = window2.replace(/<\/?[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
+      if (cleaned.length > best.text.length) best.text = cleaned;
+    }
+  }
+
+  return best.text || shortDesc;
+}
+
 function parseDescription(desc) {
   const out = {};
   if (!desc) return out;
@@ -163,7 +222,16 @@ module.exports = async function handler(req, res) {
 
   const slugData = parseSlug(url);
   const titlu = decodeEntities(product?.name || '').replace(/\s*\|\s*Imobiliare\.ro\s*$/i, '').trim();
-  const descriere = decodeEntities(product?.description || '');
+  // JSON-LD description is capped (~1000 chars, often ending in a half entity).
+  // Try to recover the full text from inline JSON blobs / HTML body.
+  const shortDesc = decodeEntities(product?.description || '');
+  let descriere = extractFullDescription(html, shortDesc);
+  // Final clean-up: decode any remaining entities and trim trailing truncation
+  // markers that some sources leave behind (e.g. `… `, `&...`).
+  descriere = decodeEntities(descriere || '')
+    .replace(/\s*&[#\w]*\.{2,}\s*$/, '')
+    .replace(/\s*…\s*$/, '')
+    .trim();
   const descParsed = parseDescription(descriere);
 
   // Price
