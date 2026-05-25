@@ -12,6 +12,20 @@ function shortPropNumber(id) {
   return String(id || '').replace(/-/g, '').slice(0, 4).toUpperCase() || '----';
 }
 
+function waNumber(tel) {
+  const digits = String(tel || '').replace(/\D/g, '');
+  if (!digits) return '40745609366';
+  if (digits.startsWith('40')) return digits;
+  if (digits.startsWith('0')) return '40' + digits.slice(1);
+  return digits;
+}
+
+function waLink(tel, propTitle) {
+  const num = waNumber(tel);
+  const txt = encodeURIComponent(`Bună, sunt interesat(ă) de ${propTitle || 'această proprietate'}. Aș vrea mai multe detalii.`);
+  return `https://wa.me/${num}?text=${txt}`;
+}
+
 function fmtNum(n) {
   if (n == null) return '-';
   return new Intl.NumberFormat('ro-RO').format(n);
@@ -653,6 +667,9 @@ function renderSidebar(agent, p) {
         <a href="tel:${agent.telefon}" class="pp-call-btn">
           <i class="fa-solid fa-phone"></i> Sună acum
         </a>
+        <a href="${waLink(agent.telefon, p && p.titlu)}" target="_blank" rel="noopener" class="pp-wa-btn">
+          <i class="fa-brands fa-whatsapp"></i> Scrie pe WhatsApp
+        </a>
       </div>
 
       <div class="pp-form-card">
@@ -692,14 +709,36 @@ function renderSidebar(agent, p) {
     </aside>`;
 }
 
+// ---------- MID-PAGE CTA STRIP ----------
+function renderCtaStrip(p, agent) {
+  if (!agent) return '';
+  const tel = agent.telefon || '0745 609 366';
+  return `
+    <aside class="pp-cta-strip">
+      <div class="pp-cta-strip-text">
+        <span class="pp-cta-strip-eyebrow">— Te interesează?</span>
+        <p class="pp-cta-strip-h">Scrie-i lui ${escapeHtml((agent.nume || '').split(' ')[0] || 'Ilan')} pe WhatsApp sau <em>programează o vizionare</em>.</p>
+      </div>
+      <div class="pp-cta-strip-actions">
+        <a href="${waLink(tel, p.titlu)}" target="_blank" rel="noopener" class="cta-wa">
+          <i class="fa-brands fa-whatsapp"></i> WhatsApp
+        </a>
+        <a href="#" class="cta-call" onclick="event.preventDefault(); document.querySelector('.pp-form-card').scrollIntoView({behavior:'smooth', block:'center'})">
+          <i class="fa-solid fa-calendar-check"></i> Programează
+        </a>
+      </div>
+    </aside>`;
+}
+
 // ---------- MOBILE BOTTOM CTA ----------
-function renderMobileCta(agent) {
+function renderMobileCta(agent, p) {
   if (!agent) return '';
   return `
     <div class="pp-mobile-cta">
-      <a href="tel:${agent.telefon}"><i class="fa-solid fa-phone"></i> Sună acum</a>
-      <button type="button" onclick="document.querySelector('.pp-form-card').scrollIntoView({behavior:'smooth', block:'center'})">
-        <i class="fa-solid fa-calendar-check"></i> Programează vizionare
+      <a class="mcta-wa" href="${waLink(agent.telefon, p && p.titlu)}" target="_blank" rel="noopener"><i class="fa-brands fa-whatsapp"></i> WhatsApp</a>
+      <a class="mcta-call" href="tel:${agent.telefon}"><i class="fa-solid fa-phone"></i> Sună</a>
+      <button class="mcta-form" type="button" onclick="document.querySelector('.pp-form-card').scrollIntoView({behavior:'smooth', block:'center'})">
+        <i class="fa-solid fa-calendar-check"></i> Vizionare
       </button>
     </div>`;
 }
@@ -786,7 +825,7 @@ function sharePage() {
 
 // ---------- SCROLL REVEAL ----------
 function initScrollReveal() {
-  const targets = document.querySelectorAll('.pp-section, .pp-title-block, .pp-stats');
+  const targets = document.querySelectorAll('.pp-section, .pp-title-block, .pp-stats, .pp-cta-strip');
   if (!('IntersectionObserver' in window) || !targets.length) {
     targets.forEach(el => el.classList.add('is-revealed'));
     return;
@@ -847,6 +886,7 @@ function renderRezidential(p) {
           <div class="pp-main">
             ${renderDescription(p.descriere)}
             ${renderDotari(p)}
+            ${renderCtaStrip(p, p.agent)}
             ${p.regim === 'vanzare' ? renderCalcRate(p) : ''}
             ${renderPlan('rezidential')}
             ${renderMap(p, 'rezidential')}
@@ -855,7 +895,7 @@ function renderRezidential(p) {
         </div>
       </div>
     </main>
-    ${renderMobileCta(p.agent)}
+    ${renderMobileCta(p.agent, p)}
   `;
 
   document.getElementById('detailContent').innerHTML = ''; // clear loading
@@ -911,6 +951,7 @@ function renderComercial(p) {
           <div class="pp-main">
             ${renderDescription(p.descriere)}
             ${renderFisaTehnica(p)}
+            ${renderCtaStrip(p, p.agent)}
             ${p.regim === 'inchiriere' ? renderCalcLunar(p) : ''}
             ${renderPlan('comercial')}
             ${renderMap(p, 'comercial')}
@@ -919,7 +960,7 @@ function renderComercial(p) {
         </div>
       </div>
     </main>
-    ${renderMobileCta(p.agent)}
+    ${renderMobileCta(p.agent, p)}
   `;
 
   const brEl = document.querySelector('.page-header');
@@ -970,6 +1011,7 @@ function renderTeren(p) {
             ${renderDescription((p.descriere || '') + (p.vecinatati ? `\n\n**Vecinătăți:** ${p.vecinatati}` : ''))}
             ${renderUtilitati(p)}
             ${renderRegimJuridic(p)}
+            ${renderCtaStrip(p, p.agent)}
             ${renderCalcConstruibil(p)}
             ${renderPlan('terenuri')}
             ${renderMap(p, 'terenuri')}
@@ -979,7 +1021,7 @@ function renderTeren(p) {
         </div>
       </div>
     </main>
-    ${renderMobileCta(p.agent)}
+    ${renderMobileCta(p.agent, p)}
   `;
 
   const brEl = document.querySelector('.page-header');
