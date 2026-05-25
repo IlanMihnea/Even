@@ -1113,6 +1113,133 @@ function showToast(msg) {
   setTimeout(() => t.classList.remove('show'), 3000);
 }
 
+// ---------- IMPORT IMOBILIARE.RO ----------
+let importedDraft = null;
+
+function openImportModal() {
+  importedDraft = null;
+  document.getElementById('importUrlInput').value = '';
+  document.getElementById('importPreview').style.display = 'none';
+  document.getElementById('importPreviewBody').innerHTML = '';
+  document.getElementById('importModal').classList.add('open');
+  setTimeout(() => document.getElementById('importUrlInput').focus(), 100);
+}
+function closeImportModal() {
+  document.getElementById('importModal').classList.remove('open');
+  importedDraft = null;
+}
+
+async function runImportFetch() {
+  const urlInput = document.getElementById('importUrlInput');
+  const btn = document.getElementById('importFetchBtn');
+  const url = (urlInput.value || '').trim();
+  if (!/^https?:\/\/(www\.)?imobiliare\.ro\/oferta\//i.test(url)) {
+    alert('Te rog lipește un link valid imobiliare.ro/oferta/...');
+    return;
+  }
+  btn.disabled = true;
+  const originalHtml = btn.innerHTML;
+  btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Se extrag datele...';
+
+  try {
+    const r = await fetch('/api/import-imobiliare', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ url })
+    });
+    const data = await r.json();
+    if (!r.ok) throw new Error(data.error || `HTTP ${r.status}`);
+
+    importedDraft = data;
+    renderImportPreview(data);
+    document.getElementById('importPreview').style.display = 'block';
+  } catch (err) {
+    alert('Nu am putut extrage: ' + err.message);
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = originalHtml;
+  }
+}
+
+function renderImportPreview(d) {
+  const row = (label, value) => {
+    if (value === undefined || value === null || value === '' || value === false) return '';
+    let display = value;
+    if (typeof value === 'boolean') display = value ? 'Da' : 'Nu';
+    if (Array.isArray(value)) display = value.length + ' elemente';
+    return `<div style="display:grid;grid-template-columns:160px 1fr;gap:8px;padding:4px 0;border-bottom:1px dashed var(--gray-200)">
+      <div style="color:var(--gray-500);font-weight:500">${label}</div>
+      <div>${escapeHtmlAdm(String(display)).slice(0, 280)}</div>
+    </div>`;
+  };
+  const body = [
+    row('Categorie', d.categorie),
+    row('Tip', d.tip),
+    row('Regim', d.regim === 'inchiriere' ? 'Închiriere' : d.regim === 'vanzare' ? 'Vânzare' : d.regim),
+    row('Titlu', d.titlu),
+    row('Preț', d.pret ? `${d.pret} ${d.moneda || 'EUR'}` : null),
+    row('Oraș', d.oras),
+    row('Cartier', d.cartier),
+    row('Adresă', d.adresa),
+    row('Camere', d.camere),
+    row('Băi', d.bai),
+    row('Suprafață utilă', d.suprafata ? `${d.suprafata} mp` : null),
+    row('Suprafață totală', d.suprafataTotala ? `${d.suprafataTotala} mp` : null),
+    row('Etaj', d.etaj != null && d.etajTotal ? `${d.etaj} din ${d.etajTotal}` : d.etaj),
+    row('An construcție', d.anConstructie),
+    row('Compartimentare', d.compartimentare),
+    row('Mobilat', d.mobilat),
+    row('Încălzire', d.tipIncalzire),
+    row('Parcare', d.parcare),
+    row('Balcon', d.balcon),
+    row('Terase', d.terase),
+    row('Descriere', d.descriere ? d.descriere.slice(0, 200) + (d.descriere.length > 200 ? '…' : '') : null),
+    row('Imagini pe imobiliare.ro', d.imaginiSursa && d.imaginiSursa.length ? `${d.imaginiSursa.length} (NU se importă — urci pozele proprii)` : null),
+  ].filter(Boolean).join('');
+  document.getElementById('importPreviewBody').innerHTML = body || '<em>Nu am extras nicio dată utilă.</em>';
+}
+
+function acceptImportedDraft() {
+  if (!importedDraft) return;
+  const d = importedDraft;
+
+  // Build an "editingProperty"-shaped object so hydrateFormValues populates the form.
+  // We deliberately do NOT set an id — submitNewProperty generates one.
+  const draft = {
+    titlu: d.titlu,
+    regim: d.regim,
+    tip: d.tip,
+    camere: d.camere,
+    suprafata: d.suprafata,
+    suprafataTotala: d.suprafataTotala,
+    etaj: d.etaj,
+    etajTotal: d.etajTotal,
+    anConstructie: d.anConstructie,
+    pret: d.pret,
+    oras: d.oras,
+    cartier: d.cartier,
+    adresa: d.adresa,
+    descriere: d.descriere,
+  };
+  Object.keys(draft).forEach(k => (draft[k] === undefined || draft[k] === null) && delete draft[k]);
+
+  // Close import modal, open add modal in correct category, then hydrate.
+  closeImportModal();
+  editingProperty = null;
+  existingImages = [];
+  document.querySelector('#addModal h2').textContent = 'Proprietate importată — verifică și completează';
+  document.querySelector('#addModal .cat-selector').style.display = '';
+  document.getElementById('addModal').classList.add('open');
+
+  // Set category (this re-renders the form), then hydrate it via temporary editingProperty hack.
+  editingProperty = draft;
+  setFormCategory(d.categorie || 'rezidential');
+  // After hydrate, clear editingProperty so submit treats this as a new (add) flow.
+  editingProperty = null;
+
+  showToast('Datele au fost preluate. Verifică, urcă pozele și salvează.');
+}
+
 // ---------- INIT ----------
 document.addEventListener('DOMContentLoaded', async () => {
   const loggedIn = await checkLogin();

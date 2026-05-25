@@ -100,7 +100,12 @@
       <div class="admin-section">
         <div class="admin-section-header">
           <h2>Proprietăți în portofoliu</h2>
-          <button class="btn btn-gold" onclick="openAddModal()"><i class="fa-solid fa-plus"></i> Adaugă proprietate</button>
+          <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+            <button class="btn btn-outline" onclick="openImportModal()" title="Importă datele unui anunț de pe imobiliare.ro">
+              <i class="fa-solid fa-cloud-arrow-down"></i> Import imobiliare.ro
+            </button>
+            <button class="btn btn-gold" onclick="openAddModal()"><i class="fa-solid fa-plus"></i> Adaugă proprietate</button>
+          </div>
         </div>
         <div class="admin-tabs" id="adminTabs"></div>
 
@@ -223,6 +228,40 @@
       <div class="modal-close" onclick="closeLeadModal()"><i class="fa-solid fa-xmark"></i></div>
       <h2>Cerere primită</h2>
       <div id="leadDetailBody"></div>
+    </div>
+  </div>
+
+  <!-- MODAL IMPORT IMOBILIARE.RO -->
+  <div class="modal" id="importModal">
+    <div class="modal-card" style="max-width:720px">
+      <div class="modal-close" onclick="closeImportModal()"><i class="fa-solid fa-xmark"></i></div>
+      <h2><i class="fa-solid fa-cloud-arrow-down" style="color:var(--gold);margin-right:6px"></i>Import de pe imobiliare.ro</h2>
+      <p class="modal-sub">Lipește linkul anunțului. Extrag datele și ți le arăt înainte să confirmi.</p>
+
+      <div class="form-group full" style="margin-top:8px">
+        <label>URL anunț imobiliare.ro</label>
+        <input type="url" id="importUrlInput" placeholder="https://www.imobiliare.ro/oferta/...">
+      </div>
+      <div style="display:flex;gap:12px;margin-top:8px">
+        <button type="button" class="btn btn-outline" onclick="closeImportModal()">Anulează</button>
+        <button type="button" id="importFetchBtn" class="btn btn-primary" onclick="runImportFetch()">
+          <i class="fa-solid fa-magnifying-glass"></i> Extrage datele
+        </button>
+      </div>
+
+      <div id="importPreview" style="display:none;margin-top:18px;padding:16px;background:var(--gray-50);border-radius:8px;border:1px solid var(--gray-200)">
+        <h3 style="margin:0 0 10px;font-size:16px"><i class="fa-solid fa-eye" style="color:var(--gold)"></i> Previzualizare extrasă</h3>
+        <div id="importPreviewBody" style="font-size:13px;line-height:1.7"></div>
+        <div style="display:flex;gap:12px;margin-top:14px">
+          <button type="button" class="btn btn-outline" onclick="closeImportModal()">Renunță</button>
+          <button type="button" class="btn btn-gold" onclick="acceptImportedDraft()">
+            <i class="fa-solid fa-check"></i> Continuă către formular
+          </button>
+        </div>
+        <p style="margin-top:10px;font-size:12px;color:var(--gray-500)">
+          La pasul următor poți edita orice câmp și urca pozele proprii din computer.
+        </p>
+      </div>
     </div>
   </div>
 
