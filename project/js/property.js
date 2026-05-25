@@ -64,13 +64,12 @@ function renderMasthead(p, category) {
 // ---------- GALLERY ----------
 function renderGallery(imagini) {
   galleryImages = Array.isArray(imagini) ? imagini.filter(Boolean) : [];
+}
+
+// Thumb strip (separate from hero image, after the cinematic hero)
+function renderThumbStrip() {
   const total = galleryImages.length;
-
-  const heroImg = galleryImages[0]
-    ? `<img src="${escapeHtml(galleryImages[0])}" alt="" loading="eager">`
-    : `<div class="img-placeholder"></div>`;
-
-  // 6 thumb slots; if more than 6, last shows "+N foto" overlay
+  if (total <= 1) return '';
   const thumbCount = 6;
   const thumbs = [];
   for (let i = 0; i < thumbCount; i++) {
@@ -84,23 +83,134 @@ function renderGallery(imagini) {
           <img src="${escapeHtml(url)}" alt="" loading="lazy">
           ${more ? `<div class="pp-thumb-more">+${total - thumbCount - 1} foto</div>` : ''}
         </div>`);
-    } else if (i === 0 && total === 1) {
-      // single image: no thumbs
-      break;
     } else {
-      thumbs.push(`<div class="pp-thumb" style="opacity:0.4;cursor:default;pointer-events:none"></div>`);
+      thumbs.push(`<div class="pp-thumb" style="opacity:0.35;cursor:default;pointer-events:none"></div>`);
     }
   }
-
   return `
-    <div class="pp-gallery">
-      <div class="pp-gallery-hero" onclick="openLightbox(0)">
-        ${heroImg}
-        ${total > 0 ? `<div class="pp-gallery-counter">01 / ${String(total).padStart(2, '0')}</div>` : ''}
-        ${total > 0 ? `<button class="pp-gallery-zoom" type="button" onclick="event.stopPropagation(); openLightbox(0)"><i class="fa-solid fa-expand"></i> Vezi toate</button>` : ''}
-      </div>
-      ${total > 1 ? `<div class="pp-gallery-thumbs">${thumbs.join('')}</div>` : ''}
+    <div class="pp-thumb-strip">
+      <button class="pp-thumb-cta" type="button" onclick="openLightbox(0)">
+        <i class="fa-solid fa-expand"></i>
+        <span>Vezi toate (${total})</span>
+      </button>
+      <div class="pp-gallery-thumbs">${thumbs.join('')}</div>
     </div>`;
+}
+
+// ---------- CINEMATIC HERO ----------
+function renderHero(p, opts) {
+  const { eyebrow, address, priceMain, priceSub } = opts;
+  const id = p.id;
+  const total = galleryImages.length;
+  const heroSrc = galleryImages[0] || '';
+  const heroBg = heroSrc
+    ? `<img src="${escapeHtml(heroSrc)}" alt="" loading="eager" class="pp-hero-img" data-parallax>`
+    : `<div class="pp-hero-img pp-hero-placeholder"></div>`;
+  return `
+    <section class="pp-hero" onclick="${heroSrc ? 'openLightbox(0)' : ''}">
+      <div class="pp-hero-bg">
+        ${heroBg}
+        <div class="pp-hero-vignette" aria-hidden="true"></div>
+        <div class="pp-hero-grain" aria-hidden="true"></div>
+      </div>
+      <div class="pp-hero-frame">
+        <div class="pp-hero-corner pp-hero-corner-tl"></div>
+        <div class="pp-hero-corner pp-hero-corner-tr"></div>
+        <div class="pp-hero-corner pp-hero-corner-bl"></div>
+        <div class="pp-hero-corner pp-hero-corner-br"></div>
+      </div>
+      <div class="pp-hero-inner">
+        <div class="pp-hero-top">
+          <span class="pp-hero-eyebrow">${eyebrow}</span>
+          <div class="pp-hero-actions" onclick="event.stopPropagation()">
+            <button class="pp-action-btn pp-fav-btn pp-action-btn--light" type="button" data-prop-id="${id}"
+                    onclick="toggleFav(this)" aria-label="Salvează la favorite">
+              <i class="fa-regular fa-heart"></i>
+              <span>Salvează</span>
+            </button>
+            <button class="pp-action-btn pp-action-btn--light" type="button" onclick="sharePage()" aria-label="Partajează">
+              <i class="fa-solid fa-share-nodes"></i>
+              <span>Partajează</span>
+            </button>
+          </div>
+        </div>
+        <div class="pp-hero-body">
+          <h1 class="pp-hero-h1">${escapeHtml(p.titlu)}</h1>
+          <div class="pp-hero-address">
+            <i class="fa-solid fa-location-dot"></i>
+            <span>${address}</span>
+          </div>
+        </div>
+        <div class="pp-hero-bottom">
+          <div class="pp-hero-price">
+            <span class="pp-hero-price-label">Preț</span>
+            <div class="pp-hero-price-main">${priceMain}</div>
+            ${priceSub ? `<div class="pp-hero-price-sub">${priceSub}</div>` : ''}
+          </div>
+          ${total > 0 ? `
+          <div class="pp-hero-counter" onclick="event.stopPropagation(); openLightbox(0)">
+            <span class="pp-hero-counter-num">01</span>
+            <span class="pp-hero-counter-sep">/</span>
+            <span class="pp-hero-counter-tot">${String(total).padStart(2, '0')}</span>
+            <span class="pp-hero-counter-label">vezi galeria</span>
+          </div>` : ''}
+        </div>
+        <div class="pp-hero-scroll" aria-hidden="true">
+          <span class="pp-hero-scroll-line"></span>
+          <span class="pp-hero-scroll-text">Scroll</span>
+        </div>
+      </div>
+    </section>`;
+}
+
+// ---------- PARALLAX + COUNT-UP ----------
+function initHeroParallax() {
+  const img = document.querySelector('.pp-hero-img[data-parallax]');
+  if (!img) return;
+  let ticking = false;
+  const onScroll = () => {
+    if (ticking) return;
+    ticking = true;
+    requestAnimationFrame(() => {
+      const rect = img.getBoundingClientRect();
+      if (rect.bottom > 0 && rect.top < window.innerHeight) {
+        const offset = Math.max(-60, Math.min(120, window.scrollY * 0.22));
+        img.style.transform = `translate3d(0, ${offset}px, 0) scale(1.08)`;
+      }
+      ticking = false;
+    });
+  };
+  window.addEventListener('scroll', onScroll, { passive: true });
+  onScroll();
+}
+
+function animateNumber(el, target, suffix) {
+  const isFloat = /\./.test(String(target));
+  const num = parseFloat(String(target).replace(/[^\d.\-]/g, ''));
+  if (!isFinite(num)) { el.textContent = target + (suffix || ''); return; }
+  const duration = 900;
+  const start = performance.now();
+  const fmt = (v) => isFloat ? v.toFixed(1) : new Intl.NumberFormat('ro-RO').format(Math.round(v));
+  const step = (now) => {
+    const t = Math.min(1, (now - start) / duration);
+    const eased = 1 - Math.pow(1 - t, 3);
+    el.textContent = fmt(num * eased) + (suffix || '');
+    if (t < 1) requestAnimationFrame(step);
+  };
+  requestAnimationFrame(step);
+}
+
+function initStatsCountUp() {
+  const nums = document.querySelectorAll('.pp-stat-num[data-value]');
+  if (!('IntersectionObserver' in window) || !nums.length) return;
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (!entry.isIntersecting) return;
+      animateNumber(entry.target, entry.target.dataset.value, '');
+      io.unobserve(entry.target);
+    });
+  }, { threshold: 0.4 });
+  nums.forEach(el => io.observe(el));
 }
 
 // ---------- LIGHTBOX ----------
@@ -207,20 +317,52 @@ function renderTitleBlock(p, opts) {
 function renderStats(stats) {
   return `
     <section class="pp-stats">
-      ${stats.map(s => `
+      ${stats.map(s => {
+        const raw = String(s.val);
+        const numeric = typeof s.val === 'number' || /^-?\d[\d.,]*$/.test(raw);
+        const num = numeric
+          ? `<span class="pp-stat-num" data-value="${escapeHtml(raw)}">0</span>`
+          : `<span class="pp-stat-num">${escapeHtml(raw)}</span>`;
+        const unit = s.unit ? `<small>${escapeHtml(s.unit)}</small>` : '';
+        return `
         <div class="pp-stat">
-          <span class="pp-stat-val">${s.val}${s.unit ? `<small>${s.unit}</small>` : ''}</span>
+          <span class="pp-stat-val">${num}${unit}</span>
           <div class="pp-stat-rule"></div>
-          <span class="pp-stat-label">${s.label}</span>
-        </div>
-      `).join('')}
+          <span class="pp-stat-label">${escapeHtml(s.label)}</span>
+        </div>`;
+      }).join('')}
     </section>`;
 }
 
 // ---------- DESCRIPTION ----------
 function renderDescription(text) {
   if (!text) return '';
-  const paragraphs = text.split(/\n+/).filter(Boolean).map(p => `<p>${escapeHtml(p)}</p>`).join('');
+  const cleaned = String(text)
+    .replace(/<br\s*\/?>/gi, '\n')
+    .replace(/<\/p>\s*<p[^>]*>/gi, '\n\n')
+    .replace(/<\/?p[^>]*>/gi, '\n')
+    .replace(/<\/?(strong|b)>/gi, '__B__')
+    .replace(/<[^>]+>/g, '')
+    .replace(/&nbsp;/g, ' ')
+    .replace(/&amp;/g, '&');
+
+  const blocks = cleaned
+    .split(/\r?\n\s*\r?\n|\r?\n/)
+    .map(p => p.trim())
+    .filter(Boolean);
+
+  if (!blocks.length) return '';
+
+  const formatBlock = (p, idx) => {
+    let html = escapeHtml(p)
+      .replace(/__B__(.+?)__B__/g, '<strong>$1</strong>')
+      .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+    const cls = idx === 0 ? 'pp-description-lead' : '';
+    return `<p${cls ? ` class="${cls}"` : ''}>${html}</p>`;
+  };
+
+  const paragraphs = blocks.map(formatBlock).join('');
+
   return `
     <section class="pp-section">
       <span class="pp-section-eyebrow">— Despre proprietate</span>
@@ -875,12 +1017,13 @@ function renderRezidential(p) {
     <a href="index.html">Acasă</a> / <a href="listings-rezidential.html">Rezidențial</a> / ${escapeHtml(p.titlu)}
   `;
 
+  renderGallery(p.imagini);
   const html = `
+    ${renderHero(p, { eyebrow, address, priceMain, priceSub })}
     ${renderMasthead(p, 'rezidential')}
     <main class="prop-detail">
       <div class="container">
-        ${renderGallery(p.imagini)}
-        ${renderTitleBlock(p, { eyebrow, address, priceMain, priceSub })}
+        ${renderThumbStrip()}
         ${renderStats(stats)}
         <div class="pp-layout">
           <div class="pp-main">
@@ -917,6 +1060,8 @@ function renderRezidential(p) {
   if (p.regim === 'vanzare') calcRate();
   setTimeout(() => initPropertyMap(p, 'rezidential'), 300);
   initScrollReveal();
+  initHeroParallax();
+  initStatsCountUp();
 }
 
 function renderComercial(p) {
@@ -940,12 +1085,13 @@ function renderComercial(p) {
 
   document.title = `${p.titlu} · EVEN`;
 
+  renderGallery(p.imagini);
   const html = `
+    ${renderHero(p, { eyebrow, address, priceMain, priceSub })}
     ${renderMasthead(p, 'comercial')}
     <main class="prop-detail">
       <div class="container">
-        ${renderGallery(p.imagini)}
-        ${renderTitleBlock(p, { eyebrow, address, priceMain, priceSub })}
+        ${renderThumbStrip()}
         ${renderStats(stats)}
         <div class="pp-layout">
           <div class="pp-main">
@@ -975,6 +1121,8 @@ function renderComercial(p) {
   if (p.regim === 'inchiriere') calcLunar();
   setTimeout(() => initPropertyMap(p, 'comercial'), 300);
   initScrollReveal();
+  initHeroParallax();
+  initStatsCountUp();
 }
 
 function renderTeren(p) {
@@ -999,12 +1147,13 @@ function renderTeren(p) {
 
   document.title = `${p.titlu} · EVEN`;
 
+  renderGallery(p.imagini);
   const html = `
+    ${renderHero(p, { eyebrow, address, priceMain, priceSub })}
     ${renderMasthead(p, 'terenuri')}
     <main class="prop-detail">
       <div class="container">
-        ${renderGallery(p.imagini)}
-        ${renderTitleBlock(p, { eyebrow, address, priceMain, priceSub })}
+        ${renderThumbStrip()}
         ${renderStats(stats)}
         <div class="pp-layout">
           <div class="pp-main">
@@ -1036,6 +1185,8 @@ function renderTeren(p) {
   if (p.CUT || p.POT) calcBuild();
   setTimeout(() => initPropertyMap(p, 'terenuri'), 300);
   initScrollReveal();
+  initHeroParallax();
+  initStatsCountUp();
 }
 
 // ---------- INIT ----------
