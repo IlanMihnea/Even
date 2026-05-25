@@ -784,6 +784,24 @@ function sharePage() {
   }
 }
 
+// ---------- SCROLL REVEAL ----------
+function initScrollReveal() {
+  const targets = document.querySelectorAll('.pp-section, .pp-title-block, .pp-stats');
+  if (!('IntersectionObserver' in window) || !targets.length) {
+    targets.forEach(el => el.classList.add('is-revealed'));
+    return;
+  }
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('is-revealed');
+        io.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
+  targets.forEach(el => io.observe(el));
+}
+
 // ---------- ATMOSPHERE OVERLAYS ----------
 function ensureAtmosphere() {
   if (document.querySelector('.pp-bg-grain')) return;
@@ -858,6 +876,7 @@ function renderRezidential(p) {
   if (typeof applyFavStates === 'function') applyFavStates(document);
   if (p.regim === 'vanzare') calcRate();
   setTimeout(() => initPropertyMap(p, 'rezidential'), 300);
+  initScrollReveal();
 }
 
 function renderComercial(p) {
@@ -914,6 +933,7 @@ function renderComercial(p) {
   if (typeof applyFavStates === 'function') applyFavStates(document);
   if (p.regim === 'inchiriere') calcLunar();
   setTimeout(() => initPropertyMap(p, 'comercial'), 300);
+  initScrollReveal();
 }
 
 function renderTeren(p) {
@@ -973,6 +993,7 @@ function renderTeren(p) {
   if (typeof applyFavStates === 'function') applyFavStates(document);
   if (p.CUT || p.POT) calcBuild();
   setTimeout(() => initPropertyMap(p, 'terenuri'), 300);
+  initScrollReveal();
 }
 
 // ---------- INIT ----------
