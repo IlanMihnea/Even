@@ -888,6 +888,7 @@ async function restoreProject(id) {
 function openAddModal() {
   editingProperty = null;
   existingImages = [];
+  resetPendingFiles();
   document.querySelector('#addModal h2').textContent = 'Adaugă proprietate nouă';
   document.querySelector('#addModal .cat-selector').style.display = '';
   document.getElementById('addModal').classList.add('open');
@@ -897,6 +898,7 @@ function closeAddModal() {
   document.getElementById('addModal').classList.remove('open');
   editingProperty = null;
   existingImages = [];
+  resetPendingFiles();
 }
 
 function setFormCategory(cat) {
@@ -1006,6 +1008,7 @@ function renderDynamicForm() {
   }
   hydrateFormValues();
   renderImaginiPreview();
+  renderPendingPreview();
 }
 
 function agentSelector() {
@@ -1018,8 +1021,10 @@ function imageUploadBlock() {
   return `
     <div class="form-group full">
       <label>Imagini</label>
-      <input type="file" name="imaginiFiles" multiple accept="image/*">
+      <input type="file" name="imaginiFiles" multiple accept="image/*" onchange="handlePendingFilesSelected(event)">
+      <div class="imagini-hint"><i class="fa-solid fa-arrows-up-down-left-right"></i> Trage miniaturile pentru a le reordona. Prima imagine devine cover-ul anunțului.</div>
       <div id="imaginiPreview" class="imagini-preview"></div>
+      <div id="pendingPreview" class="imagini-preview"></div>
     </div>
   `;
 }
@@ -1029,11 +1034,124 @@ function renderImaginiPreview() {
   if (!wrap) return;
   if (!existingImages.length) { wrap.innerHTML = ''; return; }
   wrap.innerHTML = existingImages.map((url, i) => `
-    <div class="img-thumb">
+    <div class="img-thumb" draggable="true"
+         ondragstart="onThumbDragStart(event,'existing',${i})"
+         ondragover="onThumbDragOver(event)"
+         ondragleave="onThumbDragLeave(event)"
+         ondrop="onThumbDrop(event,'existing',${i})"
+         ondragend="onThumbDragEnd(event)">
       <img src="${url}" alt="">
+      ${i === 0 && pendingFiles.length === 0 ? '<span class="img-thumb-cover">Cover</span>' : `<span class="img-thumb-idx">${i + 1}</span>`}
       <button type="button" class="img-thumb-x" onclick="removeExistingImage(${i})" title="Șterge"><i class="fa-solid fa-xmark"></i></button>
     </div>
   `).join('');
+}
+
+// ---------- PENDING (newly selected) FILES WITH REORDER ----------
+let pendingFiles = [];          // File[] in user-defined order
+let pendingPreviewUrls = [];    // dataURL[] aligned with pendingFiles
+
+function handlePendingFilesSelected(e) {
+  const files = Array.from(e.target.files || []);
+  // Append (don't replace) so user can add in batches
+  files.forEach(f => {
+    pendingFiles.push(f);
+    const reader = new FileReader();
+    const idx = pendingFiles.length - 1;
+    reader.onload = ev => {
+      pendingPreviewUrls[idx] = ev.target.result;
+      renderPendingPreview();
+    };
+    reader.readAsDataURL(f);
+  });
+  // Clear input so the same file could be re-added later if removed
+  e.target.value = '';
+  renderPendingPreview();
+}
+
+function renderPendingPreview() {
+  const wrap = document.getElementById('pendingPreview');
+  if (!wrap) return;
+  if (!pendingFiles.length) { wrap.innerHTML = ''; return; }
+  const baseIdx = existingImages.length;
+  wrap.innerHTML = pendingFiles.map((f, i) => {
+    const overallIdx = baseIdx + i;
+    const isCover = overallIdx === 0;
+    const src = pendingPreviewUrls[i] || '';
+    return `
+      <div class="img-thumb" draggable="true"
+           ondragstart="onThumbDragStart(event,'pending',${i})"
+           ondragover="onThumbDragOver(event)"
+           ondragleave="onThumbDragLeave(event)"
+           ondrop="onThumbDrop(event,'pending',${i})"
+           ondragend="onThumbDragEnd(event)">
+        ${src ? `<img src="${src}" alt="">` : '<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;color:#bbb"><i class="fa-solid fa-spinner fa-spin"></i></div>'}
+        ${isCover ? '<span class="img-thumb-cover">Cover</span>' : `<span class="img-thumb-idx">${overallIdx + 1}</span>`}
+        <button type="button" class="img-thumb-x" onclick="removePendingFile(${i})" title="Șterge"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+    `;
+  }).join('');
+}
+
+function removePendingFile(i) {
+  pendingFiles.splice(i, 1);
+  pendingPreviewUrls.splice(i, 1);
+  renderPendingPreview();
+  renderImaginiPreview();
+}
+
+// Drag & drop reorder across both lists (existing → pending allowed)
+let dragSrc = null; // { list: 'existing'|'pending', index: number }
+
+function onThumbDragStart(e, list, index) {
+  dragSrc = { list, index };
+  e.dataTransfer.effectAllowed = 'move';
+  // Firefox requires data to be set
+  try { e.dataTransfer.setData('text/plain', `${list}:${index}`); } catch {}
+  e.currentTarget.classList.add('dragging');
+}
+function onThumbDragOver(e) {
+  if (!dragSrc) return;
+  e.preventDefault();
+  e.dataTransfer.dropEffect = 'move';
+  e.currentTarget.classList.add('drop-target');
+}
+function onThumbDragLeave(e) {
+  e.currentTarget.classList.remove('drop-target');
+}
+function onThumbDragEnd(e) {
+  e.currentTarget.classList.remove('dragging');
+  document.querySelectorAll('.img-thumb.drop-target').forEach(el => el.classList.remove('drop-target'));
+  dragSrc = null;
+}
+function onThumbDrop(e, destList, destIndex) {
+  e.preventDefault();
+  e.currentTarget.classList.remove('drop-target');
+  if (!dragSrc) return;
+  if (dragSrc.list === destList && dragSrc.index === destIndex) return;
+
+  // Build a unified ordered array, perform the move, then split back.
+  const unified = [
+    ...existingImages.map(url => ({ type: 'existing', url })),
+    ...pendingFiles.map((f, i) => ({ type: 'pending', file: f, dataUrl: pendingPreviewUrls[i] }))
+  ];
+  const srcAbs  = dragSrc.list === 'existing' ? dragSrc.index : existingImages.length + dragSrc.index;
+  const destAbs = destList    === 'existing' ? destIndex      : existingImages.length + destIndex;
+  const [moved] = unified.splice(srcAbs, 1);
+  unified.splice(destAbs, 0, moved);
+
+  existingImages = unified.filter(x => x.type === 'existing').map(x => x.url);
+  const newPending = unified.filter(x => x.type === 'pending');
+  pendingFiles = newPending.map(x => x.file);
+  pendingPreviewUrls = newPending.map(x => x.dataUrl);
+
+  renderImaginiPreview();
+  renderPendingPreview();
+}
+
+function resetPendingFiles() {
+  pendingFiles = [];
+  pendingPreviewUrls = [];
 }
 
 async function removeExistingImage(idx) {
@@ -1078,8 +1196,9 @@ async function submitNewProperty(e) {
   const isEdit = !!editingProperty;
   formData.id = isEdit ? editingProperty.id : `${activeFormCategory.slice(0,3)}-${Date.now()}`;
 
-  const fileInput = e.target.querySelector('input[name="imaginiFiles"]');
-  const newFiles = fileInput && fileInput.files ? Array.from(fileInput.files) : [];
+  // Use the reorderable pendingFiles array (in user's chosen order),
+  // not the raw FileList — that way drag-reorder is what actually gets uploaded.
+  const newFiles = pendingFiles.slice();
 
   try {
     let newUrls = [];
