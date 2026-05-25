@@ -183,19 +183,19 @@ body[data-page="terenuri"] {
   max-width: 880px;
 }
 .pp-hero-h1 {
-  font-family: var(--font-body);
-  font-weight: 600;
-  font-size: clamp(2.2rem, 6.4vw, 5.4rem);
-  line-height: 1;
-  letter-spacing: -0.028em;
-  margin: 0 0 22px;
-  color: var(--pp-linen);
-  text-shadow: 0 4px 32px rgba(0, 0, 0, 0.4);
+  font-family: var(--font-heading);
+  font-weight: 500;
+  font-size: clamp(2.6rem, 6vw, 5.6rem);
+  line-height: 0.98;
+  letter-spacing: -0.014em;
+  margin: 0 0 26px;
+  color: var(--pp-stone);
+  text-shadow: 0 4px 32px rgba(0, 0, 0, 0.45);
   text-wrap: balance;
+  font-feature-settings: "kern", "liga", "dlig";
   animation: pp-hero-rise 1s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 .pp-hero-h1 em {
-  font-family: var(--font-heading);
   font-style: italic;
   font-weight: 500;
   color: var(--pp-gold);
