@@ -49,11 +49,13 @@
 
   <!-- =========================================
        HERO — video bg, editorial overlay
+       Scroll-scrub pin wrapper (desktop only — mobile falls back to autoplay loop via JS)
        ========================================= -->
+  <div class="hp-hero-pin" id="hpHeroPin">
   <section class="hp-hero">
 
     <div class="hp-hero-video" aria-hidden="true">
-      <video id="heroVideo" autoplay loop muted playsinline preload="auto">
+      <video id="heroVideo" muted playsinline preload="auto">
         <source src="design/landscape.mp4" type="video/mp4">
       </video>
       <div class="hp-hero-scrim"></div>
@@ -127,6 +129,7 @@
     </div>
 
   </section>
+  </div><!-- /.hp-hero-pin -->
 
   <!-- Section mark (3 stones) -->
   <div class="hp-section-mark" aria-hidden="true">

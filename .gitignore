@@ -8,6 +8,7 @@ node_modules
 # Fișiere locale / temp
 *.zip
 *.backup
+*-original-backup.*
 hormozi_leads_summary.md
 hormozi_offers_summary.md
 generate-images.js

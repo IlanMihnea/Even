@@ -233,6 +233,46 @@ body[data-page="home"] {
   isolation: isolate;
 }
 
+/* Scroll-scrub pin: wrapper is tall, hero sticks for the duration of the video.
+   Activated by JS on desktop only via .is-pinned class.
+   Internal spacing uses clamp+vh so the composition breathes with viewport height
+   (1080p stays generous; 768–900px compacts gracefully without clipping the trust strip). */
+.hp-hero-pin { position: relative; }
+@media (min-width: 769px) {
+  .hp-hero-pin.is-pinned {
+    height: 300vh; /* 1 viewport visible + 2 viewports of scroll → video plays through */
+  }
+  .hp-hero-pin.is-pinned > .hp-hero {
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    min-height: 100vh;
+    padding-top: clamp(72px, 8vh, 96px);
+    padding-bottom: clamp(40px, 5vh, 72px);
+  }
+  .hp-hero-pin.is-pinned .hp-hero-grid {
+    min-height: 0;
+    height: 100%;
+  }
+  /* Tighten vertical rhythm inside hero-text so the trust strip never crowds the bottom edge */
+  .hp-hero-pin.is-pinned .hp-hero-text .hp-eyebrow {
+    margin-bottom: clamp(18px, 2.6vh, 32px);
+  }
+  .hp-hero-pin.is-pinned .hp-hero-h1 {
+    font-size: clamp(2.2rem, 5.4vw, 5rem);
+    margin-bottom: clamp(20px, 3vh, 36px);
+  }
+  .hp-hero-pin.is-pinned .hp-hero-lede {
+    margin-bottom: clamp(20px, 3vh, 36px);
+  }
+  .hp-hero-pin.is-pinned .hp-hero-actions {
+    margin-bottom: clamp(28px, 4.2vh, 56px);
+  }
+  .hp-hero-pin.is-pinned .hp-hero-trust {
+    padding-top: clamp(18px, 2.6vh, 28px);
+  }
+}
+
 /* Video background */
 .hp-hero-video {
   position: absolute;
@@ -246,28 +286,32 @@ body[data-page="home"] {
   object-fit: cover;
   display: block;
   filter: contrast(1.05) saturate(0.85) brightness(0.85);
+  transform: scale(1.08);
+  transform-origin: center top;
 }
-/* Heavy editorial scrim — Linen warm wash bottom-left, Midnight gravity top-right */
+/* Readability scrim — strong darkening on the left (text column), light on the right (photo) */
 .hp-hero-scrim {
   position: absolute;
   inset: 0;
   background:
-    linear-gradient(160deg,
-      rgba(28, 35, 64, 0.50) 0%,
-      rgba(28, 35, 64, 0.35) 40%,
-      rgba(28, 35, 64, 0.65) 100%
+    linear-gradient(105deg,
+      rgba(28, 35, 64, 0.72) 0%,
+      rgba(28, 35, 64, 0.58) 32%,
+      rgba(28, 35, 64, 0.22) 65%,
+      rgba(28, 35, 64, 0.10) 100%
     ),
     linear-gradient(to bottom,
-      transparent 30%,
-      rgba(28, 35, 64, 0.35) 100%
+      transparent 55%,
+      rgba(28, 35, 64, 0.38) 100%
     );
   pointer-events: none;
 }
+/* Vignette — kept only the warm gold top-right accent (over feature card).
+   Removed the bottom-left linen wash that was lightening the trust strip area. */
 .hp-hero-vignette {
   position: absolute;
   inset: 0;
   background:
-    radial-gradient(900px 700px at 8% 95%, rgba(245, 243, 238, 0.16), transparent 60%),
     radial-gradient(700px 500px at 95% 12%, rgba(200, 169, 110, 0.16), transparent 60%);
   pointer-events: none;
 }
@@ -289,6 +333,8 @@ body[data-page="home"] {
 .hp-hero-text {
   color: var(--hp-stone);
   max-width: 640px;
+  /* Soft halo behind text — invisible as a "shadow", but lifts type off any video frame */
+  text-shadow: 0 1px 24px rgba(0, 0, 0, 0.45);
 }
 .hp-hero-text .hp-eyebrow {
   margin-bottom: 32px;

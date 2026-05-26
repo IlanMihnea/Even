@@ -340,11 +340,82 @@ function applyFluxTabVisibility(counts) {
   }
 }
 
+// ============================================
+// Hero scroll-scrub — video advances with scroll; page stays pinned until video ends.
+// Desktop only; mobile / reduced-motion falls back to autoplay loop.
+// ============================================
+function initHeroScrub() {
+  const pin = document.getElementById('hpHeroPin');
+  const video = document.getElementById('heroVideo');
+  if (!pin || !video) return;
+
+  const mq = window.matchMedia('(max-width: 768px), (prefers-reduced-motion: reduce)');
+  let raf = null;
+  let scrollBound = false;
+
+  function update() {
+    raf = null;
+    const rect = pin.getBoundingClientRect();
+    const total = pin.offsetHeight - window.innerHeight;
+    if (total <= 0) return;
+    const scrolled = Math.min(Math.max(0, -rect.top), total);
+    const progress = scrolled / total;
+    const dur = video.duration;
+    if (dur && isFinite(dur)) {
+      const target = progress * dur;
+      // Clamp inside [0, duration - 1 frame] to avoid stalling on the last frame
+      video.currentTime = Math.min(Math.max(target, 0), Math.max(0, dur - 0.04));
+    }
+  }
+
+  function onScroll() {
+    if (raf == null) raf = requestAnimationFrame(update);
+  }
+
+  function ensureLoaded(cb) {
+    if (video.readyState >= 1 && video.duration && isFinite(video.duration)) cb();
+    else video.addEventListener('loadedmetadata', cb, { once: true });
+  }
+
+  function applyMode() {
+    if (mq.matches) {
+      // Mobile or reduced-motion: autoplay loop, no pinning
+      pin.classList.remove('is-pinned');
+      if (scrollBound) {
+        window.removeEventListener('scroll', onScroll);
+        window.removeEventListener('resize', onScroll);
+        scrollBound = false;
+      }
+      video.setAttribute('loop', '');
+      video.setAttribute('autoplay', '');
+      video.play().catch(() => {});
+    } else {
+      // Desktop: scrub on scroll
+      pin.classList.add('is-pinned');
+      video.removeAttribute('autoplay');
+      video.removeAttribute('loop');
+      video.pause();
+      if (!scrollBound) {
+        window.addEventListener('scroll', onScroll, { passive: true });
+        window.addEventListener('resize', onScroll, { passive: true });
+        scrollBound = true;
+      }
+      ensureLoaded(() => onScroll());
+    }
+  }
+
+  applyMode();
+  if (mq.addEventListener) mq.addEventListener('change', applyMode);
+  else if (mq.addListener) mq.addListener(applyMode);
+}
+
 document.addEventListener('DOMContentLoaded', async () => {
   document.querySelectorAll('.flux-tab').forEach(tab => {
     tab.addEventListener('click', () => setFluxTab(tab.dataset.flux));
   });
   renderFilters();
+
+  initHeroScrub();
 
   const [counts] = await Promise.all([
     fetchCategoryCounts(),
