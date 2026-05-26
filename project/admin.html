@@ -2,8 +2,11 @@
 <html lang="ro">
 <head>
   <meta charset="UTF-8">
+  <link rel="icon" href="favicon.ico" sizes="any">
   <link rel="icon" type="image/svg+xml" href="design/logomark-even.svg">
-  <link rel="apple-touch-icon" href="design/logomark-even.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
+  <link rel="icon" type="image/png" sizes="96x96" href="favicon-96.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Admin Dashboard · EVEN</title>
   <meta name="robots" content="noindex">
@@ -76,8 +79,24 @@
               <option value="vizionare">Vizionare</option>
               <option value="oferta">Ofertă</option>
             </select>
+            <button class="btn btn-outline" onclick="exportLeadsCsv()" title="Exportă lead-urile filtrate ca CSV"><i class="fa-solid fa-file-csv"></i> Export CSV</button>
             <button class="btn btn-outline" onclick="renderLeads()"><i class="fa-solid fa-rotate"></i> Refresh</button>
           </div>
+        </div>
+        <div id="leadsBulkBar" class="leads-bulk-bar" style="display:none">
+          <span class="bulk-count"><span id="bulkSelectedCount">0</span> selectate</span>
+          <select id="bulkStatusSelect" class="lead-status-select" style="margin-left:8px">
+            <option value="">Schimbă status...</option>
+            <option value="nou">Nou</option>
+            <option value="contactat">Contactat</option>
+            <option value="vizionare-programata">Vizionare programată</option>
+            <option value="oferta-trimisa">Ofertă trimisă</option>
+            <option value="inchis-castigat">Câștigat</option>
+            <option value="inchis-pierdut">Pierdut</option>
+          </select>
+          <button class="btn btn-outline btn-sm" onclick="applyBulkLeadStatus()"><i class="fa-solid fa-check"></i> Aplică</button>
+          <button class="btn btn-outline btn-sm" onclick="bulkDeleteLeads()" style="color:#c33"><i class="fa-solid fa-trash"></i> Șterge selectate</button>
+          <button class="btn btn-outline btn-sm" onclick="clearLeadSelection()">Anulează</button>
         </div>
         <div id="leadsWrap"></div>
       </div>
@@ -103,6 +122,7 @@
         <div class="admin-section-header">
           <h2>Proprietăți în portofoliu</h2>
           <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+            <button class="btn btn-outline" onclick="exportPropertiesCsv()" title="Exportă proprietățile filtrate ca CSV"><i class="fa-solid fa-file-csv"></i> Export CSV</button>
             <button class="btn btn-outline" onclick="openImportModal()" title="Importă datele unui anunț de pe imobiliare.ro">
               <i class="fa-solid fa-cloud-arrow-down"></i> Import imobiliare.ro
             </button>
@@ -123,6 +143,8 @@
             <option value="inactive">Arhivate</option>
             <option value="all">Toate</option>
           </select>
+          <input type="number" id="propPretMin" placeholder="Preț min €" oninput="renderTable()" style="width:120px">
+          <input type="number" id="propPretMax" placeholder="Preț max €" oninput="renderTable()" style="width:120px">
           <select id="propSortBy" onchange="renderTable()">
             <option value="created_desc">Recente întâi</option>
             <option value="created_asc">Vechi întâi</option>
@@ -134,6 +156,32 @@
         </div>
 
         <div id="tableWrap"></div>
+      </div>
+
+      <!-- CUMPĂRĂTORI CĂUTAȚI -->
+      <div class="admin-section">
+        <div class="admin-section-header">
+          <h2><i class="fa-solid fa-user-tag" style="color:var(--gold);margin-right:6px"></i>Cumpărători în căutare</h2>
+          <button class="btn btn-gold" onclick="openBuyerModal()"><i class="fa-solid fa-plus"></i> Adaugă cumpărător</button>
+        </div>
+        <p style="color:var(--gray-500);font-size:13px;margin:-4px 0 10px">
+          Salvează ce caută un client (criterii). Când adaugi o proprietate care se potrivește, vezi badge-ul „match" pe rândul ei.
+        </p>
+        <div class="admin-filter-bar">
+          <input type="text" id="buyerSearchInput" placeholder="Caută nume, email, telefon..." oninput="renderBuyersTable()">
+          <select id="buyerPrioritateFilter" onchange="renderBuyersTable()">
+            <option value="">Prioritate · toate</option>
+            <option value="hot">🔥 Hot</option>
+            <option value="normal">Normal</option>
+            <option value="cold">Cold</option>
+          </select>
+          <select id="buyerActivFilter" onchange="renderBuyersTable()">
+            <option value="active">Doar activi</option>
+            <option value="all">Toți</option>
+            <option value="inactive">Inactivi</option>
+          </select>
+        </div>
+        <div id="buyersWrap"></div>
       </div>
 
       <!-- PROIECTE -->
@@ -230,6 +278,31 @@
       <div class="modal-close" onclick="closeLeadModal()"><i class="fa-solid fa-xmark"></i></div>
       <h2>Cerere primită</h2>
       <div id="leadDetailBody"></div>
+    </div>
+  </div>
+
+  <!-- MODAL BUYER PROFILE -->
+  <div class="modal" id="buyerModal">
+    <div class="modal-card" style="max-width:640px">
+      <div class="modal-close" onclick="closeBuyerModal()"><i class="fa-solid fa-xmark"></i></div>
+      <h2 id="buyerModalTitle">Adaugă cumpărător</h2>
+      <p class="modal-sub">Lasă goale câmpurile care nu contează — doar criteriile completate intră în filtru.</p>
+      <form onsubmit="submitBuyer(event)">
+        <div id="buyerForm"></div>
+        <div style="display:flex;gap:12px;margin-top:24px">
+          <button type="button" class="btn btn-outline" onclick="closeBuyerModal()">Anulează</button>
+          <button type="submit" class="btn btn-primary"><i class="fa-solid fa-check"></i> Salvează</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL MATCH LIST (când dai click pe badge) -->
+  <div class="modal" id="matchesModal">
+    <div class="modal-card" style="max-width:600px">
+      <div class="modal-close" onclick="closeMatchesModal()"><i class="fa-solid fa-xmark"></i></div>
+      <h2 id="matchesModalTitle">Cumpărători potriviți</h2>
+      <div id="matchesBody"></div>
     </div>
   </div>
 

@@ -30,7 +30,8 @@ function toRezidential(row) {
     oras: row.oras, cartier: row.cartier, adresa: row.adresa,
     descriere: row.descriere, imagini: row.imagini || [], facilitati: row.facilitati || [],
     agentId: row.agent_id, agent: normalizeAgent(row.agents), categorie: 'rezidential',
-    banner: row.banner === true
+    banner: row.banner === true,
+    viewCount: row.view_count || 0, activ: row.activ
   };
 }
 
@@ -43,7 +44,8 @@ function toComercial(row) {
     clasaCladire: row.clasa_cladire, oras: row.oras, cartier: row.cartier, adresa: row.adresa,
     descriere: row.descriere, imagini: row.imagini || [], specificatii: row.specificatii || {},
     agentId: row.agent_id, agent: normalizeAgent(row.agents), categorie: 'comercial',
-    banner: row.banner === true
+    banner: row.banner === true,
+    viewCount: row.view_count || 0, activ: row.activ
   };
 }
 
@@ -59,8 +61,74 @@ function toTeren(row) {
     descriere: row.descriere, vecinatati: row.vecinatati,
     imagini: row.imagini || [],
     agentId: row.agent_id, agent: normalizeAgent(row.agents), categorie: 'terenuri',
-    banner: row.banner === true
+    banner: row.banner === true,
+    viewCount: row.view_count || 0, activ: row.activ
   };
+}
+
+// ── BUYER PROFILES (saved searches) ───────────────────────────
+function normalizeBuyerProfile(b) {
+  if (!b) return null;
+  return {
+    id: b.id, nume: b.nume, email: b.email, telefon: b.telefon,
+    categorie: b.categorie, regim: b.regim,
+    tip: b.tip || [], orase: b.orase || [], cartiere: b.cartiere || [],
+    camereMin: b.camere_min, camereMax: b.camere_max,
+    pretMin: b.pret_min, pretMax: b.pret_max,
+    suprafataMin: b.suprafata_min, suprafataMax: b.suprafata_max,
+    note: b.note, prioritate: b.prioritate || 'normal',
+    activ: b.activ !== false, agentId: b.agent_id,
+    createdAt: b.created_at
+  };
+}
+
+async function getBuyerProfiles() {
+  const { data, error } = await _supabase
+    .from('buyer_profiles')
+    .select('*')
+    .order('created_at', { ascending: false });
+  if (error) throw error;
+  return (data || []).map(normalizeBuyerProfile);
+}
+
+async function upsertBuyerProfile(b) {
+  const dbRow = {
+    nume: b.nume,
+    email: b.email || null,
+    telefon: b.telefon || null,
+    categorie: b.categorie || null,
+    regim: b.regim || null,
+    tip: b.tip && b.tip.length ? b.tip : null,
+    orase: b.orase && b.orase.length ? b.orase : null,
+    cartiere: b.cartiere && b.cartiere.length ? b.cartiere : null,
+    camere_min: b.camereMin || null,
+    camere_max: b.camereMax || null,
+    pret_min: b.pretMin || null,
+    pret_max: b.pretMax || null,
+    suprafata_min: b.suprafataMin || null,
+    suprafata_max: b.suprafataMax || null,
+    note: b.note || null,
+    prioritate: b.prioritate || 'normal',
+    activ: b.activ !== false,
+    agent_id: b.agentId || null,
+  };
+  if (b.id) dbRow.id = b.id;
+  const { data, error } = await _supabase
+    .from('buyer_profiles').upsert(dbRow).select().single();
+  if (error) throw error;
+  return normalizeBuyerProfile(data);
+}
+
+async function deleteBuyerProfile(id) {
+  const { error } = await _supabase.from('buyer_profiles').delete().eq('id', id);
+  if (error) throw error;
+}
+
+// Fire-and-forget view increment. Called from public property pages.
+async function recordPropertyView(id) {
+  if (!id) return;
+  try { await _supabase.rpc('increment_property_view', { p_id: id }); }
+  catch (e) { /* silent — don't break the page if RPC missing */ }
 }
 
 function toProject(row) {
@@ -183,6 +251,12 @@ async function upsertProperty(categorie, camelData) {
 async function deleteProperty(id) {
   const { error } = await _supabase
     .from('properties').update({ activ: false }).eq('id', id);
+  if (error) throw error;
+}
+
+async function hardDeleteProperty(id) {
+  const { error } = await _supabase
+    .from('properties').delete().eq('id', id);
   if (error) throw error;
 }
 

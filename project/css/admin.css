@@ -2,6 +2,82 @@
    ADMIN.CSS
    ============================================ */
 
+/* ----- Bulk action bar (leads) ----- */
+.leads-bulk-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 12px;
+  padding: 10px 14px;
+  background: linear-gradient(180deg, #fffdf7, #fdf6e3);
+  border: 1px solid var(--gold, #C8A96E);
+  border-radius: 8px;
+  flex-wrap: wrap;
+}
+.leads-bulk-bar .bulk-count {
+  font-size: 13px;
+  color: var(--gray-700, #444);
+  font-weight: 600;
+}
+.btn-sm { padding: 6px 10px !important; font-size: 13px !important; }
+
+/* WhatsApp icon button */
+.icon-btn.icon-btn-wa { color: #25D366; }
+.icon-btn.icon-btn-wa:hover { background: rgba(37, 211, 102, 0.1); }
+
+/* Buyer-match badge (shown in property rows) */
+.match-badge {
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 3px 9px; border-radius: 999px;
+  background: linear-gradient(180deg, #fff8e1, #fff1c2);
+  border: 1px solid #e6c965;
+  color: #7c5a0e;
+  font-size: 11px; font-weight: 600;
+  cursor: pointer; transition: all .12s;
+}
+.match-badge:hover {
+  background: linear-gradient(180deg, #fff1c2, #ffe899);
+  transform: translateY(-1px);
+}
+.match-badge.zero {
+  background: #f5f5f5; border-color: #e0e0e0; color: #999;
+  cursor: default;
+}
+.match-badge.zero:hover { transform: none; background: #f5f5f5; }
+
+/* View count chip */
+.views-chip {
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 2px 8px; font-size: 11px;
+  color: #666; background: #f5f3ed; border-radius: 4px;
+}
+.views-chip i { font-size: 10px; }
+
+/* Buyer table priority tags */
+.prio-tag {
+  display: inline-block; padding: 2px 8px; font-size: 10px; font-weight: 700;
+  letter-spacing: 0.06em; text-transform: uppercase; border-radius: 999px;
+}
+.prio-hot    { background: #ffe0db; color: #b3361b; }
+.prio-normal { background: #e8efff; color: #2e4e8c; }
+.prio-cold   { background: #f0f0f0; color: #888; }
+
+.buyer-criteria {
+  font-size: 12px; color: #666; line-height: 1.5;
+}
+.buyer-criteria b { color: var(--ink, #2a2a2a); font-weight: 600; }
+
+/* Match modal — list of matched buyers */
+.match-list { display: flex; flex-direction: column; gap: 10px; margin-top: 10px; }
+.match-item {
+  padding: 12px 14px; border: 1px solid var(--gray-200, #e5e5e5);
+  border-radius: 8px; display: flex; justify-content: space-between; align-items: flex-start;
+  gap: 12px;
+}
+.match-item-name { font-weight: 600; }
+.match-item-contact a { color: var(--navy, #1a2e44); text-decoration: none; font-size: 13px; }
+.match-item-actions { display: flex; gap: 6px; }
+
 /* ----- Filter bar above tables ----- */
 .admin-filter-bar {
   display: flex;

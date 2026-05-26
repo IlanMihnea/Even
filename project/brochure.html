@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Brochure proprietate · EVEN</title>
+  <meta name="robots" content="noindex">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --navy: #1a2e44;
+      --gold: #C8A96E;
+      --ink: #2a2a2a;
+      --muted: #6b6b6b;
+      --line: #d8d4cc;
+      --paper: #fbfaf6;
+    }
+    * { box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; background: #ecebe7; color: var(--ink); font-family: 'DM Sans', sans-serif; }
+    body { padding: 32px 0; }
+
+    .toolbar {
+      max-width: 794px;
+      margin: 0 auto 20px;
+      display: flex; justify-content: space-between; align-items: center;
+      gap: 12px; padding: 0 24px;
+    }
+    .toolbar h1 { font-size: 14px; font-weight: 600; color: #888; letter-spacing: 0.1em; text-transform: uppercase; margin: 0; }
+    .toolbar-actions { display: flex; gap: 8px; }
+    .tbtn {
+      padding: 8px 14px; font-size: 13px; font-weight: 600; cursor: pointer;
+      border: 1px solid var(--line); border-radius: 6px; background: white;
+      color: var(--ink); transition: all .15s;
+    }
+    .tbtn:hover { background: var(--paper); }
+    .tbtn.primary { background: var(--navy); color: white; border-color: var(--navy); }
+    .tbtn.primary:hover { background: #243f5b; }
+
+    .toggle {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 6px 10px; background: white; border: 1px solid var(--line); border-radius: 6px;
+      font-size: 13px;
+    }
+
+    /* A4 page (210x297mm) at 96 DPI = ~794x1123 px */
+    .page {
+      width: 794px;
+      min-height: 1123px;
+      margin: 0 auto;
+      background: white;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+      padding: 48px 56px;
+      page-break-after: always;
+      position: relative;
+    }
+    .page:last-child { page-break-after: auto; }
+
+    /* Header */
+    .b-head {
+      display: flex; justify-content: space-between; align-items: flex-end;
+      padding-bottom: 18px; border-bottom: 2px solid var(--gold);
+      margin-bottom: 28px;
+    }
+    .b-brand {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 30px; font-weight: 600; letter-spacing: 0.04em;
+      color: var(--navy); line-height: 1;
+    }
+    .b-brand-sub {
+      font-size: 9px; letter-spacing: 0.35em; color: var(--muted);
+      text-transform: uppercase; margin-top: 4px;
+    }
+    .b-cat {
+      font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase;
+      color: var(--gold); font-weight: 600;
+    }
+    .b-ref { font-size: 11px; color: var(--muted); margin-top: 2px; }
+
+    /* Hero image */
+    .b-hero {
+      width: 100%; aspect-ratio: 16/9;
+      background: #eee center/cover no-repeat;
+      border-radius: 4px;
+      margin-bottom: 22px;
+    }
+
+    /* Title + price */
+    .b-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 32px; font-weight: 500; line-height: 1.15;
+      color: var(--navy); margin: 0 0 8px;
+    }
+    .b-loc {
+      font-size: 13px; color: var(--muted); margin-bottom: 14px;
+    }
+    .b-price {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 28px; font-weight: 600; color: var(--gold);
+      margin-bottom: 22px;
+    }
+    .b-price small { font-size: 13px; color: var(--muted); font-weight: 400; margin-left: 6px; }
+
+    /* Key facts grid */
+    .b-facts {
+      display: grid; grid-template-columns: repeat(4, 1fr);
+      gap: 0;
+      border: 1px solid var(--line); border-radius: 4px;
+      margin-bottom: 24px;
+    }
+    .b-fact {
+      padding: 12px 14px;
+      border-right: 1px solid var(--line);
+      border-bottom: 1px solid var(--line);
+    }
+    .b-fact:nth-child(4n) { border-right: none; }
+    .b-fact:nth-last-child(-n+4) { border-bottom: none; }
+    .b-fact-label {
+      font-size: 9px; letter-spacing: 0.15em; text-transform: uppercase;
+      color: var(--muted); margin-bottom: 4px;
+    }
+    .b-fact-val {
+      font-size: 16px; font-weight: 600; color: var(--ink);
+    }
+
+    /* Description */
+    .b-section-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 18px; font-weight: 600; color: var(--navy);
+      letter-spacing: 0.06em; text-transform: uppercase;
+      margin: 24px 0 12px;
+    }
+    .b-desc {
+      font-size: 13px; line-height: 1.75; color: #444;
+      white-space: pre-line; text-align: justify;
+    }
+
+    /* Gallery on page 2 */
+    .b-gallery {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+    .b-gallery .gimg {
+      aspect-ratio: 4/3;
+      background: #eee center/cover no-repeat;
+      border-radius: 3px;
+    }
+    .b-gallery .gimg.big { grid-column: span 2; aspect-ratio: 16/7; }
+
+    /* Footer */
+    .b-foot {
+      position: absolute;
+      bottom: 32px; left: 56px; right: 56px;
+      padding-top: 16px; border-top: 1px solid var(--line);
+      display: flex; justify-content: space-between; align-items: center;
+      font-size: 11px; color: var(--muted);
+    }
+    .b-agent {
+      display: flex; gap: 12px; align-items: center;
+    }
+    .b-agent-photo {
+      width: 44px; height: 44px; border-radius: 50%;
+      background: #eee center/cover no-repeat;
+      border: 2px solid var(--gold);
+    }
+    .b-agent-name { font-weight: 600; color: var(--ink); font-size: 13px; }
+    .b-agent-role { font-size: 10px; color: var(--muted); letter-spacing: 0.1em; text-transform: uppercase; }
+    .b-agent-contact { font-size: 11px; color: var(--ink); }
+    .b-agent-contact span { display: inline-block; margin-right: 12px; }
+
+    .b-foot-right { text-align: right; }
+    .b-disclaimer {
+      font-size: 9px; color: #aaa; max-width: 280px; line-height: 1.5;
+    }
+
+    .loading { padding: 80px 40px; text-align: center; color: #999; }
+    .error { padding: 80px 40px; text-align: center; color: #c33; }
+
+    /* Print */
+    @media print {
+      body { background: white; padding: 0; }
+      .toolbar { display: none !important; }
+      .page { box-shadow: none; margin: 0; width: 100%; min-height: auto; padding: 16mm 14mm; }
+      @page { size: A4; margin: 0; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="toolbar">
+    <h1>Brochure proprietate</h1>
+    <div class="toolbar-actions">
+      <label class="toggle">
+        <input type="checkbox" id="blindToggle"> Versiune colaborator (fără agent)
+      </label>
+      <button class="tbtn primary" onclick="window.print()">Print / Salvează ca PDF</button>
+    </div>
+  </div>
+
+  <div id="brochureRoot">
+    <div class="page"><div class="loading">Se încarcă proprietatea...</div></div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/db.js"></script>
+  <script src="js/main.js"></script>
+  <script>
+    // Read params
+    const params = new URLSearchParams(window.location.search);
+    const propId = params.get('id');
+    const propCat = params.get('cat') || 'rezidential';
+    const blindParam = params.get('blind') === '1';
+
+    document.getElementById('blindToggle').checked = blindParam;
+    document.getElementById('blindToggle').addEventListener('change', render);
+
+    let property = null;
+
+    async function load() {
+      if (!propId) {
+        document.getElementById('brochureRoot').innerHTML = '<div class="page"><div class="error">Lipseste parametrul ?id=</div></div>';
+        return;
+      }
+      try {
+        property = await getPropertyById(propId, propCat);
+        if (!property) throw new Error('Proprietatea nu a fost gasita');
+        render();
+        document.title = `${property.titlu || 'Brochure'} · EVEN`;
+      } catch (err) {
+        document.getElementById('brochureRoot').innerHTML = `<div class="page"><div class="error">Eroare: ${escapeHtml(err.message)}</div></div>`;
+      }
+    }
+
+    function escapeHtml(s) {
+      return String(s == null ? '' : s).replace(/[&<>"']/g, ch => ({
+        '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
+      }[ch]));
+    }
+
+    function formatPriceLocal(v, currency) {
+      if (!v && v !== 0) return '—';
+      const n = +v;
+      return new Intl.NumberFormat('ro-RO').format(n) + ' ' + (currency || '€');
+    }
+
+    function buildFacts(p) {
+      const facts = [];
+      if (p.categorie === 'rezidential') {
+        if (p.camere) facts.push(['Camere', p.camere]);
+        if (p.suprafata) facts.push(['Suprafață', p.suprafata + ' mp']);
+        if (p.etaj != null) facts.push(['Etaj', p.etaj + (p.etajTotal ? `/${p.etajTotal}` : '')]);
+        if (p.anConstructie) facts.push(['An', p.anConstructie]);
+        if (p.bai) facts.push(['Băi', p.bai]);
+        if (p.compartimentare) facts.push(['Compartim.', p.compartimentare]);
+        if (p.parcare) facts.push(['Parcare', 'Da']);
+        if (p.balcon) facts.push(['Balcon', 'Da']);
+      } else if (p.categorie === 'comercial') {
+        if (p.tipSpatiu) facts.push(['Tip', p.tipSpatiu]);
+        if (p.suprafataTotala) facts.push(['Suprafață', p.suprafataTotala + ' mp']);
+        if (p.clasaCladire) facts.push(['Clasă', p.clasaCladire]);
+        if (p.etaj != null) facts.push(['Etaj', p.etaj]);
+        if (p.locuriParcare) facts.push(['Parcare', p.locuriParcare + ' locuri']);
+        if (p.inaltimeLibera) facts.push(['Înălțime', p.inaltimeLibera + ' m']);
+      } else if (p.categorie === 'terenuri') {
+        if (p.tip) facts.push(['Tip', p.tip]);
+        if (p.suprafata) facts.push(['Suprafață', p.suprafata + ' ' + (p.unitate || 'mp')]);
+        if (p.frontStradal) facts.push(['Front', p.frontStradal + ' ml']);
+        if (p.accesDrum) facts.push(['Acces', p.accesDrum]);
+        if (p.zonarePUG) facts.push(['PUG', p.zonarePUG]);
+        if (p.CUT) facts.push(['CUT', p.CUT]);
+        if (p.POT) facts.push(['POT', p.POT + '%']);
+      }
+      while (facts.length < 4) facts.push(['', '']);
+      return facts.slice(0, 8);
+    }
+
+    function render() {
+      if (!property) return;
+      const p = property;
+      const blind = document.getElementById('blindToggle').checked;
+      const newUrl = new URL(window.location.href);
+      newUrl.searchParams.set('blind', blind ? '1' : '0');
+      window.history.replaceState(null, '', newUrl.toString());
+
+      const cover = (p.imagini && p.imagini[0]) || '';
+      const rest = (p.imagini || []).slice(1, 7);
+      const cat = ({rezidential:'Rezidențial', comercial:'Comercial', terenuri:'Teren'})[p.categorie] || p.categorie;
+      const regimLabel = p.regim === 'inchiriere' ? '· Închiriere' : (p.regim === 'vanzare' ? '· Vânzare' : '');
+      const loc = [p.cartier, p.oras || p.localitate || p.judet].filter(Boolean).join(' · ');
+
+      const price = p.pret ?? p.pretTotal;
+      const priceUnit = (p.regim === 'inchiriere' && p.categorie === 'rezidential') ? '/lună'
+                     : (p.categorie === 'comercial' && p.regim === 'inchiriere') ? '€/mp/lună'
+                     : '';
+
+      const facts = buildFacts(p);
+
+      // Footer: agent or blind
+      let footHtml = '';
+      if (blind || !p.agent) {
+        footHtml = `
+          <div></div>
+          <div class="b-foot-right">
+            <div class="b-disclaimer">
+              Informațiile prezentate sunt orientative. Pentru detalii suplimentare, contactați biroul intermediar.
+            </div>
+          </div>`;
+      } else {
+        const a = p.agent;
+        const photo = a.foto ? `<div class="b-agent-photo" style="background-image:url('${a.foto}')"></div>` : '<div class="b-agent-photo"></div>';
+        footHtml = `
+          <div class="b-agent">
+            ${photo}
+            <div>
+              <div class="b-agent-name">${escapeHtml(a.nume || '')}</div>
+              <div class="b-agent-role">${escapeHtml(a.rol || 'Agent imobiliar')}</div>
+            </div>
+          </div>
+          <div class="b-foot-right b-agent-contact">
+            ${a.telefon ? `<span>${escapeHtml(a.telefon)}</span>` : ''}
+            ${a.email ? `<span>${escapeHtml(a.email)}</span>` : ''}
+            <div style="font-size:10px;color:#aaa;margin-top:2px">even-imobiliare.ro</div>
+          </div>`;
+      }
+
+      const page1 = `
+        <div class="page">
+          <div class="b-head">
+            <div>
+              <div class="b-brand">EVEN</div>
+              <div class="b-brand-sub">Imobiliare</div>
+            </div>
+            <div style="text-align:right">
+              <div class="b-cat">${escapeHtml(cat)} ${regimLabel}</div>
+              <div class="b-ref">Ref. ${escapeHtml(p.id || '')}</div>
+            </div>
+          </div>
+
+          ${cover ? `<div class="b-hero" style="background-image:url('${cover}')"></div>` : ''}
+
+          <h1 class="b-title">${escapeHtml(p.titlu || '')}</h1>
+          <div class="b-loc">${escapeHtml(loc)}${p.adresa ? ' · ' + escapeHtml(p.adresa) : ''}</div>
+          ${price ? `<div class="b-price">${formatPriceLocal(price, p.moneda || '€')}${priceUnit ? ` <small>${priceUnit}</small>` : ''}</div>` : ''}
+
+          <div class="b-facts">
+            ${facts.map(([l, v]) => `
+              <div class="b-fact">
+                <div class="b-fact-label">${escapeHtml(l)}</div>
+                <div class="b-fact-val">${escapeHtml(String(v))}</div>
+              </div>`).join('')}
+          </div>
+
+          ${p.descriere ? `
+            <div class="b-section-title">Descriere</div>
+            <div class="b-desc">${escapeHtml(p.descriere).slice(0, 1200)}${p.descriere.length > 1200 ? '…' : ''}</div>
+          ` : ''}
+
+          <div class="b-foot">${footHtml}</div>
+        </div>
+      `;
+
+      const page2 = rest.length ? `
+        <div class="page">
+          <div class="b-head">
+            <div class="b-brand" style="font-size:22px">EVEN</div>
+            <div class="b-cat">Galerie foto</div>
+          </div>
+          <div class="b-gallery">
+            ${rest.map((url, i) => `<div class="gimg${i === 0 && rest.length > 4 ? ' big' : ''}" style="background-image:url('${url}')"></div>`).join('')}
+          </div>
+          <div class="b-foot">${footHtml}</div>
+        </div>
+      ` : '';
+
+      document.getElementById('brochureRoot').innerHTML = page1 + page2;
+    }
+
+    load();
+  </script>
+</body>
+</html>

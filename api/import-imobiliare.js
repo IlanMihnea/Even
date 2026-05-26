@@ -78,45 +78,65 @@ function findLongestStringByPrefix(node, prefix, best) {
 }
 
 function extractFullDescription(html, shortDesc) {
-  if (!shortDesc) return shortDesc;
-  const stripped = shortDesc.replace(/&[#\w]*\.{0,3}$/, '').trim();
-  const prefix = stripped.slice(0, 60);
-  if (!prefix) return shortDesc;
+  // imobiliare.ro renders the full text twice in the HTML — once inside a
+  // <noscript> block, once inside <div id="truncatedDescription"> which is
+  // only *visually* clamped via CSS (the "Vezi mai mult" button just removes
+  // the clamp class). Both contain the complete description, so no headless
+  // browser is needed — we just read straight from the HTML.
+  const best = { text: shortDesc || '' };
 
-  const best = { value: shortDesc.length, text: shortDesc };
-
-  // Strategy A: every <script type="application/json"> block
-  const jsonScripts = html.match(/<script[^>]*type=["']application\/(?:ld\+)?json["'][^>]*>[\s\S]*?<\/script>/gi) || [];
-  for (const block of jsonScripts) {
-    const body = block.replace(/^<script[^>]*>/i, '').replace(/<\/script>$/i, '');
-    try {
-      const data = JSON.parse(body);
-      findLongestStringByPrefix(data, prefix, best);
-    } catch (_) { /* skip malformed */ }
+  // Strategy A: <div id="truncatedDescription"> — preserves line breaks
+  const truncMatch = html.match(/<div\b[^>]*\bid=["']truncatedDescription["'][^>]*>([\s\S]*?)<\/div>/i);
+  if (truncMatch) {
+    const text = htmlBlockToText(truncMatch[1]);
+    if (text.length > best.text.length) best.text = text;
   }
 
-  // Strategy B: inline state assignments (Nuxt / Next / custom)
-  const stateRgx = /(?:window\.__NUXT__|window\.__INITIAL_STATE__|window\.__NEXT_DATA__|window\.__APOLLO_STATE__)\s*=\s*(\{[\s\S]*?\});?<\/script>/g;
-  let m;
-  while ((m = stateRgx.exec(html))) {
-    try {
-      const data = JSON.parse(m[1]);
-      findLongestStringByPrefix(data, prefix, best);
-    } catch (_) { /* skip */ }
+  // Strategy B: <noscript> fallback — same content, sometimes the only one present
+  if (best.text.length < 200) {
+    const noscriptBlocks = html.match(/<noscript>([\s\S]*?)<\/noscript>/gi) || [];
+    for (const block of noscriptBlocks) {
+      if (!/text-content|whitespace-pre-line/i.test(block)) continue;
+      const inner = block.replace(/^<noscript>/i, '').replace(/<\/noscript>$/i, '');
+      const innerDiv = inner.match(/<div\b[^>]*>([\s\S]*?)<\/div>/i);
+      if (!innerDiv) continue;
+      const text = htmlBlockToText(innerDiv[1]);
+      if (text.length > best.text.length) best.text = text;
+    }
   }
 
-  // Strategy C: raw HTML body — find prefix and read forward to a natural end
-  if (best.text.length <= shortDesc.length + 10) {
-    const idx = html.indexOf(prefix);
-    if (idx >= 0) {
-      // grab a generous window, then strip HTML and decode
-      const window2 = html.slice(idx, idx + 8000);
-      const cleaned = window2.replace(/<\/?[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
-      if (cleaned.length > best.text.length) best.text = cleaned;
+  // Strategy C: legacy fallback — prefix-search inside inline JSON blobs.
+  // Kept for resilience if imobiliare.ro changes the DOM markup again.
+  if (shortDesc && best.text.length <= shortDesc.length + 10) {
+    const prefix = shortDesc.replace(/&[#\w]*\.{0,3}$/, '').trim().slice(0, 60);
+    if (prefix) {
+      const longest = { value: best.text.length, text: best.text };
+      const jsonScripts = html.match(/<script[^>]*type=["']application\/(?:ld\+)?json["'][^>]*>[\s\S]*?<\/script>/gi) || [];
+      for (const block of jsonScripts) {
+        const body = block.replace(/^<script[^>]*>/i, '').replace(/<\/script>$/i, '');
+        try { findLongestStringByPrefix(JSON.parse(body), prefix, longest); } catch (_) {}
+      }
+      if (longest.text.length > best.text.length) best.text = longest.text;
     }
   }
 
   return best.text || shortDesc;
+}
+
+// Convert an HTML fragment (the inner contents of the description container)
+// to plain text, preserving the paragraph breaks that imobiliare.ro renders
+// via `whitespace-pre-line`. Strip tags but keep newlines.
+function htmlBlockToText(fragment) {
+  return decodeEntities(
+    fragment
+      .replace(/<br\s*\/?>/gi, '\n')
+      .replace(/<\/(p|div|li)>/gi, '\n')
+      .replace(/<[^>]+>/g, '')
+  )
+    .replace(/\r\n/g, '\n')
+    .replace(/[ \t]+\n/g, '\n')
+    .replace(/\n{3,}/g, '\n\n')
+    .trim();
 }
 
 function parseDescription(desc) {

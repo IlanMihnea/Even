@@ -215,6 +215,48 @@ function ensureLightbox() {
     if (e.key === 'ArrowLeft')  prevLightbox();
     if (e.key === 'ArrowRight') nextLightbox();
   });
+
+  // --- Touch swipe (mobile) ---
+  const imgWrap = el.querySelector('.pp-lightbox-img-wrap');
+  const imgEl   = el.querySelector('.pp-lightbox-img');
+  let tStartX = 0, tStartY = 0, tStartT = 0, tracking = false;
+  const onStart = e => {
+    if (e.touches.length !== 1) { tracking = false; return; }
+    tracking = true;
+    tStartX = e.touches[0].clientX;
+    tStartY = e.touches[0].clientY;
+    tStartT = Date.now();
+    if (imgEl) imgEl.style.transition = 'none';
+  };
+  const onMove = e => {
+    if (!tracking || e.touches.length !== 1) return;
+    const dx = e.touches[0].clientX - tStartX;
+    const dy = e.touches[0].clientY - tStartY;
+    if (Math.abs(dx) > Math.abs(dy)) {
+      e.preventDefault();
+      if (imgEl) imgEl.style.transform = `translateX(${dx}px)`;
+    }
+  };
+  const onEnd = e => {
+    if (!tracking) return;
+    tracking = false;
+    const t = (e.changedTouches && e.changedTouches[0]) || null;
+    if (imgEl) { imgEl.style.transition = ''; imgEl.style.transform = ''; }
+    if (!t) return;
+    const dx = t.clientX - tStartX;
+    const dy = t.clientY - tStartY;
+    const dt = Date.now() - tStartT;
+    if (Math.abs(dx) > Math.abs(dy) && (Math.abs(dx) > 50 || (Math.abs(dx) > 30 && dt < 300))) {
+      if (dx < 0) nextLightbox(); else prevLightbox();
+    }
+  };
+  [el, imgWrap].forEach(t => {
+    if (!t) return;
+    t.addEventListener('touchstart', onStart, { passive: true });
+    t.addEventListener('touchmove',  onMove,  { passive: false });
+    t.addEventListener('touchend',   onEnd,   { passive: true });
+    t.addEventListener('touchcancel',onEnd,   { passive: true });
+  });
   return el;
 }
 function openLightbox(idx) {
@@ -317,8 +359,46 @@ function renderDescription(text) {
     <section class="pp-section">
       <span class="pp-section-eyebrow">— Despre proprietate</span>
       <h2 class="pp-section-h2">Descriere</h2>
-      <div class="pp-description">${html}</div>
+      <div class="pp-description-wrap is-collapsed" data-collapsible="pending">
+        <div class="pp-description">${html}</div>
+        <div class="pp-description-fade" aria-hidden="true"></div>
+      </div>
+      <button type="button" class="pp-description-toggle" onclick="toggleDescription(this)" hidden>
+        <span class="pp-desc-toggle-label">Vezi mai mult</span>
+        <i class="fa-solid fa-chevron-down"></i>
+      </button>
     </section>`;
+}
+
+function toggleDescription(btn) {
+  const section = btn.closest('section');
+  const wrap = section && section.querySelector('.pp-description-wrap');
+  if (!wrap) return;
+  const collapsed = wrap.classList.toggle('is-collapsed');
+  const label = btn.querySelector('.pp-desc-toggle-label');
+  const icon  = btn.querySelector('i');
+  if (label) label.textContent = collapsed ? 'Vezi mai mult' : 'Vezi mai puțin';
+  if (icon)  icon.className = collapsed ? 'fa-solid fa-chevron-down' : 'fa-solid fa-chevron-up';
+}
+
+function initDescriptionClamp() {
+  document.querySelectorAll('.pp-description-wrap[data-collapsible="pending"]').forEach(wrap => {
+    wrap.dataset.collapsible = 'done';
+    const inner = wrap.querySelector('.pp-description');
+    if (!inner) return;
+    // Measure full natural height by temporarily un-clamping
+    wrap.classList.remove('is-collapsed');
+    const fullH = inner.getBoundingClientRect().height;
+    wrap.classList.add('is-collapsed');
+    // CSS clamp = 360px. If content overflows, expose the toggle.
+    const limit = 360;
+    if (fullH > limit + 40) {
+      const btn = wrap.parentElement.querySelector('.pp-description-toggle');
+      if (btn) btn.hidden = false;
+    } else {
+      wrap.classList.remove('is-collapsed');
+    }
+  });
 }
 
 // ---------- FEATURES / DOTĂRI ----------
@@ -951,6 +1031,7 @@ function renderRezidential(p) {
   initScrollReveal();
   initParallax();
   initCountUp();
+  initDescriptionClamp();
 }
 
 function renderComercial(p) {
@@ -1003,6 +1084,7 @@ function renderComercial(p) {
   initScrollReveal();
   initParallax();
   initCountUp();
+  initDescriptionClamp();
 }
 
 function renderTeren(p) {
@@ -1057,6 +1139,7 @@ function renderTeren(p) {
   initScrollReveal();
   initParallax();
   initCountUp();
+  initDescriptionClamp();
 }
 
 // ---------- INIT ----------
@@ -1115,6 +1198,10 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   currentProperty = p;
+
+  // Fire-and-forget analytics: bump the view counter once per page load.
+  // No await — page render is independent of this.
+  if (typeof recordPropertyView === 'function') recordPropertyView(id);
 
   if (!p) {
     showFatal(contentEl,

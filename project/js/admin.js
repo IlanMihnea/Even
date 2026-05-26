@@ -13,6 +13,7 @@ let allLeadsCache = [];
 let allPropsCache = [];
 let allProjectsCache = [];
 let allAgentsCache = [];
+let allBuyersCache = [];
 
 // ---------- AUTH ----------
 
@@ -65,7 +66,8 @@ async function showDashboard() {
     renderLeads(),
     renderTable(),
     renderProjectsTable(),
-    renderAgentsTable()
+    renderAgentsTable(),
+    renderBuyersTable()
   ]);
   renderBannerPanel();
 }
@@ -86,20 +88,30 @@ async function refreshStats() {
     allProjectsCache = projects;
     allLeadsCache = leads;
 
+    const activeProps = allProps.filter(p => p.activ !== false);
     const counts = {
-      rezidential: allProps.filter(p => p.categorie === 'rezidential' && p.activ !== false).length,
-      comercial: allProps.filter(p => p.categorie === 'comercial' && p.activ !== false).length,
-      terenuri: allProps.filter(p => p.categorie === 'terenuri' && p.activ !== false).length,
+      rezidential: activeProps.filter(p => p.categorie === 'rezidential').length,
+      comercial: activeProps.filter(p => p.categorie === 'comercial').length,
+      terenuri: activeProps.filter(p => p.categorie === 'terenuri').length,
       proiecte: projects.filter(p => p.activ !== false).length,
       leadsNoi: leads.filter(l => l.status === 'nou').length
     };
+    // Estimated portfolio value: sum of pret (rezidential vânzare) + pretTotal (comercial + terenuri).
+    // Skip rentals (€/lună) and listings with no price.
+    const totalValue = activeProps.reduce((sum, p) => {
+      if (p.categorie === 'rezidential' && p.regim === 'vanzare') return sum + (+p.pret || 0);
+      if (p.categorie === 'comercial' && p.regim === 'vanzare') return sum + (+p.pretTotal || +p.pret * (+p.suprafataTotala || 0) || 0);
+      if (p.categorie === 'terenuri') return sum + (+p.pretTotal || 0);
+      return sum;
+    }, 0);
 
     const stats = [
       { cat: 'rezidential', icon: 'fa-home', label: 'Rezidențial', count: counts.rezidential },
       { cat: 'comercial', icon: 'fa-building', label: 'Comercial', count: counts.comercial },
       { cat: 'terenuri', icon: 'fa-map', label: 'Terenuri', count: counts.terenuri },
       { cat: 'proiecte', icon: 'fa-city', label: 'Proiecte noi', count: counts.proiecte },
-      { cat: 'leads', icon: 'fa-envelope', label: 'Cereri noi', count: counts.leadsNoi }
+      { cat: 'leads', icon: 'fa-envelope', label: 'Cereri noi', count: counts.leadsNoi },
+      { cat: 'value', icon: 'fa-euro-sign', label: 'Valoare portofoliu (vânzare)', count: formatBigEur(totalValue) }
     ];
     statsGrid.innerHTML = stats.map(s => `
       <div class="stat-card ${s.cat}">
@@ -166,6 +178,7 @@ async function renderLeads() {
       <table class="admin-table leads-table">
         <thead>
           <tr>
+            <th style="width:36px"><input type="checkbox" id="leadSelectAll" onchange="toggleAllLeadSelection(this.checked)"></th>
             <th>Data</th>
             <th>Nume</th>
             <th>Contact</th>
@@ -181,8 +194,10 @@ async function renderLeads() {
             const dateStr = date.toLocaleDateString('ro-RO', { day: '2-digit', month: 'short' }) + ' · ' + date.toLocaleTimeString('ro-RO', { hour: '2-digit', minute: '2-digit' });
             const target = l.properties?.titlu || l.projects?.nume || '—';
             const isNew = l.status === 'nou';
+            const wa = waPhone(l.telefon);
             return `
               <tr class="${isNew ? 'lead-new' : ''}">
+                <td><input type="checkbox" class="lead-row-check" data-id="${l.id}" onchange="updateBulkBar()"></td>
                 <td><span style="font-size:12px;color:var(--gray-500)">${dateStr}</span></td>
                 <td><strong>${escapeHtmlAdm(l.nume || '—')}</strong></td>
                 <td>
@@ -200,6 +215,7 @@ async function renderLeads() {
                 </td>
                 <td>
                   <div class="table-actions">
+                    ${wa ? `<a class="icon-btn icon-btn-wa" href="https://wa.me/${wa}" target="_blank" rel="noopener" title="WhatsApp"><i class="fa-brands fa-whatsapp"></i></a>` : ''}
                     <span class="icon-btn" onclick="openLeadDetail('${l.id}')" title="Vezi detalii"><i class="fa-solid fa-eye"></i></span>
                     <span class="icon-btn danger" onclick="confirmDeleteLead('${l.id}')" title="Șterge"><i class="fa-solid fa-trash"></i></span>
                   </div>
@@ -210,6 +226,7 @@ async function renderLeads() {
         </tbody>
       </table>
     `;
+    updateBulkBar();
   } catch (err) {
     wrap.innerHTML = '<div style="padding:24px;color:#e84545">Eroare la încărcarea cererilor: ' + escapeHtmlAdm(err.message) + '</div>';
     console.error(err);
@@ -288,6 +305,7 @@ function openLeadDetail(id) {
       <div style="display:flex;gap:10px;margin-top:20px;flex-wrap:wrap">
         ${lead.email ? `<a class="btn btn-primary" href="mailto:${escapeHtmlAdm(lead.email)}?subject=${encodeURIComponent('Răspuns EVEN — ' + (lead.tip || ''))}"><i class="fa-solid fa-reply"></i> Răspunde pe email</a>` : ''}
         ${lead.telefon ? `<a class="btn btn-outline" href="tel:${escapeHtmlAdm(lead.telefon)}"><i class="fa-solid fa-phone"></i> Sună</a>` : ''}
+        ${waPhone(lead.telefon) ? `<a class="btn btn-outline" style="border-color:#25D366;color:#1c9e4a" href="https://wa.me/${waPhone(lead.telefon)}" target="_blank" rel="noopener"><i class="fa-brands fa-whatsapp"></i> WhatsApp</a>` : ''}
       </div>
     </div>
   `;
@@ -326,6 +344,206 @@ function escapeHtmlAdm(s) {
   }[ch]));
 }
 
+// Compact EUR formatter (1.2M, 350K) for the dashboard stat card.
+function formatBigEur(v) {
+  const n = +v || 0;
+  if (n >= 1e6) return '€' + (n / 1e6).toFixed(1).replace('.0', '') + 'M';
+  if (n >= 1e3) return '€' + Math.round(n / 1e3) + 'K';
+  return '€' + n;
+}
+
+// Strip non-digits, prefix Romania country code if local format.
+function waPhone(raw) {
+  if (!raw) return '';
+  let d = String(raw).replace(/\D/g, '');
+  if (d.startsWith('0')) d = '40' + d.slice(1);
+  return d;
+}
+
+// CSV helpers — RFC 4180 quoting with UTF-8 BOM so Excel opens it cleanly.
+function csvEscape(v) {
+  if (v == null) return '';
+  const s = String(v);
+  return /[",\n;]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s;
+}
+function downloadCsv(filename, rows) {
+  const csv = '﻿' + rows.map(r => r.map(csvEscape).join(',')).join('\n');
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = filename;
+  document.body.appendChild(a); a.click();
+  setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 0);
+}
+
+// Build a public URL for a listing (used by "copy link" action).
+function publicPropertyUrl(prop) {
+  const slug = prop.categorie === 'terenuri' ? 'teren' : prop.categorie;
+  const o = window.location.origin && window.location.origin.startsWith('http')
+    ? window.location.origin
+    : 'https://www.even-imobiliare.ro';
+  return `${o.replace(/\/$/, '')}/property-${slug}.html?id=${encodeURIComponent(prop.id)}`;
+}
+
+async function copyPropertyLink(id) {
+  const prop = (allPropsCache || []).find(p => String(p.id) === String(id));
+  if (!prop) return;
+  const url = publicPropertyUrl(prop);
+  try {
+    await navigator.clipboard.writeText(url);
+    showToast('Link copiat în clipboard.');
+  } catch {
+    prompt('Copiază manual linkul:', url);
+  }
+}
+
+// ---------- LEADS — BULK ACTIONS & EXPORT ----------
+
+function getSelectedLeadIds() {
+  return Array.from(document.querySelectorAll('.lead-row-check:checked')).map(el => el.dataset.id);
+}
+
+function updateBulkBar() {
+  const ids = getSelectedLeadIds();
+  const bar = document.getElementById('leadsBulkBar');
+  if (!bar) return;
+  if (ids.length === 0) {
+    bar.style.display = 'none';
+  } else {
+    bar.style.display = 'flex';
+    document.getElementById('bulkSelectedCount').textContent = ids.length;
+  }
+  // Sync the master checkbox indeterminate state
+  const all = document.querySelectorAll('.lead-row-check');
+  const master = document.getElementById('leadSelectAll');
+  if (master) {
+    master.checked = all.length > 0 && ids.length === all.length;
+    master.indeterminate = ids.length > 0 && ids.length < all.length;
+  }
+}
+
+function toggleAllLeadSelection(on) {
+  document.querySelectorAll('.lead-row-check').forEach(el => { el.checked = on; });
+  updateBulkBar();
+}
+
+function clearLeadSelection() {
+  document.querySelectorAll('.lead-row-check').forEach(el => { el.checked = false; });
+  updateBulkBar();
+}
+
+async function applyBulkLeadStatus() {
+  const status = document.getElementById('bulkStatusSelect').value;
+  if (!status) { alert('Alege un status.'); return; }
+  const ids = getSelectedLeadIds();
+  if (!ids.length) return;
+  if (!confirm(`Schimbi statusul a ${ids.length} cereri în "${LEAD_STATUS_LABELS[status]}"?`)) return;
+  try {
+    await Promise.all(ids.map(id => updateLeadStatus(id, status)));
+    showToast(`${ids.length} cereri actualizate.`);
+    await renderLeads();
+    await refreshStats();
+  } catch (err) {
+    alert('Eroare: ' + err.message);
+  }
+}
+
+async function bulkDeleteLeads() {
+  const ids = getSelectedLeadIds();
+  if (!ids.length) return;
+  if (!confirm(`Ștergi definitiv ${ids.length} cereri? Acțiunea NU poate fi anulată.`)) return;
+  try {
+    await Promise.all(ids.map(id => deleteLead(id)));
+    showToast(`${ids.length} cereri șterse.`);
+    await renderLeads();
+    await refreshStats();
+  } catch (err) {
+    alert('Eroare: ' + err.message);
+  }
+}
+
+function exportLeadsCsv() {
+  const leads = allLeadsCache || [];
+  if (!leads.length) { alert('Nu există cereri de exportat cu filtrele curente.'); return; }
+  const header = ['Data', 'Nume', 'Email', 'Telefon', 'Tip', 'Status', 'Sursă', 'Pentru', 'Mesaj', 'Notă internă'];
+  const rows = [header, ...leads.map(l => [
+    new Date(l.created_at).toLocaleString('ro-RO'),
+    l.nume || '',
+    l.email || '',
+    l.telefon || '',
+    LEAD_TIP_LABELS[l.tip] || l.tip || '',
+    LEAD_STATUS_LABELS[l.status] || l.status || '',
+    l.sursa || '',
+    l.properties?.titlu || l.projects?.nume || '',
+    l.mesaj || '',
+    l.note || ''
+  ])];
+  const stamp = new Date().toISOString().slice(0, 10);
+  downloadCsv(`leads-even-${stamp}.csv`, rows);
+  showToast(`${leads.length} cereri exportate.`);
+}
+
+function exportPropertiesCsv() {
+  // Export the currently-rendered set (respects active tab + filters).
+  // We reuse the same filter logic as renderTable via a tag we leave on tableWrap.
+  const tbody = document.querySelector('#tableWrap tbody');
+  if (!tbody) { alert('Nu există proprietăți de exportat.'); return; }
+  const rowIds = Array.from(tbody.querySelectorAll('tr'))
+    .map(tr => {
+      // We don't currently render id in the cell, so rebuild from cached set + active tab + filter state.
+      return tr;
+    });
+
+  // Simpler: rebuild from cache using the same filters renderTable applies.
+  const all = allPropsCache || [];
+  let data = all.filter(p => p.categorie === activeAdminTab);
+  const filterMode = document.getElementById('propActivFilter')?.value || 'active';
+  if (filterMode === 'active') data = data.filter(p => p.activ !== false);
+  else if (filterMode === 'inactive') data = data.filter(p => p.activ === false);
+  const q = (document.getElementById('propSearchInput')?.value || '').toLowerCase().trim();
+  if (q) data = data.filter(p =>
+    (p.titlu || '').toLowerCase().includes(q) ||
+    (p.oras || '').toLowerCase().includes(q) ||
+    (p.cartier || '').toLowerCase().includes(q) ||
+    (p.judet || '').toLowerCase().includes(q) ||
+    String(p.id || '').toLowerCase().includes(q));
+  const regim = document.getElementById('propRegimFilter')?.value;
+  if (regim && activeAdminTab !== 'terenuri') data = data.filter(p => p.regim === regim);
+  const pMin = +document.getElementById('propPretMin')?.value || 0;
+  const pMax = +document.getElementById('propPretMax')?.value || 0;
+  if (pMin || pMax) data = data.filter(p => {
+    const v = p.pret ?? p.pretTotal ?? 0;
+    if (pMin && v < pMin) return false;
+    if (pMax && v > pMax) return false;
+    return true;
+  });
+
+  if (!data.length) { alert('Niciun rând cu filtrele curente.'); return; }
+
+  const header = ['ID', 'Titlu', 'Categorie', 'Tip', 'Regim', 'Preț', 'Preț total', 'Camere', 'Suprafață', 'Etaj', 'Oraș', 'Cartier', 'Adresă', 'Județ', 'Status', 'Link public'];
+  const rows = [header, ...data.map(p => [
+    p.id,
+    p.titlu || '',
+    p.categorie,
+    p.tip || p.tipSpatiu || '',
+    p.regim || '',
+    p.pret ?? '',
+    p.pretTotal ?? '',
+    p.camere ?? '',
+    p.suprafata ?? p.suprafataTotala ?? '',
+    p.etaj != null ? p.etaj + (p.etajTotal ? `/${p.etajTotal}` : '') : '',
+    p.oras || '',
+    p.cartier || '',
+    p.adresa || '',
+    p.judet || '',
+    p.activ === false ? 'arhivat' : 'activ',
+    publicPropertyUrl(p)
+  ])];
+  const stamp = new Date().toISOString().slice(0, 10);
+  downloadCsv(`proprietati-${activeAdminTab}-${stamp}.csv`, rows);
+  showToast(`${data.length} proprietăți exportate.`);
+}
+
 // ---------- TABS & PROPERTY TABLE (with filters) ----------
 
 function renderAdminTabs() {
@@ -346,6 +564,8 @@ function resetPropFilters() {
   document.getElementById('propRegimFilter').value = '';
   document.getElementById('propActivFilter').value = 'active';
   document.getElementById('propSortBy').value = 'created_desc';
+  const pMin = document.getElementById('propPretMin'); if (pMin) pMin.value = '';
+  const pMax = document.getElementById('propPretMax'); if (pMax) pMax.value = '';
   renderTable();
 }
 
@@ -468,6 +688,18 @@ async function renderTable() {
       data = data.filter(p => p.regim === regimFilter);
     }
 
+    // Price range — uses pret (residential/rent) or pretTotal (commercial sale / land).
+    const pMin = +document.getElementById('propPretMin')?.value || 0;
+    const pMax = +document.getElementById('propPretMax')?.value || 0;
+    if (pMin || pMax) {
+      data = data.filter(p => {
+        const v = p.pret ?? p.pretTotal ?? 0;
+        if (pMin && v < pMin) return false;
+        if (pMax && v > pMax) return false;
+        return true;
+      });
+    }
+
     // Sort
     const sortBy = document.getElementById('propSortBy')?.value || 'created_desc';
     data = sortPropsAdmin(data, sortBy);
@@ -517,23 +749,39 @@ async function renderTable() {
           </tr>
         </thead>
         <tbody>
-          ${data.map(row => `
+          ${data.map(row => {
+            const matchCount = countMatchesForProperty(row);
+            const matchBadge = row.activ === false ? '' : (matchCount > 0
+              ? `<span class="match-badge" onclick="openMatchesModal('${row.id}', '${activeAdminTab}')" title="Click pentru cumpărători potriviți"><i class="fa-solid fa-user-tag"></i> ${matchCount}</span>`
+              : `<span class="match-badge zero" title="Niciun cumpărător potrivit"><i class="fa-solid fa-user-tag"></i> 0</span>`);
+            const viewChip = (row.viewCount > 0)
+              ? `<span class="views-chip" title="Vizualizări pe site"><i class="fa-solid fa-eye"></i> ${row.viewCount}</span>`
+              : '';
+            return `
             <tr style="${row.activ === false ? 'opacity:0.5' : ''}">
               ${columns.map(c => `<td>${c.render ? c.render(row[c.key], row) : (row[c.key] ?? '-')}</td>`).join('')}
-              <td>${row.activ === false ? '<span style="color:#999;font-size:12px">arhivat</span>' : '<span style="color:var(--success);font-size:12px">activ</span>'}</td>
+              <td>
+                ${row.activ === false ? '<span style="color:#999;font-size:12px">arhivat</span>' : '<span style="color:var(--success);font-size:12px">activ</span>'}
+                <div style="display:flex;gap:6px;margin-top:4px;flex-wrap:wrap">${matchBadge}${viewChip}</div>
+              </td>
               <td>
                 <div class="table-actions">
                   ${row.activ === false
                     ? ''
                     : `<span class="icon-btn icon-btn-banner${row.banner ? ' is-on' : ''}" onclick="toggleBanner('${row.id}', ${row.banner ? 'true' : 'false'})" title="${row.banner ? 'Pe banner acum · click pentru a scoate' : 'Pune pe bannerul QR'}"><i class="fa-solid fa-qrcode"></i></span>`}
+                  ${row.activ === false ? '' : `<span class="icon-btn" onclick="copyPropertyLink('${row.id}')" title="Copiază linkul public"><i class="fa-solid fa-link"></i></span>`}
+                  <span class="icon-btn" onclick="openBrochure('${row.id}', '${activeAdminTab}', false)" title="Brochure PDF"><i class="fa-solid fa-file-pdf"></i></span>
+                  <span class="icon-btn" onclick="openBrochure('${row.id}', '${activeAdminTab}', true)" title="Brochure pentru colaborator (fără agent)"><i class="fa-solid fa-share-from-square"></i></span>
                   <span class="icon-btn" onclick="editProperty('${row.id}', '${activeAdminTab}')" title="Editează"><i class="fa-solid fa-pen"></i></span>
                   ${row.activ === false
                     ? `<span class="icon-btn" onclick="restoreProperty('${row.id}')" title="Restaurează"><i class="fa-solid fa-rotate-left"></i></span>`
-                    : `<span class="icon-btn danger" onclick="confirmDeleteProperty('${row.id}')" title="Arhivează"><i class="fa-solid fa-trash"></i></span>`}
+                    : `<span class="icon-btn" onclick="confirmArchiveProperty('${row.id}')" title="Arhivează"><i class="fa-solid fa-box-archive"></i></span>`}
+                  <span class="icon-btn danger" onclick="confirmHardDeleteProperty('${row.id}')" title="Șterge definitiv"><i class="fa-solid fa-trash"></i></span>
                 </div>
               </td>
             </tr>
-          `).join('')}
+          `;
+          }).join('')}
         </tbody>
       </table>
     `;
@@ -566,13 +814,30 @@ async function restoreProperty(id) {
   }
 }
 
-async function confirmDeleteProperty(id) {
-  if (!confirm(`Arhivezi proprietatea ${id}? Va fi ascunsă din listinguri (poate fi restaurată).`)) return;
+async function confirmArchiveProperty(id) {
+  if (!confirm(`Arhivezi proprietatea ${id}? Va fi ascunsă din listinguri (poate fi restaurată oricând).`)) return;
   try {
     await deleteProperty(id);
     showToast('Proprietate arhivată.');
     await refreshStats();
     await renderTable();
+  } catch (err) {
+    alert('Eroare la arhivare: ' + err.message);
+  }
+}
+
+async function confirmHardDeleteProperty(id) {
+  const prop = (allPropsCache || []).find(p => String(p.id) === String(id));
+  const label = prop?.titlu ? `"${prop.titlu}"` : `${id}`;
+  if (!confirm(`ȘTERGERE DEFINITIVĂ — proprietatea ${label} va fi ștearsă complet din bază. Această acțiune NU poate fi anulată.\n\nContinui?`)) return;
+  if (!confirm(`Ești absolut sigur? Tastează OK ca să confirmi ștergerea definitivă a ${label}.`)) return;
+  try {
+    await hardDeleteProperty(id);
+    showToast('Proprietate ștearsă definitiv.');
+    allPropsCache = allPropsCache.filter(p => String(p.id) !== String(id));
+    await refreshStats();
+    await renderTable();
+    renderBannerPanel();
   } catch (err) {
     alert('Eroare la ștergere: ' + err.message);
   }
@@ -1357,6 +1622,356 @@ function acceptImportedDraft() {
   editingProperty = null;
 
   showToast('Datele au fost preluate. Verifică, urcă pozele și salvează.');
+}
+
+// ============================================================
+// BUYER PROFILES — saved searches + matching
+// ============================================================
+
+const BUYER_CATEGORII = [
+  { value: '', label: 'Orice' },
+  { value: 'rezidential', label: 'Rezidențial' },
+  { value: 'comercial', label: 'Comercial' },
+  { value: 'terenuri', label: 'Teren' },
+];
+const BUYER_REGIMURI = [
+  { value: '', label: 'Orice' },
+  { value: 'vanzare', label: 'Vânzare' },
+  { value: 'inchiriere', label: 'Închiriere' },
+];
+
+// Returns true if a property matches a buyer's criteria.
+// Empty criteria are treated as "any". Array criteria use OR; cross-field is AND.
+function propertyMatchesBuyer(p, b) {
+  if (!p || !b || b.activ === false) return false;
+  if (b.categorie && b.categorie !== p.categorie) return false;
+  if (b.regim && b.regim !== p.regim) return false;
+  if (b.tip && b.tip.length) {
+    const tip = p.tip || p.tipSpatiu;
+    if (!tip || !b.tip.includes(tip)) return false;
+  }
+  if (b.orase && b.orase.length) {
+    const city = (p.oras || p.localitate || p.judet || '').toLowerCase();
+    if (!b.orase.some(o => city.includes(o.toLowerCase()))) return false;
+  }
+  if (b.cartiere && b.cartiere.length) {
+    const cart = (p.cartier || '').toLowerCase();
+    if (!b.cartiere.some(c => cart.includes(c.toLowerCase()))) return false;
+  }
+  if (b.camereMin != null && (p.camere || 0) < b.camereMin) return false;
+  if (b.camereMax != null && (p.camere || 999) > b.camereMax) return false;
+  const price = p.pret ?? p.pretTotal ?? 0;
+  if (b.pretMin != null && price < b.pretMin) return false;
+  if (b.pretMax != null && price > b.pretMax) return false;
+  const surf = p.suprafata ?? p.suprafataTotala ?? 0;
+  if (b.suprafataMin != null && surf < b.suprafataMin) return false;
+  if (b.suprafataMax != null && surf > b.suprafataMax) return false;
+  return true;
+}
+
+function countMatchesForProperty(p) {
+  if (!allBuyersCache || !allBuyersCache.length) return 0;
+  return allBuyersCache.filter(b => b.activ !== false && propertyMatchesBuyer(p, b)).length;
+}
+
+function getMatchedBuyers(prop) {
+  return (allBuyersCache || []).filter(b => b.activ !== false && propertyMatchesBuyer(prop, b));
+}
+
+async function renderBuyersTable() {
+  const wrap = document.getElementById('buyersWrap');
+  if (!wrap) return;
+  wrap.innerHTML = '<div style="padding:24px;color:var(--gray-400)"><i class="fa-solid fa-spinner fa-spin"></i> Se încarcă...</div>';
+  try {
+    const buyers = await getBuyerProfiles();
+    allBuyersCache = buyers;
+
+    const q = (document.getElementById('buyerSearchInput')?.value || '').toLowerCase().trim();
+    const prio = document.getElementById('buyerPrioritateFilter')?.value || '';
+    const activMode = document.getElementById('buyerActivFilter')?.value || 'active';
+
+    let data = buyers;
+    if (q) data = data.filter(b =>
+      (b.nume || '').toLowerCase().includes(q) ||
+      (b.email || '').toLowerCase().includes(q) ||
+      (b.telefon || '').toLowerCase().includes(q));
+    if (prio) data = data.filter(b => b.prioritate === prio);
+    if (activMode === 'active') data = data.filter(b => b.activ !== false);
+    else if (activMode === 'inactive') data = data.filter(b => b.activ === false);
+
+    if (!data.length) {
+      wrap.innerHTML = '<div style="padding:32px;color:var(--gray-500);text-align:center;background:var(--gray-50);border-radius:8px">Niciun cumpărător salvat. Apasă „Adaugă cumpărător" ca să începi.</div>';
+      return;
+    }
+
+    wrap.innerHTML = `
+      <div style="margin-bottom:8px;font-size:13px;color:var(--gray-500)">${data.length} ${data.length === 1 ? 'cumpărător' : 'cumpărători'}</div>
+      <table class="admin-table">
+        <thead>
+          <tr><th>Nume</th><th>Contact</th><th>Caută</th><th>Buget</th><th>Match-uri</th><th></th></tr>
+        </thead>
+        <tbody>
+          ${data.map(b => {
+            const matchedProps = (allPropsCache || []).filter(p => p.activ !== false && propertyMatchesBuyer(p, b));
+            const wa = waPhone(b.telefon);
+            return `
+              <tr style="${b.activ === false ? 'opacity:0.5' : ''}">
+                <td>
+                  <strong>${escapeHtmlAdm(b.nume)}</strong>
+                  <div style="margin-top:3px"><span class="prio-tag prio-${b.prioritate}">${b.prioritate === 'hot' ? '🔥 ' : ''}${b.prioritate}</span></div>
+                </td>
+                <td style="font-size:13px">
+                  ${b.email ? `<a href="mailto:${escapeHtmlAdm(b.email)}">${escapeHtmlAdm(b.email)}</a>` : ''}
+                  ${b.telefon ? `<br><a href="tel:${escapeHtmlAdm(b.telefon)}">${escapeHtmlAdm(b.telefon)}</a>` : ''}
+                </td>
+                <td class="buyer-criteria">${escapeHtmlAdm(buyerCriteriaSummary(b))}</td>
+                <td style="font-size:13px;white-space:nowrap">${buyerBudgetLabel(b)}</td>
+                <td>
+                  ${matchedProps.length > 0
+                    ? `<span class="match-badge" onclick="openMatchesForBuyer('${b.id}')"><i class="fa-solid fa-bullseye"></i> ${matchedProps.length}</span>`
+                    : `<span class="match-badge zero"><i class="fa-solid fa-bullseye"></i> 0</span>`}
+                </td>
+                <td>
+                  <div class="table-actions">
+                    ${wa ? `<a class="icon-btn icon-btn-wa" href="https://wa.me/${wa}" target="_blank" rel="noopener" title="WhatsApp"><i class="fa-brands fa-whatsapp"></i></a>` : ''}
+                    <span class="icon-btn" onclick='editBuyer(${JSON.stringify(b.id)})' title="Editează"><i class="fa-solid fa-pen"></i></span>
+                    <span class="icon-btn danger" onclick="confirmDeleteBuyer('${b.id}')" title="Șterge"><i class="fa-solid fa-trash"></i></span>
+                  </div>
+                </td>
+              </tr>
+            `;
+          }).join('')}
+        </tbody>
+      </table>
+    `;
+  } catch (err) {
+    wrap.innerHTML = '<div style="padding:24px;color:#e84545">Eroare: ' + escapeHtmlAdm(err.message) + '</div>';
+    console.error(err);
+  }
+}
+
+function buyerCriteriaSummary(b) {
+  const parts = [];
+  if (b.categorie) parts.push(b.categorie);
+  if (b.regim) parts.push(b.regim);
+  if (b.tip && b.tip.length) parts.push(b.tip.join('/'));
+  if (b.orase && b.orase.length) parts.push(b.orase.join(', '));
+  if (b.cartiere && b.cartiere.length) parts.push('(' + b.cartiere.join(', ') + ')');
+  if (b.camereMin || b.camereMax) {
+    parts.push(`${b.camereMin || '?'}-${b.camereMax || '?'} cam`);
+  }
+  if (b.suprafataMin || b.suprafataMax) {
+    parts.push(`${b.suprafataMin || ''}–${b.suprafataMax || ''} mp`);
+  }
+  return parts.length ? parts.join(' · ') : '(orice)';
+}
+
+function buyerBudgetLabel(b) {
+  if (!b.pretMin && !b.pretMax) return '<span style="color:#aaa">orice</span>';
+  const min = b.pretMin ? formatPrice(b.pretMin) : '';
+  const max = b.pretMax ? formatPrice(b.pretMax) : '';
+  if (min && max) return `${min} – ${max}`;
+  if (min) return `de la ${min}`;
+  return `până la ${max}`;
+}
+
+let editingBuyer = null;
+function openBuyerModal(buyer = null) {
+  editingBuyer = buyer;
+  document.getElementById('buyerModalTitle').textContent = buyer ? 'Editează cumpărător' : 'Adaugă cumpărător';
+  const b = buyer || {};
+  document.getElementById('buyerForm').innerHTML = `
+    <div class="form-grid">
+      <div class="form-group full"><label>Nume cumpărător *</label><input type="text" name="nume" required value="${escapeHtmlAdm(b.nume || '')}" placeholder="ex: Familia Ionescu"></div>
+      <div class="form-group"><label>Email</label><input type="email" name="email" value="${escapeHtmlAdm(b.email || '')}"></div>
+      <div class="form-group"><label>Telefon</label><input type="tel" name="telefon" value="${escapeHtmlAdm(b.telefon || '')}" placeholder="07xx..."></div>
+      <div class="form-group">
+        <label>Prioritate</label>
+        <select name="prioritate">
+          <option value="hot" ${b.prioritate === 'hot' ? 'selected' : ''}>🔥 Hot</option>
+          <option value="normal" ${(b.prioritate || 'normal') === 'normal' ? 'selected' : ''}>Normal</option>
+          <option value="cold" ${b.prioritate === 'cold' ? 'selected' : ''}>Cold</option>
+        </select>
+      </div>
+      <div class="form-group"><label>Activ?</label>
+        <select name="activ">
+          <option value="true" ${b.activ !== false ? 'selected' : ''}>Da</option>
+          <option value="false" ${b.activ === false ? 'selected' : ''}>Nu (pe pauză)</option>
+        </select>
+      </div>
+
+      <div class="form-group full" style="margin-top:8px"><strong style="color:var(--gold);font-size:13px;letter-spacing:0.1em;text-transform:uppercase">Criterii căutare</strong></div>
+
+      <div class="form-group">
+        <label>Categorie</label>
+        <select name="categorie">${BUYER_CATEGORII.map(c => `<option value="${c.value}" ${b.categorie === c.value ? 'selected' : ''}>${c.label}</option>`).join('')}</select>
+      </div>
+      <div class="form-group">
+        <label>Regim</label>
+        <select name="regim">${BUYER_REGIMURI.map(r => `<option value="${r.value}" ${b.regim === r.value ? 'selected' : ''}>${r.label}</option>`).join('')}</select>
+      </div>
+      <div class="form-group full"><label>Tipuri (separate cu virgulă)</label><input type="text" name="tip" value="${(b.tip || []).join(', ')}" placeholder="apartament, vila"></div>
+      <div class="form-group full"><label>Orașe (separate cu virgulă)</label><input type="text" name="orase" value="${(b.orase || []).join(', ')}" placeholder="București, Constanța"></div>
+      <div class="form-group full"><label>Cartiere (separate cu virgulă)</label><input type="text" name="cartiere" value="${(b.cartiere || []).join(', ')}" placeholder="Herăstrău, Floreasca"></div>
+
+      <div class="form-group"><label>Camere min</label><input type="number" name="camereMin" min="0" value="${b.camereMin || ''}"></div>
+      <div class="form-group"><label>Camere max</label><input type="number" name="camereMax" min="0" value="${b.camereMax || ''}"></div>
+      <div class="form-group"><label>Buget min (€)</label><input type="number" name="pretMin" value="${b.pretMin || ''}"></div>
+      <div class="form-group"><label>Buget max (€)</label><input type="number" name="pretMax" value="${b.pretMax || ''}"></div>
+      <div class="form-group"><label>Suprafață min (mp)</label><input type="number" name="suprafataMin" value="${b.suprafataMin || ''}"></div>
+      <div class="form-group"><label>Suprafață max (mp)</label><input type="number" name="suprafataMax" value="${b.suprafataMax || ''}"></div>
+
+      <div class="form-group full"><label>Notă internă</label><textarea name="note" rows="3">${escapeHtmlAdm(b.note || '')}</textarea></div>
+    </div>
+  `;
+  document.getElementById('buyerModal').classList.add('open');
+}
+
+function closeBuyerModal() {
+  document.getElementById('buyerModal').classList.remove('open');
+  editingBuyer = null;
+}
+
+function editBuyer(id) {
+  const b = allBuyersCache.find(x => String(x.id) === String(id));
+  if (!b) return;
+  openBuyerModal(b);
+}
+
+async function submitBuyer(e) {
+  e.preventDefault();
+  const form = e.target;
+  const btn = form.querySelector('button[type="submit"]');
+  btn.disabled = true;
+  btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Se salvează...';
+
+  const csvList = s => (s || '').split(',').map(x => x.trim()).filter(Boolean);
+  const fd = {};
+  form.querySelectorAll('[name]').forEach(el => { fd[el.name] = el.value; });
+
+  const buyer = {
+    id: editingBuyer?.id,
+    nume: fd.nume,
+    email: fd.email,
+    telefon: fd.telefon,
+    prioritate: fd.prioritate,
+    activ: fd.activ === 'true',
+    categorie: fd.categorie,
+    regim: fd.regim,
+    tip: csvList(fd.tip),
+    orase: csvList(fd.orase),
+    cartiere: csvList(fd.cartiere),
+    camereMin: fd.camereMin ? +fd.camereMin : null,
+    camereMax: fd.camereMax ? +fd.camereMax : null,
+    pretMin: fd.pretMin ? +fd.pretMin : null,
+    pretMax: fd.pretMax ? +fd.pretMax : null,
+    suprafataMin: fd.suprafataMin ? +fd.suprafataMin : null,
+    suprafataMax: fd.suprafataMax ? +fd.suprafataMax : null,
+    note: fd.note,
+  };
+
+  try {
+    await upsertBuyerProfile(buyer);
+    closeBuyerModal();
+    showToast(editingBuyer ? 'Cumpărător actualizat.' : 'Cumpărător adăugat.');
+    await renderBuyersTable();
+    await renderTable(); // refresh match counts on property table
+  } catch (err) {
+    alert('Eroare: ' + err.message);
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = '<i class="fa-solid fa-check"></i> Salvează';
+  }
+}
+
+async function confirmDeleteBuyer(id) {
+  if (!confirm('Ștergi acest cumpărător din baza ta?')) return;
+  try {
+    await deleteBuyerProfile(id);
+    showToast('Cumpărător șters.');
+    await renderBuyersTable();
+    await renderTable();
+  } catch (err) {
+    alert('Eroare: ' + err.message);
+  }
+}
+
+// Matches modal: list buyers that match a given property
+function openMatchesModal(propId, cat) {
+  const prop = (allPropsCache || []).find(p => String(p.id) === String(propId));
+  if (!prop) return;
+  const matched = getMatchedBuyers(prop);
+  document.getElementById('matchesModalTitle').textContent =
+    `${matched.length} ${matched.length === 1 ? 'cumpărător potrivit' : 'cumpărători potriviți'} pentru „${prop.titlu || prop.id}"`;
+  const body = document.getElementById('matchesBody');
+  if (!matched.length) {
+    body.innerHTML = '<p style="color:var(--gray-500);text-align:center;padding:24px">Niciun cumpărător din baza ta nu se potrivește cu această proprietate.</p>';
+  } else {
+    body.innerHTML = `<div class="match-list">${matched.map(b => {
+      const wa = waPhone(b.telefon);
+      return `
+        <div class="match-item">
+          <div>
+            <div class="match-item-name">${escapeHtmlAdm(b.nume)} <span class="prio-tag prio-${b.prioritate}" style="margin-left:6px">${b.prioritate}</span></div>
+            <div class="match-item-contact">
+              ${b.email ? `<a href="mailto:${escapeHtmlAdm(b.email)}">${escapeHtmlAdm(b.email)}</a>` : ''}
+              ${b.telefon ? ` · <a href="tel:${escapeHtmlAdm(b.telefon)}">${escapeHtmlAdm(b.telefon)}</a>` : ''}
+            </div>
+            <div class="buyer-criteria" style="margin-top:4px">${escapeHtmlAdm(buyerCriteriaSummary(b))}</div>
+            ${b.note ? `<div style="margin-top:6px;font-size:12px;color:#777;font-style:italic">„${escapeHtmlAdm(b.note)}"</div>` : ''}
+          </div>
+          <div class="match-item-actions">
+            ${wa ? `<a class="icon-btn icon-btn-wa" href="https://wa.me/${wa}?text=${encodeURIComponent('Bună ' + (b.nume.split(' ')[0] || '') + ', am o proprietate care s-ar putea potrivi: ' + publicPropertyUrl(prop))}" target="_blank" title="Trimite link pe WhatsApp"><i class="fa-brands fa-whatsapp"></i></a>` : ''}
+            ${b.email ? `<a class="icon-btn" href="mailto:${escapeHtmlAdm(b.email)}?subject=${encodeURIComponent('Proprietate care s-ar putea potrivi')}&body=${encodeURIComponent('Bună ' + (b.nume.split(' ')[0] || '') + ',\n\nAm un anunț care s-ar putea potrivi cu ce cauți:\n' + publicPropertyUrl(prop))}" title="Email"><i class="fa-solid fa-envelope"></i></a>` : ''}
+          </div>
+        </div>`;
+    }).join('')}</div>`;
+  }
+  document.getElementById('matchesModal').classList.add('open');
+}
+
+function closeMatchesModal() {
+  document.getElementById('matchesModal').classList.remove('open');
+}
+
+// From buyers table: list properties that match a buyer
+function openMatchesForBuyer(buyerId) {
+  const b = allBuyersCache.find(x => String(x.id) === String(buyerId));
+  if (!b) return;
+  const matched = (allPropsCache || []).filter(p => p.activ !== false && propertyMatchesBuyer(p, b));
+  document.getElementById('matchesModalTitle').textContent =
+    `${matched.length} ${matched.length === 1 ? 'proprietate potrivită' : 'proprietăți potrivite'} pentru ${b.nume}`;
+  const body = document.getElementById('matchesBody');
+  if (!matched.length) {
+    body.innerHTML = '<p style="color:var(--gray-500);text-align:center;padding:24px">Nicio proprietate din portofoliu nu se potrivește cu criteriile.</p>';
+  } else {
+    body.innerHTML = `<div class="match-list">${matched.map(p => {
+      const price = p.pret ?? p.pretTotal;
+      const priceStr = price ? formatPrice(price) : 'Preț la cerere';
+      return `
+        <div class="match-item">
+          <div>
+            <div class="match-item-name">${escapeHtmlAdm(p.titlu || p.id)}</div>
+            <div class="buyer-criteria" style="margin-top:4px">
+              ${escapeHtmlAdm([p.oras, p.cartier].filter(Boolean).join(' · '))} · <b>${priceStr}</b>
+            </div>
+          </div>
+          <div class="match-item-actions">
+            <a class="icon-btn" href="${publicPropertyUrl(p)}" target="_blank" title="Vezi anunțul"><i class="fa-solid fa-eye"></i></a>
+            <a class="icon-btn" onclick="openBrochure('${p.id}', '${p.categorie}', false); return false;" href="#" title="Brochure"><i class="fa-solid fa-file-pdf"></i></a>
+          </div>
+        </div>`;
+    }).join('')}</div>`;
+  }
+  document.getElementById('matchesModal').classList.add('open');
+}
+
+// ============================================================
+// BROCHURE — open printable property brochure in new tab
+// ============================================================
+function openBrochure(id, cat, blind) {
+  const url = `brochure.html?id=${encodeURIComponent(id)}&cat=${encodeURIComponent(cat)}${blind ? '&blind=1' : ''}`;
+  window.open(url, '_blank', 'noopener');
 }
 
 // ---------- INIT ----------
