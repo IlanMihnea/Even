@@ -964,13 +964,19 @@ async function submitAgent(e) {
 }
 
 async function confirmDeleteAgent(id) {
-  if (!confirm(`Ștergi acest agent? Proprietățile asignate vor rămâne fără agent.`)) return;
+  const agent = (allAgentsCache || []).find(a => String(a.id) === String(id));
+  const assigned = (allPropsCache || []).filter(p => String(p.agentId) === String(id)).length;
+  const msg = assigned > 0
+    ? `Ștergi agentul „${agent?.nume || id}"?\n\n${assigned} ${assigned === 1 ? 'proprietate este asignată' : 'proprietăți sunt asignate'} — vor rămâne în portofoliu fără agent (le poți reasigna din modalul de editare).`
+    : `Ștergi agentul „${agent?.nume || id}"?`;
+  if (!confirm(msg)) return;
   try {
     await deleteAgent(id);
     showToast('Agent șters.');
     await renderAgentsTable();
+    await renderTable(); // refresh property table (agent column may show '—' now)
   } catch (err) {
-    alert('Eroare: ' + err.message);
+    alert('Eroare: ' + err.message + '\n\nDacă vezi „foreign key constraint", rulează seed/migration-agents-fk-2026-05.sql în Supabase.');
   }
 }
 
