@@ -70,6 +70,7 @@ async function showDashboard() {
     renderBuyersTable()
   ]);
   renderBannerPanel();
+  renderHomeHeroPanel();
 }
 
 // ---------- STATS ----------
@@ -638,6 +639,72 @@ function categoryLabelAdm(cat) {
   return { rezidential: 'Rezidențial', comercial: 'Comercial', terenuri: 'Teren' }[cat] || cat || '';
 }
 
+// ---------- HOMEPAGE HERO PANEL ----------
+
+async function renderHomeHeroPanel() {
+  const panel = document.getElementById('homeHeroPanel');
+  if (!panel) return;
+
+  let props = allPropsCache;
+  if (!props || !props.length) {
+    try { props = await getAllPropertiesAdmin(); allPropsCache = props; }
+    catch { props = []; }
+  }
+  const current = props.find(p => p.homeHero === true && p.activ !== false);
+
+  const hint = `
+    <div class="banner-url-row">
+      <span class="banner-url-hint">Această proprietate apare în card-ul de peste video, pe homepage. Apasă pe iconița <i class="fa-solid fa-star"></i> din dreptul unei proprietăți active ca să o pui aici.</span>
+    </div>`;
+
+  if (!current) {
+    panel.innerHTML = `
+      <div class="banner-empty">
+        <i class="fa-solid fa-circle-info"></i>
+        <div>
+          <strong>Nicio proprietate selectată pentru hero.</strong>
+          <span>Homepage-ul va afișa card-ul implicit până când alegi una.</span>
+        </div>
+      </div>
+      ${hint}`;
+    return;
+  }
+
+  const thumb = (current.imagini && current.imagini[0])
+    ? `<img src="${escapeHtmlAdm(current.imagini[0])}" alt="">`
+    : `<div class="banner-thumb-empty"><i class="fa-solid fa-image"></i></div>`;
+  const pretTxt = current.pret != null
+    ? formatPrice(current.pret)
+    : (current.pretTotal != null ? formatPrice(current.pretTotal) : 'Preț la cerere');
+
+  panel.innerHTML = `
+    <div class="banner-current">
+      <div class="banner-thumb">${thumb}</div>
+      <div class="banner-current-info">
+        <span class="banner-tag"><i class="fa-solid fa-circle" style="font-size:7px"></i> În hero pe homepage</span>
+        <strong>${escapeHtmlAdm(current.titlu || '(fără titlu)')}</strong>
+        <span class="banner-meta">${escapeHtmlAdm(categoryLabelAdm(current.categorie))} · ${escapeHtmlAdm(current.oras || current.localitate || current.judet || '')} · ${pretTxt}</span>
+      </div>
+      <div class="banner-current-actions">
+        <a class="btn btn-outline btn-sm" href="property-${current.categorie === 'terenuri' ? 'teren' : current.categorie}.html?id=${encodeURIComponent(current.id)}" target="_blank" rel="noopener">Vezi</a>
+        <button class="btn btn-outline btn-sm" onclick="toggleHomeHero('${current.id}', true)">Scoate din hero</button>
+      </div>
+    </div>
+    ${hint}`;
+}
+
+async function toggleHomeHero(id, isCurrentlyOn) {
+  try {
+    await setHomeHeroProperty(isCurrentlyOn ? null : id);
+    showToast(isCurrentlyOn ? 'Proprietate scoasă din hero.' : 'Proprietate pusă în hero-ul homepage-ului.');
+    allPropsCache = await getAllPropertiesAdmin();
+    await renderTable();
+    renderHomeHeroPanel();
+  } catch (err) {
+    alert('Eroare: ' + err.message);
+  }
+}
+
 async function toggleBanner(id, isCurrentlyOn) {
   try {
     await setBannerProperty(isCurrentlyOn ? null : id);
@@ -769,6 +836,9 @@ async function renderTable() {
                   ${row.activ === false
                     ? ''
                     : `<span class="icon-btn icon-btn-banner${row.banner ? ' is-on' : ''}" onclick="toggleBanner('${row.id}', ${row.banner ? 'true' : 'false'})" title="${row.banner ? 'Pe banner acum · click pentru a scoate' : 'Pune pe bannerul QR'}"><i class="fa-solid fa-qrcode"></i></span>`}
+                  ${row.activ === false
+                    ? ''
+                    : `<span class="icon-btn icon-btn-banner${row.homeHero ? ' is-on' : ''}" onclick="toggleHomeHero('${row.id}', ${row.homeHero ? 'true' : 'false'})" title="${row.homeHero ? 'În hero pe homepage · click pentru a scoate' : 'Pune în hero pe homepage'}"><i class="fa-solid fa-star"></i></span>`}
                   ${row.activ === false ? '' : `<span class="icon-btn" onclick="copyPropertyLink('${row.id}')" title="Copiază linkul public"><i class="fa-solid fa-link"></i></span>`}
                   <span class="icon-btn" onclick="openBrochure('${row.id}', '${activeAdminTab}', false)" title="Brochure PDF"><i class="fa-solid fa-file-pdf"></i></span>
                   <span class="icon-btn" onclick="openBrochure('${row.id}', '${activeAdminTab}', true)" title="Brochure pentru colaborator (fără agent)"><i class="fa-solid fa-share-from-square"></i></span>
@@ -838,6 +908,7 @@ async function confirmHardDeleteProperty(id) {
     await refreshStats();
     await renderTable();
     renderBannerPanel();
+    renderHomeHeroPanel();
   } catch (err) {
     alert('Eroare la ștergere: ' + err.message);
   }

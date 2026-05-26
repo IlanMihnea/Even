@@ -458,6 +458,13 @@ body[data-page="home"] {
   border: 1px solid rgba(28, 35, 64, 0.06);
   pointer-events: none;
 }
+/* Real photo variant — used when a property is bound to the hero from admin. */
+.hp-feature-image.has-photo {
+  background-size: cover;
+  background-position: center;
+}
+.hp-feature-image.has-photo::after { display: none; }
+.hp-feature-image.has-photo::before { border-color: rgba(245, 243, 238, 0.35); }
 /* Decorative stones inside the empty image */
 .hp-feature-image::after {
   content: '';

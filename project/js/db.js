@@ -30,7 +30,7 @@ function toRezidential(row) {
     oras: row.oras, cartier: row.cartier, adresa: row.adresa,
     descriere: row.descriere, imagini: row.imagini || [], facilitati: row.facilitati || [],
     agentId: row.agent_id, agent: normalizeAgent(row.agents), categorie: 'rezidential',
-    banner: row.banner === true,
+    banner: row.banner === true, homeHero: row.home_hero === true,
     viewCount: row.view_count || 0, activ: row.activ
   };
 }
@@ -44,7 +44,7 @@ function toComercial(row) {
     clasaCladire: row.clasa_cladire, oras: row.oras, cartier: row.cartier, adresa: row.adresa,
     descriere: row.descriere, imagini: row.imagini || [], specificatii: row.specificatii || {},
     agentId: row.agent_id, agent: normalizeAgent(row.agents), categorie: 'comercial',
-    banner: row.banner === true,
+    banner: row.banner === true, homeHero: row.home_hero === true,
     viewCount: row.view_count || 0, activ: row.activ
   };
 }
@@ -61,7 +61,7 @@ function toTeren(row) {
     descriere: row.descriere, vecinatati: row.vecinatati,
     imagini: row.imagini || [],
     agentId: row.agent_id, agent: normalizeAgent(row.agents), categorie: 'terenuri',
-    banner: row.banner === true,
+    banner: row.banner === true, homeHero: row.home_hero === true,
     viewCount: row.view_count || 0, activ: row.activ
   };
 }
@@ -172,6 +172,34 @@ async function getPropertyById(id, categorie) {
     .single();
   if (error) return null;
   return converters[categorie](data);
+}
+
+// Property currently featured in the homepage hero card (over the video).
+async function getHomeHeroProperty() {
+  const { data, error } = await _supabase
+    .from('properties')
+    .select('*, agents(*)')
+    .eq('home_hero', true)
+    .eq('activ', true)
+    .limit(1)
+    .maybeSingle();
+  if (error) return null;
+  if (!data) return null;
+  const converters = { rezidential: toRezidential, comercial: toComercial, terenuri: toTeren };
+  const fn = converters[data.categorie];
+  return fn ? fn(data) : data;
+}
+
+// Sets which property the homepage hero points to. Only one can be active.
+async function setHomeHeroProperty(id) {
+  const { error: clearErr } = await _supabase
+    .from('properties').update({ home_hero: false }).eq('home_hero', true);
+  if (clearErr) throw clearErr;
+  if (id) {
+    const { error } = await _supabase
+      .from('properties').update({ home_hero: true }).eq('id', id);
+    if (error) throw error;
+  }
 }
 
 // Property currently featured on the physical QR banner.

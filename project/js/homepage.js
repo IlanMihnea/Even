@@ -139,6 +139,73 @@ function setFluxTab(flux) {
   renderFilters();
 }
 
+async function renderHeroFeature() {
+  const wrap = document.getElementById('hpHeroFeature');
+  if (!wrap) return;
+  let p;
+  try { p = await getHomeHeroProperty(); }
+  catch (err) { console.error('Hero feature error:', err); return; }
+  if (!p) return; // keep the default static card
+
+  const cat = p.categorie;
+  const propPage = cat === 'terenuri' ? 'property-teren.html' : `property-${cat}.html`;
+  const link = `${propPage}?id=${encodeURIComponent(p.id)}`;
+  const num = shortPropNum(p.id);
+
+  let tagTxt, metaParts, priceTxt;
+  if (cat === 'rezidential') {
+    const tipLbl = (p.tip || '').charAt(0).toUpperCase() + (p.tip || '').slice(1);
+    tagTxt = `${tipLbl}${p.camere ? ' · ' + p.camere + ' camere' : ''}`;
+    metaParts = [
+      p.suprafata ? `<span><i class="fa-solid fa-vector-square"></i>${p.suprafata} m²</span>` : '',
+      p.camere ? `<span><i class="fa-solid fa-bed"></i>${p.camere} cam.</span>` : '',
+      (p.cartier || p.oras) ? `<span><i class="fa-solid fa-location-dot"></i>${p.cartier || p.oras}</span>` : ''
+    ];
+    priceTxt = formatPrice(p.pret) + (p.regim === 'inchiriere' ? '<span class="per-month">/lună</span>' : '');
+  } else if (cat === 'comercial') {
+    const tipLbl = (p.tipSpatiu || 'Spațiu comercial').charAt(0).toUpperCase() + (p.tipSpatiu || 'Spațiu comercial').slice(1);
+    tagTxt = `${tipLbl}${p.clasaCladire ? ' · Clasa ' + p.clasaCladire : ''}`;
+    metaParts = [
+      p.suprafataTotala ? `<span><i class="fa-solid fa-vector-square"></i>${p.suprafataTotala} m²</span>` : '',
+      (p.cartier || p.oras) ? `<span><i class="fa-solid fa-location-dot"></i>${p.cartier || p.oras}</span>` : ''
+    ];
+    priceTxt = p.pretTotal ? formatPrice(p.pretTotal) : (p.pret ? formatPrice(p.pret) + '<span class="per-month"> €/mp/lună</span>' : 'Preț la cerere');
+  } else { // terenuri
+    const tipLbl = (p.tip || 'Teren').replace(/-/g, ' ');
+    tagTxt = `Teren · ${tipLbl}`;
+    metaParts = [
+      p.suprafata ? `<span><i class="fa-solid fa-vector-square"></i>${p.suprafata} ${p.unitate || 'mp'}</span>` : '',
+      (p.localitate || p.judet) ? `<span><i class="fa-solid fa-location-dot"></i>${p.localitate || p.judet}</span>` : ''
+    ];
+    priceTxt = p.pretTotal ? formatPrice(p.pretTotal) : 'Preț la cerere';
+  }
+  const meta = metaParts.filter(Boolean).join('<span class="hp-meta-rule"></span>');
+
+  const photo = (p.imagini && p.imagini[0]) ? p.imagini[0] : '';
+  const imgStyle = photo ? ` style="background-image:url('${photo.replace(/'/g, "%27")}')"` : '';
+  const imgClass = photo ? 'hp-feature-image has-photo' : 'hp-feature-image';
+
+  wrap.innerHTML = `
+    <a class="hp-feature-card" href="${link}" style="text-decoration:none;color:inherit;display:block">
+      <div class="hp-feature-eyebrow">
+        <span>Selecție · Nº ${num}</span>
+        <span class="hp-feature-mark">●</span>
+      </div>
+      <div class="${imgClass}"${imgStyle} role="img" aria-label="${(p.titlu || '').replace(/"/g, '&quot;')}">
+        <span class="hp-feature-tag">${tagTxt}</span>
+      </div>
+      <div class="hp-feature-body">
+        <h3 class="hp-feature-title">${p.titlu || ''}</h3>
+        <div class="hp-feature-meta">${meta}</div>
+        <div class="hp-feature-foot">
+          <span class="hp-feature-price">${priceTxt}</span>
+          <span class="hp-feature-cta">Detalii <i class="fa-solid fa-arrow-up-right-from-square"></i></span>
+        </div>
+      </div>
+    </a>
+  `;
+}
+
 async function renderFeaturedProperties() {
   const grid = document.getElementById('featuredGrid');
   if (!grid) return;
@@ -281,6 +348,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   const [counts] = await Promise.all([
     fetchCategoryCounts(),
+    renderHeroFeature(),
     renderFeaturedProperties(),
     renderHomeProjects(),
   ]);
