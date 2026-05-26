@@ -1776,10 +1776,89 @@ function buyerBudgetLabel(b) {
 }
 
 let editingBuyer = null;
+
+// Selected chip values for the buyer-modal multi-selects.
+// Reset every time the modal opens.
+let buyerSelections = { tip: [], orase: [], cartiere: [] };
+
+// Build option lists from the current property cache so the dropdowns only
+// suggest values that actually exist in the portfolio (matching is reliable).
+function distinctValuesFor(field) {
+  const set = new Set();
+  (allPropsCache || []).forEach(p => {
+    if (field === 'tip') {
+      if (p.tip) set.add(p.tip);
+      if (p.tipSpatiu) set.add(p.tipSpatiu);
+    } else if (field === 'orase') {
+      [p.oras, p.localitate, p.judet].forEach(v => { if (v) set.add(v); });
+    } else if (field === 'cartiere') {
+      if (p.cartier) set.add(p.cartier);
+    }
+  });
+  return Array.from(set).sort((a, b) => a.localeCompare(b, 'ro'));
+}
+
+function renderChipInput(field, placeholder) {
+  const selected = buyerSelections[field] || [];
+  const allOptions = distinctValuesFor(field);
+  const available = allOptions.filter(o => !selected.some(s => s.toLowerCase() === o.toLowerCase()));
+  return `
+    <div class="chip-input" id="chip-${field}">
+      ${selected.length === 0 ? '' : selected.map((v, i) => `
+        <span class="chip">${escapeHtmlAdm(v)}<button type="button" class="chip-x" onclick="removeChip('${field}', ${i})" aria-label="șterge">✕</button></span>
+      `).join('')}
+      <select onchange="addChipFromSelect('${field}', this)">
+        <option value="">${selected.length ? '+ adaugă...' : placeholder}</option>
+        ${available.map(o => `<option value="${escapeHtmlAdm(o)}">${escapeHtmlAdm(o)}</option>`).join('')}
+      </select>
+      <input class="chip-free" placeholder="sau scrie manual + Enter" onkeydown="addChipFromInput(event, '${field}')">
+    </div>
+  `;
+}
+
+function addChipFromSelect(field, sel) {
+  const v = sel.value.trim();
+  if (!v) return;
+  if (!buyerSelections[field].some(x => x.toLowerCase() === v.toLowerCase())) {
+    buyerSelections[field].push(v);
+  }
+  redrawChip(field);
+}
+
+function addChipFromInput(ev, field) {
+  if (ev.key !== 'Enter') return;
+  ev.preventDefault();
+  const v = ev.target.value.trim();
+  if (!v) return;
+  if (!buyerSelections[field].some(x => x.toLowerCase() === v.toLowerCase())) {
+    buyerSelections[field].push(v);
+  }
+  ev.target.value = '';
+  redrawChip(field);
+}
+
+function removeChip(field, idx) {
+  buyerSelections[field].splice(idx, 1);
+  redrawChip(field);
+}
+
+function redrawChip(field) {
+  const placeholders = { tip: 'Selectează tip...', orase: 'Selectează oraș...', cartiere: 'Selectează cartier...' };
+  const wrap = document.getElementById(`chip-${field}`);
+  if (!wrap) return;
+  wrap.outerHTML = renderChipInput(field, placeholders[field]);
+}
+
 function openBuyerModal(buyer = null) {
   editingBuyer = buyer;
   document.getElementById('buyerModalTitle').textContent = buyer ? 'Editează cumpărător' : 'Adaugă cumpărător';
   const b = buyer || {};
+  // Initialize chip selections from the buyer being edited (or empty for new).
+  buyerSelections = {
+    tip: [...(b.tip || [])],
+    orase: [...(b.orase || [])],
+    cartiere: [...(b.cartiere || [])],
+  };
   document.getElementById('buyerForm').innerHTML = `
     <div class="form-grid">
       <div class="form-group full"><label>Nume cumpărător *</label><input type="text" name="nume" required value="${escapeHtmlAdm(b.nume || '')}" placeholder="ex: Familia Ionescu"></div>
@@ -1810,9 +1889,10 @@ function openBuyerModal(buyer = null) {
         <label>Regim</label>
         <select name="regim">${BUYER_REGIMURI.map(r => `<option value="${r.value}" ${b.regim === r.value ? 'selected' : ''}>${r.label}</option>`).join('')}</select>
       </div>
-      <div class="form-group full"><label>Tipuri (separate cu virgulă)</label><input type="text" name="tip" value="${(b.tip || []).join(', ')}" placeholder="apartament, vila"></div>
-      <div class="form-group full"><label>Orașe (separate cu virgulă)</label><input type="text" name="orase" value="${(b.orase || []).join(', ')}" placeholder="București, Constanța"></div>
-      <div class="form-group full"><label>Cartiere (separate cu virgulă)</label><input type="text" name="cartiere" value="${(b.cartiere || []).join(', ')}" placeholder="Herăstrău, Floreasca"></div>
+
+      <div class="form-group full"><label>Tipuri proprietate</label>${renderChipInput('tip', 'Selectează tip...')}<small style="color:var(--gray-500);font-size:11px">Opțiunile vin din proprietățile actuale. Poți scrie și manual + Enter.</small></div>
+      <div class="form-group full"><label>Orașe</label>${renderChipInput('orase', 'Selectează oraș...')}</div>
+      <div class="form-group full"><label>Cartiere</label>${renderChipInput('cartiere', 'Selectează cartier...')}</div>
 
       <div class="form-group"><label>Camere min</label><input type="number" name="camereMin" min="0" value="${b.camereMin || ''}"></div>
       <div class="form-group"><label>Camere max</label><input type="number" name="camereMax" min="0" value="${b.camereMax || ''}"></div>
@@ -1845,7 +1925,6 @@ async function submitBuyer(e) {
   btn.disabled = true;
   btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Se salvează...';
 
-  const csvList = s => (s || '').split(',').map(x => x.trim()).filter(Boolean);
   const fd = {};
   form.querySelectorAll('[name]').forEach(el => { fd[el.name] = el.value; });
 
@@ -1858,9 +1937,9 @@ async function submitBuyer(e) {
     activ: fd.activ === 'true',
     categorie: fd.categorie,
     regim: fd.regim,
-    tip: csvList(fd.tip),
-    orase: csvList(fd.orase),
-    cartiere: csvList(fd.cartiere),
+    tip: [...buyerSelections.tip],
+    orase: [...buyerSelections.orase],
+    cartiere: [...buyerSelections.cartiere],
     camereMin: fd.camereMin ? +fd.camereMin : null,
     camereMax: fd.camereMax ? +fd.camereMax : null,
     pretMin: fd.pretMin ? +fd.pretMin : null,

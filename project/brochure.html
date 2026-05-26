@@ -42,28 +42,35 @@
       font-size: 13px;
     }
 
-    /* A4 page (210x297mm) at 96 DPI = ~794x1123 px */
+    /* A4 page (210x297mm) at 96 DPI = ~794x1123 px) — flex column so footer
+       never overlaps with content; if content is longer than a page, the
+       browser splits to a 2nd page naturally on print. */
     .page {
       width: 794px;
       min-height: 1123px;
       margin: 0 auto;
       background: white;
       box-shadow: 0 4px 24px rgba(0,0,0,0.08);
-      padding: 48px 56px;
+      padding: 44px 50px;
       page-break-after: always;
-      position: relative;
+      display: flex; flex-direction: column;
+      gap: 0;
     }
     .page:last-child { page-break-after: auto; }
+    .page-body { flex: 1; display: flex; flex-direction: column; }
 
     /* Header */
     .b-head {
       display: flex; justify-content: space-between; align-items: flex-end;
-      padding-bottom: 18px; border-bottom: 2px solid var(--gold);
-      margin-bottom: 28px;
+      padding-bottom: 16px; border-bottom: 2px solid var(--gold);
+      margin-bottom: 24px;
+    }
+    .b-head.blind {
+      border-bottom-color: #e6e3dd;
     }
     .b-brand {
       font-family: 'Cormorant Garamond', serif;
-      font-size: 30px; font-weight: 600; letter-spacing: 0.04em;
+      font-size: 28px; font-weight: 600; letter-spacing: 0.04em;
       color: var(--navy); line-height: 1;
     }
     .b-brand-sub {
@@ -74,7 +81,8 @@
       font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase;
       color: var(--gold); font-weight: 600;
     }
-    .b-ref { font-size: 11px; color: var(--muted); margin-top: 2px; }
+    .b-head.blind .b-cat { color: var(--muted); }
+    .b-ref { font-size: 11px; color: var(--muted); margin-top: 4px; }
 
     /* Hero image */
     .b-hero {
@@ -87,16 +95,18 @@
     /* Title + price */
     .b-title {
       font-family: 'Cormorant Garamond', serif;
-      font-size: 32px; font-weight: 500; line-height: 1.15;
+      font-size: 28px; font-weight: 500; line-height: 1.2;
       color: var(--navy); margin: 0 0 8px;
     }
     .b-loc {
       font-size: 13px; color: var(--muted); margin-bottom: 14px;
+      line-height: 1.5;
     }
     .b-price {
       font-family: 'Cormorant Garamond', serif;
-      font-size: 28px; font-weight: 600; color: var(--gold);
-      margin-bottom: 22px;
+      font-size: 26px; font-weight: 600; color: var(--gold);
+      margin: 0 0 20px;
+      line-height: 1.2;
     }
     .b-price small { font-size: 13px; color: var(--muted); font-weight: 400; margin-left: 6px; }
 
@@ -105,39 +115,45 @@
       display: grid; grid-template-columns: repeat(4, 1fr);
       gap: 0;
       border: 1px solid var(--line); border-radius: 4px;
-      margin-bottom: 24px;
+      margin: 0 0 22px;
+      overflow: hidden;
     }
     .b-fact {
-      padding: 12px 14px;
+      padding: 11px 13px;
       border-right: 1px solid var(--line);
       border-bottom: 1px solid var(--line);
+      min-height: 52px;
     }
     .b-fact:nth-child(4n) { border-right: none; }
     .b-fact:nth-last-child(-n+4) { border-bottom: none; }
     .b-fact-label {
       font-size: 9px; letter-spacing: 0.15em; text-transform: uppercase;
       color: var(--muted); margin-bottom: 4px;
+      line-height: 1.2;
     }
     .b-fact-val {
-      font-size: 16px; font-weight: 600; color: var(--ink);
+      font-size: 15px; font-weight: 600; color: var(--ink);
+      line-height: 1.3;
     }
 
     /* Description */
     .b-section-title {
       font-family: 'Cormorant Garamond', serif;
-      font-size: 18px; font-weight: 600; color: var(--navy);
+      font-size: 17px; font-weight: 600; color: var(--navy);
       letter-spacing: 0.06em; text-transform: uppercase;
-      margin: 24px 0 12px;
+      margin: 8px 0 10px;
     }
     .b-desc {
-      font-size: 13px; line-height: 1.75; color: #444;
+      font-size: 12.5px; line-height: 1.7; color: #444;
       white-space: pre-line; text-align: justify;
+      margin: 0 0 20px;
     }
 
     /* Gallery on page 2 */
     .b-gallery {
       display: grid; grid-template-columns: 1fr 1fr;
       gap: 10px;
+      margin-bottom: 20px;
     }
     .b-gallery .gimg {
       aspect-ratio: 4/3;
@@ -146,14 +162,15 @@
     }
     .b-gallery .gimg.big { grid-column: span 2; aspect-ratio: 16/7; }
 
-    /* Footer */
+    /* Footer (sits at bottom of the page via flex, not absolute positioning) */
     .b-foot {
-      position: absolute;
-      bottom: 32px; left: 56px; right: 56px;
+      margin-top: auto;
       padding-top: 16px; border-top: 1px solid var(--line);
       display: flex; justify-content: space-between; align-items: center;
+      gap: 16px;
       font-size: 11px; color: var(--muted);
     }
+    .b-foot.empty { border-top: none; padding-top: 0; min-height: 0; }
     .b-agent {
       display: flex; gap: 12px; align-items: center;
     }
@@ -161,16 +178,12 @@
       width: 44px; height: 44px; border-radius: 50%;
       background: #eee center/cover no-repeat;
       border: 2px solid var(--gold);
+      flex-shrink: 0;
     }
-    .b-agent-name { font-weight: 600; color: var(--ink); font-size: 13px; }
-    .b-agent-role { font-size: 10px; color: var(--muted); letter-spacing: 0.1em; text-transform: uppercase; }
-    .b-agent-contact { font-size: 11px; color: var(--ink); }
-    .b-agent-contact span { display: inline-block; margin-right: 12px; }
-
-    .b-foot-right { text-align: right; }
-    .b-disclaimer {
-      font-size: 9px; color: #aaa; max-width: 280px; line-height: 1.5;
-    }
+    .b-agent-name { font-weight: 600; color: var(--ink); font-size: 13px; line-height: 1.3; }
+    .b-agent-role { font-size: 10px; color: var(--muted); letter-spacing: 0.1em; text-transform: uppercase; margin-top: 2px; }
+    .b-agent-contact { font-size: 11px; color: var(--ink); text-align: right; line-height: 1.6; }
+    .b-agent-contact span { display: block; }
 
     .loading { padding: 80px 40px; text-align: center; color: #999; }
     .error { padding: 80px 40px; text-align: center; color: #c33; }
@@ -179,7 +192,11 @@
     @media print {
       body { background: white; padding: 0; }
       .toolbar { display: none !important; }
-      .page { box-shadow: none; margin: 0; width: 100%; min-height: auto; padding: 16mm 14mm; }
+      .page {
+        box-shadow: none; margin: 0;
+        width: 100%; min-height: 277mm;  /* A4 height minus margins */
+        padding: 14mm 14mm;
+      }
       @page { size: A4; margin: 0; }
     }
   </style>
@@ -190,7 +207,7 @@
     <h1>Brochure proprietate</h1>
     <div class="toolbar-actions">
       <label class="toggle">
-        <input type="checkbox" id="blindToggle"> Versiune colaborator (fără agent)
+        <input type="checkbox" id="blindToggle"> Versiune neutră (fără brand, fără agent)
       </label>
       <button class="tbtn primary" onclick="window.print()">Print / Salvează ca PDF</button>
     </div>
@@ -224,7 +241,11 @@
         property = await getPropertyById(propId, propCat);
         if (!property) throw new Error('Proprietatea nu a fost gasita');
         render();
-        document.title = `${property.titlu || 'Brochure'} · EVEN`;
+        // Blind mode = untrackable, so don't put EVEN in the tab title either.
+        const blind = document.getElementById('blindToggle').checked;
+        document.title = blind
+          ? (property.titlu || 'Brochure proprietate')
+          : `${property.titlu || 'Brochure'} · EVEN`;
       } catch (err) {
         document.getElementById('brochureRoot').innerHTML = `<div class="page"><div class="error">Eroare: ${escapeHtml(err.message)}</div></div>`;
       }
@@ -280,6 +301,9 @@
       const newUrl = new URL(window.location.href);
       newUrl.searchParams.set('blind', blind ? '1' : '0');
       window.history.replaceState(null, '', newUrl.toString());
+      document.title = blind
+        ? (property.titlu || 'Brochure proprietate')
+        : `${property.titlu || 'Brochure'} · EVEN`;
 
       const cover = (p.imagini && p.imagini[0]) || '';
       const rest = (p.imagini || []).slice(1, 7);
@@ -294,17 +318,13 @@
 
       const facts = buildFacts(p);
 
-      // Footer: agent or blind
-      let footHtml = '';
-      if (blind || !p.agent) {
-        footHtml = `
-          <div></div>
-          <div class="b-foot-right">
-            <div class="b-disclaimer">
-              Informațiile prezentate sunt orientative. Pentru detalii suplimentare, contactați biroul intermediar.
-            </div>
-          </div>`;
-      } else {
+      // Footer: agent block (full variant) or empty (blind variant).
+      // Blind = COMPLETELY untrackable: no logo, no brand name, no website,
+      // no agent, no contact. Just neutral typography and the property data.
+      let footHtml;
+      if (blind) {
+        footHtml = ''; // empty footer, the .empty class collapses it
+      } else if (p.agent) {
         const a = p.agent;
         const photo = a.foto ? `<div class="b-agent-photo" style="background-image:url('${a.foto}')"></div>` : '<div class="b-agent-photo"></div>';
         footHtml = `
@@ -315,16 +335,29 @@
               <div class="b-agent-role">${escapeHtml(a.rol || 'Agent imobiliar')}</div>
             </div>
           </div>
-          <div class="b-foot-right b-agent-contact">
+          <div class="b-agent-contact">
             ${a.telefon ? `<span>${escapeHtml(a.telefon)}</span>` : ''}
             ${a.email ? `<span>${escapeHtml(a.email)}</span>` : ''}
-            <div style="font-size:10px;color:#aaa;margin-top:2px">even-imobiliare.ro</div>
+            <span style="font-size:10px;color:#aaa;margin-top:2px">even-imobiliare.ro</span>
           </div>`;
+      } else {
+        footHtml = `
+          <div></div>
+          <div style="font-size:10px;color:#aaa">even-imobiliare.ro</div>`;
       }
 
-      const page1 = `
-        <div class="page">
-          <div class="b-head">
+      // Header: full variant shows EVEN brand; blind variant shows nothing
+      // brandable (just the category tag and ref code — those can't be traced
+      // back to a specific agency).
+      const headHtml = blind
+        ? `<div class="b-head blind">
+            <div></div>
+            <div style="text-align:right">
+              <div class="b-cat">${escapeHtml(cat)} ${regimLabel}</div>
+              <div class="b-ref">Ref. ${escapeHtml(p.id || '')}</div>
+            </div>
+          </div>`
+        : `<div class="b-head">
             <div>
               <div class="b-brand">EVEN</div>
               <div class="b-brand-sub">Imobiliare</div>
@@ -333,41 +366,50 @@
               <div class="b-cat">${escapeHtml(cat)} ${regimLabel}</div>
               <div class="b-ref">Ref. ${escapeHtml(p.id || '')}</div>
             </div>
+          </div>`;
+
+      const footClass = footHtml ? 'b-foot' : 'b-foot empty';
+      const fullDesc = p.descriere || '';
+      // Show more text — flex layout handles overflow to a 2nd print page.
+      const descTrim = fullDesc.length > 1600 ? fullDesc.slice(0, 1600).trim() + '…' : fullDesc;
+
+      const page1 = `
+        <div class="page">
+          <div class="page-body">
+            ${headHtml}
+            ${cover ? `<div class="b-hero" style="background-image:url('${cover}')"></div>` : ''}
+            <h1 class="b-title">${escapeHtml(p.titlu || '')}</h1>
+            <div class="b-loc">${escapeHtml(loc)}${p.adresa ? ' · ' + escapeHtml(p.adresa) : ''}</div>
+            ${price ? `<div class="b-price">${formatPriceLocal(price, p.moneda || '€')}${priceUnit ? ` <small>${priceUnit}</small>` : ''}</div>` : ''}
+            <div class="b-facts">
+              ${facts.map(([l, v]) => `
+                <div class="b-fact">
+                  <div class="b-fact-label">${escapeHtml(l)}</div>
+                  <div class="b-fact-val">${escapeHtml(String(v))}</div>
+                </div>`).join('')}
+            </div>
+            ${descTrim ? `
+              <div class="b-section-title">Descriere</div>
+              <div class="b-desc">${escapeHtml(descTrim)}</div>
+            ` : ''}
           </div>
-
-          ${cover ? `<div class="b-hero" style="background-image:url('${cover}')"></div>` : ''}
-
-          <h1 class="b-title">${escapeHtml(p.titlu || '')}</h1>
-          <div class="b-loc">${escapeHtml(loc)}${p.adresa ? ' · ' + escapeHtml(p.adresa) : ''}</div>
-          ${price ? `<div class="b-price">${formatPriceLocal(price, p.moneda || '€')}${priceUnit ? ` <small>${priceUnit}</small>` : ''}</div>` : ''}
-
-          <div class="b-facts">
-            ${facts.map(([l, v]) => `
-              <div class="b-fact">
-                <div class="b-fact-label">${escapeHtml(l)}</div>
-                <div class="b-fact-val">${escapeHtml(String(v))}</div>
-              </div>`).join('')}
-          </div>
-
-          ${p.descriere ? `
-            <div class="b-section-title">Descriere</div>
-            <div class="b-desc">${escapeHtml(p.descriere).slice(0, 1200)}${p.descriere.length > 1200 ? '…' : ''}</div>
-          ` : ''}
-
-          <div class="b-foot">${footHtml}</div>
+          <div class="${footClass}">${footHtml}</div>
         </div>
       `;
 
+      const page2HeadHtml = blind
+        ? `<div class="b-head blind"><div></div><div class="b-cat">Galerie foto</div></div>`
+        : `<div class="b-head"><div class="b-brand" style="font-size:22px">EVEN</div><div class="b-cat">Galerie foto</div></div>`;
+
       const page2 = rest.length ? `
         <div class="page">
-          <div class="b-head">
-            <div class="b-brand" style="font-size:22px">EVEN</div>
-            <div class="b-cat">Galerie foto</div>
+          <div class="page-body">
+            ${page2HeadHtml}
+            <div class="b-gallery">
+              ${rest.map((url, i) => `<div class="gimg${i === 0 && rest.length > 4 ? ' big' : ''}" style="background-image:url('${url}')"></div>`).join('')}
+            </div>
           </div>
-          <div class="b-gallery">
-            ${rest.map((url, i) => `<div class="gimg${i === 0 && rest.length > 4 ? ' big' : ''}" style="background-image:url('${url}')"></div>`).join('')}
-          </div>
-          <div class="b-foot">${footHtml}</div>
+          <div class="${footClass}">${footHtml}</div>
         </div>
       ` : '';
 
