@@ -1446,12 +1446,25 @@ body[data-page="home"] {
 }
 
 @media (max-width: 880px) {
+  /* Masthead compact pe mobile — doar titlul central, o singură linie */
+  .hp-masthead {
+    padding: 10px 0;
+  }
   .hp-masthead-inner {
     grid-template-columns: 1fr;
     text-align: center;
-    gap: 6px;
+    gap: 0;
+    padding: 0 18px;
   }
-  .hp-mast-mark, .hp-mast-edition, .hp-mast-title { justify-self: center; }
+  .hp-mast-mark,
+  .hp-mast-edition {
+    display: none;             /* scoatem „Ediția curentă" și „București · MMXXVI" */
+  }
+  .hp-mast-title {
+    justify-self: center;
+    font-size: 10px;
+    letter-spacing: 0.26em;
+  }
 
   /* === MOBILE EDITORIAL COVER · v5 ===
      Imaginea = fundal complet al hero-ului. TOT conținutul (eyebrow, H1, lede,
@@ -1551,10 +1564,30 @@ body[data-page="home"] {
     color: #F5F3EE;
     text-shadow: 0 2px 22px rgba(0, 0, 0, 0.55);
     font-size: clamp(2.5rem, 10vw, 3.8rem);
-    line-height: 1.04;
+    line-height: 1.18;             /* spațiu generos între linii */
     letter-spacing: -0.014em;
     margin: 0 auto;
     max-width: 14ch;
+  }
+  .hp-hero-h1 .hp-hero-line {
+    display: block;
+    margin-bottom: 4px;
+  }
+  .hp-hero-h1 .hp-hero-line:last-child {
+    margin-bottom: 0;
+  }
+
+  /* Disable entrance animations pe mobile (choppy pe overlay imagine) */
+  .hp-enter {
+    opacity: 1 !important;
+    transform: none !important;
+    animation: none !important;
+  }
+  /* Grain global folosește mix-blend-mode → repaint scump pe scroll mobile.
+     Reduc opacity și scot mix-blend ca să elimin choppiness-ul. */
+  .hp-bg-grain {
+    opacity: 0.15;
+    mix-blend-mode: normal;
   }
   .hp-hero-h1 em {
     color: var(--hp-gold);
