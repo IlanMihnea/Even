@@ -1468,10 +1468,12 @@ body[data-page="home"] {
 
   /* === MOBILE EDITORIAL COVER · v5 ===
      Imaginea = fundal complet al hero-ului. TOT conținutul (eyebrow, H1, lede,
-     butoane, trust) e suprapus peste imagine pe layer-ul de deasupra.
-     O singură compoziție, ca pe desktop video, dar adaptată mobile portrait. */
+     butoane, trust) e suprapus peste imagine pe layer-ul de deasupra. */
   .hp-hero {
+    /* svh = small viewport height (stabil când iOS ascunde URL-bar).
+       Elimină „zoom-ul brusc" pe scroll rapid. Fallback 100vh dacă svh nu e suportat. */
     min-height: calc(100vh - var(--nav-h, 74px));
+    min-height: calc(100svh - var(--nav-h, 74px));
     padding: 0;
     isolation: auto;
     position: relative;
@@ -1525,6 +1527,7 @@ body[data-page="home"] {
     grid-template-columns: 1fr;
     gap: 0;
     min-height: calc(100vh - var(--nav-h, 74px));
+    min-height: calc(100svh - var(--nav-h, 74px));
     padding: 36px 24px 44px;
   }
   .hp-hero-text {
@@ -1564,17 +1567,10 @@ body[data-page="home"] {
     color: #F5F3EE;
     text-shadow: 0 2px 22px rgba(0, 0, 0, 0.55);
     font-size: clamp(2.5rem, 10vw, 3.8rem);
-    line-height: 1.18;             /* spațiu generos între linii */
+    line-height: 1.04;             /* compact ca în varianta dinainte */
     letter-spacing: -0.014em;
     margin: 0 auto;
     max-width: 14ch;
-  }
-  .hp-hero-h1 .hp-hero-line {
-    display: block;
-    margin-bottom: 4px;
-  }
-  .hp-hero-h1 .hp-hero-line:last-child {
-    margin-bottom: 0;
   }
 
   /* Disable entrance animations pe mobile (choppy pe overlay imagine) */
@@ -1610,11 +1606,11 @@ body[data-page="home"] {
     font-style: italic;
   }
 
-  /* Spacer flex între lede și butoane (împinge restul jos) */
+  /* Spacer flex între lede și butoane (împinge restul jos, garantează aer suficient) */
   .hp-hero-text::after {
     content: '';
     flex: 1 1 auto;
-    min-height: 28px;
+    min-height: 64px;          /* era 28px — distanță reală între „Fără surprize" și butoane */
   }
 
   /* Butoane — în partea de jos */
