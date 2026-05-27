@@ -1534,15 +1534,17 @@ body[data-page="home"] {
   }
   .hp-hero-h1 {
     position: absolute;
-    left: 24px;
-    right: 24px;
-    /* Calculul: cover are aspect-ratio 4/5 → înălțime ~125vw pe full-width. H1 stă pe partea de jos. */
-    top: calc((100vw - 0px) * 5 / 4 - 200px);
+    left: 20px;
+    right: 20px;
     z-index: 5;
+    /* Cover are aspect-ratio 4/5 pe full-width → înălțime = 125vw.
+       Plasez H1 ca să ocupe ~40% jos din imagine. */
+    top: calc(125vw - 52vw);
     color: #F5F3EE;
-    text-shadow: 0 2px 18px rgba(0, 0, 0, 0.55);
-    font-size: 2.6rem;
-    line-height: 1.05;
+    text-shadow: 0 2px 22px rgba(0, 0, 0, 0.6);
+    font-size: clamp(2.8rem, 11vw, 4.6rem);
+    line-height: 1.02;
+    letter-spacing: -0.018em;
     margin: 0;
     text-align: center;
   }
@@ -1700,10 +1702,12 @@ body[data-page="home"] {
   }
   .hp-trust-rule { display: block; }
   .hp-trust-num { font-size: 1.8rem; }
-  /* H1 puțin mai mic pe ecrane <520px */
+  /* H1 ajustat pentru ecrane <520px */
   .hp-hero-h1 {
-    font-size: 2.3rem;
-    top: calc((100vw - 0px) * 5 / 4 - 180px);
+    font-size: clamp(2.6rem, 12vw, 3.6rem);
+    top: calc(125vw - 54vw);
+    left: 14px;
+    right: 14px;
   }
 
   .hp-mast-mark { font-size: 12px; }
