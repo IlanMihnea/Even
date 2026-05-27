@@ -349,7 +349,16 @@ function initHeroScrub() {
   const video = document.getElementById('heroVideo');
   if (!pin || !video) return;
 
-  const mq = window.matchMedia('(max-width: 768px), (prefers-reduced-motion: reduce)');
+  // Mobile breakpoint aliniat cu CSS (.hp-hero-cover visible at <880px)
+  const mq = window.matchMedia('(max-width: 880px), (prefers-reduced-motion: reduce)');
+  // Pe mobile, nu descărcăm videoul de 18MB — cover-ul JPG/WebP face treaba
+  if (mq.matches) {
+    const src = video.querySelector('source');
+    if (src) src.removeAttribute('src');
+    video.removeAttribute('src');
+    video.load();
+    return;
+  }
   let raf = null;
   let scrollBound = false;
 

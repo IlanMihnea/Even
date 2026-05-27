@@ -274,6 +274,11 @@ body[data-page="home"] {
   }
 }
 
+/* Mobile cover — ascuns pe desktop, înlocuiește videoul pe mobile */
+.hp-hero-cover {
+  display: none;
+}
+
 /* Video background */
 .hp-hero-video {
   position: absolute;
@@ -1448,18 +1453,103 @@ body[data-page="home"] {
   }
   .hp-mast-mark, .hp-mast-edition, .hp-mast-title { justify-self: center; }
 
+  /* === MOBILE EDITORIAL COVER ===
+     Hero devine: poster image sus + content stack pe Linen jos.
+     Video + scrim + feature card ascunse → pagină lizibilă, rapidă, premium. */
   .hp-hero {
     min-height: auto;
-    padding: 56px 0 80px;
+    padding: 0 0 64px;        /* fără padding-top — imaginea atinge masthead-ul */
+    isolation: auto;
   }
+  /* Ascunde videoul + scrim + vignette pe mobile */
+  .hp-hero-video,
+  .hp-hero-scrim,
+  .hp-hero-vignette {
+    display: none !important;
+  }
+  /* Afișează cover-ul ca block element above content */
+  .hp-hero-cover {
+    display: block;
+    position: relative;
+    width: 100%;
+    aspect-ratio: 16 / 10;     /* păstrează ratio-ul natural al pozei */
+    overflow: hidden;
+    margin-bottom: 40px;
+  }
+  .hp-hero-cover img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center 60%;  /* favorizează fereastra & lemnul */
+    display: block;
+  }
+  /* Eyebrow subtil overlay pe imagine — masthead minimal */
+  .hp-hero-cover::after {
+    content: '— EVEN · MMXXVI —';
+    position: absolute;
+    bottom: 18px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-family: var(--font-body);
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.30em;
+    color: rgba(245, 243, 238, 0.92);
+    text-shadow: 0 1px 6px rgba(0, 0, 0, 0.55);
+    white-space: nowrap;
+  }
+
+  /* Content stack — text pe Linen solid, NO overlap, NO scrim */
   .hp-hero-grid {
     grid-template-columns: 1fr;
-    gap: 48px;
+    gap: 0;
     min-height: auto;
     padding: 0 24px;
   }
-  .hp-hero-feature { justify-content: center; }
-  .hp-feature-card { max-width: 440px; margin: 0 auto; }
+  /* Text colors revert la ink/sage (eram pe dark pentru video) */
+  .hp-hero-text {
+    color: var(--hp-ink);
+    max-width: none;
+    text-shadow: none;          /* halo-ul nu mai e necesar pe Linen */
+  }
+  .hp-hero-h1,
+  .hp-hero-h1 .hp-hero-line {
+    color: var(--hp-ink);
+  }
+  .hp-hero-lede {
+    color: var(--hp-ink-soft);
+    max-width: 100%;
+  }
+  /* Dropcap "C" pe Linen = ink, mai discret */
+  .hp-dropcap {
+    color: var(--hp-ink);
+    font-size: 1.05em;
+  }
+  /* Eyebrow rămâne sage — accent structural */
+  .hp-hero-text .hp-eyebrow {
+    color: var(--hp-sage);
+    margin-bottom: 20px;
+  }
+  /* Trust strip pe Linen: rule și labels schimbă culoare să rămână lizibile */
+  .hp-hero-trust {
+    border-top-color: var(--hp-rule);
+    max-width: 100%;
+  }
+  .hp-trust-num {
+    color: var(--hp-ink);       /* era stone (pe dark) */
+    font-size: 2rem;
+  }
+  .hp-trust-label {
+    color: var(--hp-ink-mute);
+  }
+  .hp-trust-rule {
+    background: var(--hp-rule);
+  }
+  /* Feature card — ascunsă pe mobile (apare oricum catalog Nº I imediat sub hero) */
+  .hp-hero-feature {
+    display: none;
+  }
 
   .hp-section-mark { padding: 48px 0; }
   .hp-section-mark::before, .hp-section-mark::after { width: 80px; }

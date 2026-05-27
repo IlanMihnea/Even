@@ -54,6 +54,7 @@
   <div class="hp-hero-pin" id="hpHeroPin">
   <section class="hp-hero">
 
+    <!-- Desktop & tablet: video background. Mobile: hidden, înlocuit de .hp-hero-cover -->
     <div class="hp-hero-video" aria-hidden="true">
       <video id="heroVideo" muted playsinline preload="auto">
         <source src="design/landscape.mp4" type="video/mp4">
@@ -61,6 +62,12 @@
       <div class="hp-hero-scrim"></div>
       <div class="hp-hero-vignette"></div>
     </div>
+
+    <!-- Mobile-only editorial cover (poster portrait, no video) -->
+    <picture class="hp-hero-cover" aria-hidden="true">
+      <source srcset="design/hero-mobile.webp" type="image/webp">
+      <img src="design/hero-mobile.jpg" alt="" loading="eager" decoding="async">
+    </picture>
 
     <div class="hp-hero-grid">
 
