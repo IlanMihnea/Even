@@ -202,7 +202,7 @@ body[data-page="about"] {
 }
 .ab-hero-h1 em {
   font-style: italic;
-  color: var(--ed-sage);
+  color: var(--ed-gold);
   font-weight: 500;
 }
 .ab-dropcap {
@@ -210,7 +210,7 @@ body[data-page="about"] {
   font-style: italic;
   font-weight: 500;
   font-size: 1.18em;
-  color: var(--ed-sage);
+  color: var(--ed-ink);
   letter-spacing: -0.025em;
   margin-right: 0.015em;
   display: inline-block;
