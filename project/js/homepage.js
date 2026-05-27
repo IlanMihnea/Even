@@ -344,6 +344,32 @@ function applyFluxTabVisibility(counts) {
 // Hero scroll-scrub — video advances with scroll; page stays pinned until video ends.
 // Desktop only; mobile / reduced-motion falls back to autoplay loop.
 // ============================================
+// Mobile: zoom discret pe cover image la scroll. State binar (on/off), nu scroll-linked.
+function initMobileCoverZoom() {
+  const cover = document.querySelector('.hp-hero-cover');
+  if (!cover) return;
+  const THRESHOLD = 60;          // px scroll down ca să se activeze zoom-ul
+  let isZoomed = false;
+  let ticking = false;
+
+  function update() {
+    ticking = false;
+    const should = window.scrollY > THRESHOLD;
+    if (should !== isZoomed) {
+      isZoomed = should;
+      cover.classList.toggle('is-zoomed', should);
+    }
+  }
+  function onScroll() {
+    if (!ticking) {
+      ticking = true;
+      requestAnimationFrame(update);
+    }
+  }
+  window.addEventListener('scroll', onScroll, { passive: true });
+  update();
+}
+
 function initHeroScrub() {
   const pin = document.getElementById('hpHeroPin');
   const video = document.getElementById('heroVideo');
@@ -351,12 +377,14 @@ function initHeroScrub() {
 
   // Mobile breakpoint aliniat cu CSS (.hp-hero-cover visible at <880px)
   const mq = window.matchMedia('(max-width: 880px), (prefers-reduced-motion: reduce)');
-  // Pe mobile, nu descărcăm videoul de 18MB — cover-ul JPG/WebP face treaba
+  // Pe mobile, nu descărcăm videoul de 18MB — cover-ul JPG/WebP face treaba.
+  // Activăm zoom-ul discret pe cover image.
   if (mq.matches) {
     const src = video.querySelector('source');
     if (src) src.removeAttribute('src');
     video.removeAttribute('src');
     video.load();
+    initMobileCoverZoom();
     return;
   }
   let raf = null;
