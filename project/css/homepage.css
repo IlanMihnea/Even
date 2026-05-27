@@ -1453,30 +1453,30 @@ body[data-page="home"] {
   }
   .hp-mast-mark, .hp-mast-edition, .hp-mast-title { justify-self: center; }
 
-  /* === MOBILE EDITORIAL COVER · v2 ===
-     Hero devine: imagine full-width cu H1 overlay + content stack centrat pe Linen jos.
-     Compoziție editorial — H1 atinge imaginea (cover de revistă), restul respiră dedesubt. */
+  /* === MOBILE EDITORIAL COVER · v4 ===
+     Imaginea = bandă atmosferică landscape sus (60vh max), nu poster.
+     Pe imagine: doar eyebrow + H1.
+     Sub imagine, pe Linen: lede + butoane + trust, cu rhythm vertical generos. */
   .hp-hero {
     min-height: auto;
-    padding: 0 0 56px;
+    padding: 0 0 48px;
     isolation: auto;
-    position: relative;          /* containing block pentru overlay */
+    position: relative;
   }
-  /* Ascunde videoul + scrim + vignette pe mobile */
   .hp-hero-video,
   .hp-hero-scrim,
   .hp-hero-vignette {
     display: none !important;
   }
 
-  /* ---- Cover image (overlay H1 + eyebrow on top via absolute) ---- */
+  /* Cover image — cinematic letterbox, atmosferic, nu poster */
   .hp-hero-cover {
     display: block;
     position: relative;
     width: 100%;
-    /* Aspect 4/4.6 ≈ 0.87 — păstrează formatul vertical dar lasă imaginea
-       să respire (poza originală e 16:10, deci 4/5 era prea agresiv pe lateral). */
-    aspect-ratio: 4 / 4.6;
+    /* Aspect 21/9 ≈ 2.33 — letterbox cinematic. Elimină zonele „goale" (perete, plafon)
+       și focalizează banda orizontală bogată (fereastră · sofa · bibliotecă · plantă). */
+    aspect-ratio: 21 / 9;
     overflow: hidden;
     margin-bottom: 36px;
   }
@@ -1484,34 +1484,31 @@ body[data-page="home"] {
     width: 100%;
     height: 100%;
     object-fit: cover;
-    object-position: center 50%;
+    object-position: center 58%;   /* trage focusul spre mijloc-jos: sofa + masa */
     display: block;
   }
-  /* Gradient scrim pe imagine — top subtil (eyebrow), bottom dramatic (H1) */
   .hp-hero-cover::before {
     content: '';
     position: absolute;
     inset: 0;
     background:
       linear-gradient(to bottom,
-        rgba(28, 35, 64, 0.45) 0%,
-        rgba(28, 35, 64, 0.10) 18%,
-        transparent 42%,
-        rgba(28, 35, 64, 0.20) 62%,
-        rgba(28, 35, 64, 0.80) 100%);
+        rgba(28, 35, 64, 0.42) 0%,
+        rgba(28, 35, 64, 0.20) 25%,
+        rgba(28, 35, 64, 0.25) 55%,
+        rgba(28, 35, 64, 0.75) 100%);
     pointer-events: none;
     z-index: 1;
   }
-  /* Scoatem mast MMXXVI — eyebrow real (Imobiliare cu plan) îi ia locul */
   .hp-hero-cover::after { display: none; }
 
-  /* ---- H1 + eyebrow OVERLAY pe imagine (centrate, alb cu shadow) ---- */
+  /* Grid: container generic; padding doar pentru lede/buttons/trust */
   .hp-hero-grid {
     grid-template-columns: 1fr;
     gap: 0;
     min-height: auto;
     padding: 0 24px;
-    position: static;             /* lăsăm absolute să se țintească pe .hp-hero */
+    position: static;
   }
   .hp-hero-text {
     color: var(--hp-ink);
@@ -1519,61 +1516,64 @@ body[data-page="home"] {
     text-align: center;
     text-shadow: none;
   }
-  /* Eyebrow + H1: scoate-le din flow, plasează peste imagine */
+
+  /* ---- Pe imagine letterbox: doar eyebrow centrat ---- */
   .hp-hero-text .hp-eyebrow {
     position: absolute;
-    top: 22px;
+    top: 50%;
     left: 0;
     right: 0;
+    transform: translateY(-50%);
     z-index: 5;
     justify-content: center;
-    color: rgba(245, 243, 238, 0.92);
-    text-shadow: 0 1px 8px rgba(0, 0, 0, 0.5);
+    color: rgba(245, 243, 238, 0.95);
+    text-shadow: 0 1px 10px rgba(0, 0, 0, 0.55);
     margin: 0;
+    font-size: 11px;
+    letter-spacing: 0.22em;
   }
   .hp-hero-text .hp-eyebrow .hp-eyebrow-rule {
     background: rgba(245, 243, 238, 0.7);
+    width: 36px;
   }
+
+  /* ---- H1 sub imagine, pe Linen, mare și ferm ---- */
   .hp-hero-h1 {
-    position: absolute;
-    left: 24px;
-    right: 24px;
-    z-index: 5;
-    /* Cover are aspect-ratio 4/4.6 pe full-width → înălțime 115vw.
-       H1 stă în treimea de jos, ancorat la baza imaginii. */
-    top: calc(115vw - 180px);
-    color: #F5F3EE;
-    text-shadow: 0 2px 18px rgba(0, 0, 0, 0.55);
-    font-size: clamp(2.3rem, 8.5vw, 3.6rem);
-    line-height: 1.06;
+    position: static;
+    color: var(--hp-ink);
+    text-shadow: none;
+    font-size: clamp(2.4rem, 9vw, 3.6rem);
+    line-height: 1.04;
     letter-spacing: -0.014em;
-    margin: 0;
+    margin: 0 auto 28px;
     text-align: center;
+    max-width: 18ch;
   }
   .hp-hero-h1 em {
     color: var(--hp-gold);
   }
   .hp-dropcap {
-    color: #F5F3EE;
-    font-size: 1.05em;
+    color: var(--hp-ink);
+    font-size: 1.04em;
   }
 
-  /* ---- Below-image: lede + buttons + trust pe Linen, centrate ---- */
+  /* ---- Sub imagine pe Linen: lede + buttons + trust, cu spațiu ---- */
   .hp-hero-lede {
     color: var(--hp-ink-soft);
     max-width: 460px;
     margin: 0 auto 32px;
     font-size: 1rem;
+    line-height: 1.7;
   }
   .hp-hero-lede em { color: inherit; }
 
   .hp-hero-actions {
     justify-content: center;
     margin-bottom: 40px;
-    gap: 10px;
+    gap: 12px;
+    flex-wrap: wrap;
   }
-  /* Buton primary — gata corect (ink bg) */
-  /* Buton ghost — FIX contrast: pe Linen era stone pe stone = invizibil */
+  /* Ghost button pe Linen — ink/ink (FIX contrast) */
   .hp-hero-actions .hp-btn-ghost {
     color: var(--hp-ink);
     border-color: var(--hp-ink);
@@ -1585,7 +1585,6 @@ body[data-page="home"] {
     border-color: var(--hp-ink);
   }
 
-  /* Trust strip — centrat, ink, fără rule top */
   .hp-hero-trust {
     border-top: 1px solid var(--hp-rule);
     padding-top: 24px;
@@ -1704,12 +1703,9 @@ body[data-page="home"] {
   }
   .hp-trust-rule { display: block; }
   .hp-trust-num { font-size: 1.8rem; }
-  /* H1 ajustat pentru ecrane <520px */
+  /* H1 sub imagine — scale mai compactă pe ecrane mici */
   .hp-hero-h1 {
-    font-size: clamp(2rem, 9vw, 2.8rem);
-    top: calc(115vw - 160px);
-    left: 18px;
-    right: 18px;
+    font-size: clamp(2.1rem, 9vw, 2.8rem);
   }
 
   .hp-mast-mark { font-size: 12px; }
