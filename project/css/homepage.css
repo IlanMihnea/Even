@@ -1453,15 +1453,16 @@ body[data-page="home"] {
   }
   .hp-mast-mark, .hp-mast-edition, .hp-mast-title { justify-self: center; }
 
-  /* === MOBILE EDITORIAL COVER · v4 ===
-     Imaginea = bandă atmosferică landscape sus (60vh max), nu poster.
-     Pe imagine: doar eyebrow + H1.
-     Sub imagine, pe Linen: lede + butoane + trust, cu rhythm vertical generos. */
+  /* === MOBILE EDITORIAL COVER · v5 ===
+     Imaginea = fundal complet al hero-ului. TOT conținutul (eyebrow, H1, lede,
+     butoane, trust) e suprapus peste imagine pe layer-ul de deasupra.
+     O singură compoziție, ca pe desktop video, dar adaptată mobile portrait. */
   .hp-hero {
-    min-height: auto;
-    padding: 0 0 48px;
+    min-height: calc(100vh - var(--nav-h, 74px));
+    padding: 0;
     isolation: auto;
     position: relative;
+    overflow: hidden;
   }
   .hp-hero-video,
   .hp-hero-scrim,
@@ -1469,125 +1470,150 @@ body[data-page="home"] {
     display: none !important;
   }
 
-  /* Cover image — cinematic letterbox, atmosferic, nu poster */
+  /* Cover image = BACKGROUND absolute, acoperă tot hero-ul */
   .hp-hero-cover {
     display: block;
-    position: relative;
+    position: absolute;
+    inset: 0;
     width: 100%;
-    /* Aspect 21/9 ≈ 2.33 — letterbox cinematic. Elimină zonele „goale" (perete, plafon)
-       și focalizează banda orizontală bogată (fereastră · sofa · bibliotecă · plantă). */
-    aspect-ratio: 21 / 9;
+    height: 100%;
+    aspect-ratio: auto;
     overflow: hidden;
-    margin-bottom: 36px;
+    margin: 0;
+    z-index: 0;
   }
   .hp-hero-cover img {
     width: 100%;
     height: 100%;
     object-fit: cover;
-    object-position: center 58%;   /* trage focusul spre mijloc-jos: sofa + masa */
+    object-position: center 55%;
     display: block;
   }
+  /* Smoky gradient — întunecă suficient pentru legibility, dar lasă atmosferă */
   .hp-hero-cover::before {
     content: '';
     position: absolute;
     inset: 0;
     background:
       linear-gradient(to bottom,
-        rgba(28, 35, 64, 0.42) 0%,
-        rgba(28, 35, 64, 0.20) 25%,
-        rgba(28, 35, 64, 0.25) 55%,
-        rgba(28, 35, 64, 0.75) 100%);
+        rgba(28, 35, 64, 0.55) 0%,
+        rgba(28, 35, 64, 0.42) 35%,
+        rgba(28, 35, 64, 0.55) 65%,
+        rgba(28, 35, 64, 0.82) 100%);
     pointer-events: none;
     z-index: 1;
   }
   .hp-hero-cover::after { display: none; }
 
-  /* Grid: container generic; padding doar pentru lede/buttons/trust */
+  /* Conținut: layer 2, distribuit vertical cu space-between pentru ritm generos */
   .hp-hero-grid {
+    position: relative;
+    z-index: 2;
     grid-template-columns: 1fr;
     gap: 0;
-    min-height: auto;
-    padding: 0 24px;
-    position: static;
+    min-height: calc(100vh - var(--nav-h, 74px));
+    padding: 36px 24px 44px;
   }
   .hp-hero-text {
-    color: var(--hp-ink);
-    max-width: none;
+    color: #F5F3EE;
+    max-width: 540px;
+    width: 100%;
+    margin: 0 auto;
     text-align: center;
-    text-shadow: none;
+    text-shadow: 0 1px 16px rgba(0, 0, 0, 0.35);
+    display: flex;
+    flex-direction: column;
+    height: 100%;
   }
 
-  /* ---- Pe imagine letterbox: doar eyebrow centrat ---- */
+  /* Eyebrow — sus */
   .hp-hero-text .hp-eyebrow {
-    position: absolute;
-    top: 50%;
-    left: 0;
-    right: 0;
-    transform: translateY(-50%);
-    z-index: 5;
+    position: static;
+    color: rgba(245, 243, 238, 0.92);
     justify-content: center;
-    color: rgba(245, 243, 238, 0.95);
-    text-shadow: 0 1px 10px rgba(0, 0, 0, 0.55);
     margin: 0;
-    font-size: 11px;
-    letter-spacing: 0.22em;
+    transform: none;
   }
   .hp-hero-text .hp-eyebrow .hp-eyebrow-rule {
     background: rgba(245, 243, 238, 0.7);
-    width: 36px;
   }
 
-  /* ---- H1 sub imagine, pe Linen, mare și ferm ---- */
+  /* Spacer flex între eyebrow și H1 */
+  .hp-hero-text::before {
+    content: '';
+    flex: 1 1 auto;
+    min-height: 24px;
+  }
+
+  /* H1 — bloc central principal */
   .hp-hero-h1 {
     position: static;
-    color: var(--hp-ink);
-    text-shadow: none;
-    font-size: clamp(2.4rem, 9vw, 3.6rem);
+    color: #F5F3EE;
+    text-shadow: 0 2px 22px rgba(0, 0, 0, 0.55);
+    font-size: clamp(2.5rem, 10vw, 3.8rem);
     line-height: 1.04;
     letter-spacing: -0.014em;
-    margin: 0 auto 28px;
-    text-align: center;
-    max-width: 18ch;
+    margin: 0 auto;
+    max-width: 14ch;
   }
   .hp-hero-h1 em {
     color: var(--hp-gold);
   }
   .hp-dropcap {
-    color: var(--hp-ink);
+    color: #F5F3EE;
     font-size: 1.04em;
   }
 
-  /* ---- Sub imagine pe Linen: lede + buttons + trust, cu spațiu ---- */
+  /* Lede sub H1 */
   .hp-hero-lede {
-    color: var(--hp-ink-soft);
-    max-width: 460px;
-    margin: 0 auto 32px;
-    font-size: 1rem;
-    line-height: 1.7;
+    color: rgba(245, 243, 238, 0.88);
+    max-width: 380px;
+    margin: 20px auto 0;
+    font-size: 0.95rem;
+    line-height: 1.65;
   }
-  .hp-hero-lede em { color: inherit; }
+  .hp-hero-lede em {
+    color: inherit;
+    font-style: italic;
+  }
 
+  /* Spacer flex între lede și butoane (împinge restul jos) */
+  .hp-hero-text::after {
+    content: '';
+    flex: 1 1 auto;
+    min-height: 28px;
+  }
+
+  /* Butoane — în partea de jos */
   .hp-hero-actions {
     justify-content: center;
-    margin-bottom: 40px;
-    gap: 12px;
+    margin: 0 0 22px;
+    gap: 10px;
     flex-wrap: wrap;
   }
-  /* Ghost button pe Linen — ink/ink (FIX contrast) */
-  .hp-hero-actions .hp-btn-ghost {
+  .hp-hero-actions .hp-btn-primary {
+    background: var(--hp-paper);
     color: var(--hp-ink);
-    border-color: var(--hp-ink);
+  }
+  .hp-hero-actions .hp-btn-primary:hover {
+    background: #fff;
+    color: var(--hp-ink);
+  }
+  .hp-hero-actions .hp-btn-ghost {
+    color: #F5F3EE;
+    border-color: rgba(245, 243, 238, 0.45);
     background: transparent;
   }
   .hp-hero-actions .hp-btn-ghost:hover {
-    background: var(--hp-ink);
-    color: var(--hp-paper);
-    border-color: var(--hp-ink);
+    background: rgba(245, 243, 238, 0.12);
+    border-color: #F5F3EE;
+    color: #F5F3EE;
   }
 
+  /* Trust strip — jos de tot */
   .hp-hero-trust {
-    border-top: 1px solid var(--hp-rule);
-    padding-top: 24px;
+    border-top: 1px solid rgba(245, 243, 238, 0.22);
+    padding-top: 18px;
     max-width: 320px;
     margin: 0 auto;
     justify-content: center;
@@ -1598,14 +1624,14 @@ body[data-page="home"] {
     text-align: center;
   }
   .hp-trust-num {
-    color: var(--hp-ink);
-    font-size: 1.9rem;
+    color: var(--hp-gold);
+    font-size: 1.8rem;
   }
   .hp-trust-label {
-    color: var(--hp-ink-mute);
+    color: rgba(245, 243, 238, 0.65);
   }
   .hp-trust-rule {
-    background: var(--hp-rule);
+    background: rgba(245, 243, 238, 0.22);
   }
 
   /* Feature card — ascunsă pe mobile */
@@ -1703,10 +1729,15 @@ body[data-page="home"] {
   }
   .hp-trust-rule { display: block; }
   .hp-trust-num { font-size: 1.8rem; }
-  /* H1 sub imagine — scale mai compactă pe ecrane mici */
+  /* H1 — scale mai compactă pe ecrane <520px */
   .hp-hero-h1 {
-    font-size: clamp(2.1rem, 9vw, 2.8rem);
+    font-size: clamp(2.2rem, 10vw, 3rem);
+    max-width: 12ch;
   }
+  .hp-hero-lede { font-size: 0.92rem; }
+  .hp-hero-actions { flex-direction: column; }
+  .hp-hero-actions .hp-btn { width: 100%; max-width: 300px; margin: 0 auto; }
+  .hp-trust-num { font-size: 1.7rem; }
 
   .hp-mast-mark { font-size: 12px; }
 
