@@ -293,9 +293,10 @@ Paleta este **extrasă direct din pietrele logo-ului**, apoi extinsă cu neutral
 |---|---|---|---|---|---|---|
 | **Primar brand** | piatra de bază + wordmark | **Midnight** | `#1C2340` | 28 · 35 · 64 | 89 · 81 · 36 · 56 | 533 C |
 | **Accent natural** | piatra de mijloc | **Sage** | `#7A9B92` | 122 · 155 · 146 | 56 · 25 · 41 · 9 | 5497 C |
-| **Light surface** | piatra de sus | **Pebble Cream** | `#E0DACC` | 224 · 218 · 204 | 11 · 11 · 19 · 0 | 7527 C |
-| **Fundal default** | derivat (mai luminos decât Pebble) | **Linen** | `#F5F3EE` | 245 · 243 · 238 | 3 · 3 · 6 · 0 | 7527 C light |
-| **Text pe dark** | derivat (mai cald decât Pebble) | **Stone** | `#D4CEC0` | 212 · 206 · 192 | 17 · 16 · 24 · 0 | 7528 C |
+| **Card surface (lift)** | derivat (mai luminos decât fundalul) | **Paper** | `#FAF8F2` | 250 · 248 · 242 | 1 · 2 · 5 · 0 | 7527 C extra light |
+| **Fundal default** | derivat (răcit, mai puțin gălbui) | **Linen** | `#F1F0EC` | 241 · 240 · 236 | 3 · 2 · 6 · 1 | Cool Gray 1 C |
+| **Plate / banda secțiune** | piatra de sus (desaturat) | **Pebble** | `#E8E5DC` | 232 · 229 · 220 | 7 · 7 · 14 · 0 | 7527 C |
+| **Text pe dark** | derivat (răcit, mai puțin gălbui) | **Stone** | `#D6D2C7` | 214 · 210 · 199 | 14 · 13 · 22 · 0 | 7528 C |
 | **Premium rar** | accent extern (auriu vechi) | **Aged Gold** | `#C8A96E` | 200 · 169 · 110 | 22 · 33 · 60 · 4 | 7563 C |
 
 ### 4.2 Paletă suport (pentru flux comercial / data viz / status)
@@ -313,19 +314,23 @@ Aceste 3 culori sunt **strict utilitare**. Nu apar pe materiale brand-first (cov
 | Culoare | Rol unic | Niciodată |
 |---|---|---|
 | Midnight | CTA primar, logo, titluri mari pe Linen, navbar text | Fundal pentru body text lung |
-| Linen | Fundalul paginilor, navbar | Buton, accent |
-| Pebble Cream | Carduri, panouri elevate, suprafețe | Text |
+| Linen | Fundalul paginilor, navbar | Buton, accent, card |
+| **Paper** | **Carduri, panouri elevate, suprafețe principale** | **Fundal de pagină, text** |
+| Pebble | Plate / fâșii de „pauză", section bands plate, secțiuni statistici pe light | Card individual, fundal global |
 | Stone | Text pe dark, footer body | Fundal pentru pagini light |
-| Sage | Tagline-uri, labels small-caps, underline accent, icoane mici | Buton primar pe materiale digitale |
-| Aged Gold | Badges premium, highlight pe cifră specială, max 1× per pagină | Buton standard, fundal |
+| Sage | Tagline-uri, labels small-caps, underline accent, icoane mici, decor structural | Buton primar pe materiale digitale, em în body/lede/card (acolo italic-ul rămâne fără culoare) |
+| Aged Gold | **Highlight italic în titluri H1/H2** (cuvântul-cheie), badges premium, dark band stats. Max 1-2× per ecran vizibil. | Buton standard, fundal, dropcap, em în lede/body/card, radial wash, vignete, plus signs, trust nums pe light |
 | Slate Navy | Accent secundar flux owner | Buton primar, text body |
 
 ### 4.4 Reguli nenegociabile
 
 1. **Niciodată alb pur (`#FFFFFF`) ca fundal de pagină.** Linen e baza. Albul pur arată rece pe lângă paleta pământie.
-2. **Aged Gold e seasoning, nu bază.** Max 1 element gold per pagină/material (un badge, un highlight pe cifră). Apare des → își pierde puterea.
-3. **Contrast text:** Midnight pe Linen/Pebble Cream/Stone. Stone pe Midnight. Nu amesteca direcțiile.
-4. **Sage nu e CTA.** E accent, decor structural, nu cere click.
+2. **Cardurile sunt mai luminoase decât fundalul, niciodată mai întunecate.** Paper (`#FAF8F2`) pe Linen (`#F1F0EC`) = hârtie pe masă. Crearea de adâncime se face prin *lift*, nu prin *contrast cald*. Cardurile mai întunecate decât fundalul se topesc în pagină și fac brandul să pară ieftin.
+3. **Aged Gold e bijuterie, nu wallpaper.** Locul lui natural e **cuvântul-cheie italic în H1/H2** + dark band stats. Max 1-2 momente gold per **ecran vizibil** (nu per pagină — per ce vede ochiul fără să scroleze). Gold-ul își pierde puterea dramatic la 3+ apariții simultane.
+4. **Locuri INTERZISE pentru Aged Gold:** dropcap, em în lede/body/card titles, trust/figures numbers pe light mode, plus signs, radial gradients pe fundal, vignetes peste foto, accent generic. Aceste locuri colectiv au fost identificate ca sursa „aspectului ieftin" în versiunile anterioare. Gold se concentrează în **un singur moment editorial** (titlul) ca să-și păstreze puterea.
+5. **Contrast text:** Midnight pe Linen/Paper/Pebble/Stone. Stone pe Midnight. Nu amesteca direcțiile.
+6. **Sage nu e CTA.** E accent structural — eyebrows, hair-rules, icoane mici, separatori, label caps. NU italic-highlight în titluri (acolo e gold). NU em în paragrafe/lede/card (em-ul rămâne italic ink, fără culoare).
+7. **Test Apartamento** (operațional): înainte de a adăuga un ornament nou (dropcap, em colorat, radial wash, vignete, mark decorativ stivuit), întreabă-te: *„ar pune Apartamento / Cereal / FT Weekend asta în pagină?"* Dacă nu — afară.
 
 ### 4.5 Accessibility — contrast pairs
 
@@ -333,13 +338,15 @@ Toate combinațiile testate la WCAG AA (4.5:1 body, 3:1 large text). CTA-uri viz
 
 | Combinație | Ratio | Verdict |
 |---|---|---|
-| Midnight `#1C2340` pe Linen `#F5F3EE` | 14.2:1 | AAA · body & headings |
-| Midnight pe Pebble Cream `#E0DACC` | 11.6:1 | AAA · body |
-| Stone `#D4CEC0` pe Midnight | 10.4:1 | AAA · body |
+| Midnight `#1C2340` pe Linen `#F1F0EC` | 13.9:1 | AAA · body & headings |
+| Midnight pe Paper `#FAF8F2` | 14.6:1 | AAA · body & headings |
+| Midnight pe Pebble `#E8E5DC` | 11.8:1 | AAA · body |
+| Stone `#D6D2C7` pe Midnight | 10.6:1 | AAA · body |
 | Sage `#7A9B92` pe Linen | 3.4:1 | AA large text only · NU pentru body |
+| Sage pe Paper | 3.6:1 | AA large text only |
 | Aged Gold pe Midnight | 5.1:1 | AA · OK pentru CTA dark mode |
-| Slate Navy `#3B5A7A` pe Linen | 7.6:1 | AAA · body |
-| Pebble Cream pe Midnight | 11.0:1 | AAA · text decorativ |
+| Slate Navy `#3B5A7A` pe Linen | 7.4:1 | AAA · body |
+| Stone pe Midnight | 11.2:1 | AAA · text decorativ |
 
 Body text minimum 15px DM Sans 400 — nimic mai mic pentru paragrafe.
 
@@ -348,25 +355,29 @@ Body text minimum 15px DM Sans 400 — nimic mai mic pentru paragrafe.
 #### Light mode (default — paginile normale)
 
 ```
-Background       Linen          #F5F3EE
-Surface          Pebble Cream   #E0DACC
+Background       Linen          #F1F0EC   (răcit, mai puțin gălbui)
+Surface (card)   Paper          #FAF8F2   (mai LUMINOS decât bg — hârtie pe masă)
+Plate / band     Pebble         #E8E5DC   (fâșii de pauză, NU carduri individuale)
 Primary text     Midnight       #1C2340
 Secondary text   Midnight 75%
-Accent           Sage           #7A9B92
+Accent structural Sage           #7A9B92   (eyebrows, rules, label-caps, icoane)
 CTA primary      Midnight bg → Stone text
 CTA secondary    transparent · 1px Sage border · Midnight text
+Italic highlight Aged Gold (în H1/H2, cuvânt-cheie · max 1 per moment)
+Italic body/em   ink — italic fără culoare, doar formă
 ```
 
 #### Dark mode (hero, footer, section-intro, citate dramatice)
 
 ```
 Background       Midnight       #1C2340
-Surface          Midnight 92%   (sublime contrast pentru carduri pe dark)
-Primary text     Stone          #D4CEC0
+Surface          Midnight 92%   (carduri pe dark)
+Primary text     Stone          #D6D2C7
 Secondary text   Stone 70%
 Accent           Sage           #7A9B92
 CTA primary      Aged Gold bg → Midnight text   (gold devine vizibil pe dark)
 CTA secondary    transparent · 1px Sage border · Stone text
+Stats / cifre    Aged Gold      (singurul loc unde gold e default pe stats)
 ```
 
 ### 4.7 Color tokens (pentru implementare CSS / design tools)
@@ -375,35 +386,39 @@ CTA secondary    transparent · 1px Sage border · Stone text
 :root {
   /* Brand */
   --color-midnight: #1C2340;
-  --color-sage: #7A9B92;
-  --color-pebble: #E0DACC;
-  --color-linen: #F5F3EE;
-  --color-stone: #D4CEC0;
-  --color-gold: #C8A96E;
+  --color-sage:     #7A9B92;
+  --color-paper:    #FAF8F2;  /* NEW — card surface, mai luminos decât bg */
+  --color-linen:    #F1F0EC;  /* răcit, mai puțin gălbui */
+  --color-pebble:   #E8E5DC;  /* desaturat, doar pt plate/band */
+  --color-stone:    #D6D2C7;  /* răcit */
+  --color-gold:     #C8A96E;  /* rar — max 1× per ecran vizibil */
 
   /* Support */
-  --color-slate: #3B5A7A;
-  --color-moss: #5A7A52;
-  --color-sienna: #A8593D;
+  --color-slate:    #3B5A7A;
+  --color-moss:     #5A7A52;
+  --color-sienna:   #A8593D;
 
   /* Semantic — light mode */
-  --bg: var(--color-linen);
-  --surface: var(--color-pebble);
-  --text: var(--color-midnight);
+  --bg:         var(--color-linen);
+  --surface:    var(--color-paper);    /* CARDURILE pe Paper, NU pe Pebble */
+  --plate:      var(--color-pebble);   /* fâșii / section bands plate */
+  --text:       var(--color-midnight);
   --text-muted: rgba(28, 35, 64, 0.75);
-  --accent: var(--color-sage);
-  --cta-bg: var(--color-midnight);
-  --cta-text: var(--color-stone);
+  --accent:     var(--color-sage);     /* structural: eyebrows, rules, icons */
+  --highlight:  var(--color-gold);     /* italic-cheie în H1/H2 — 1 instanță vizuală */
+  --cta-bg:     var(--color-midnight);
+  --cta-text:   var(--color-stone);
 }
 
 [data-theme="dark"] {
-  --bg: var(--color-midnight);
-  --surface: rgba(28, 35, 64, 0.92);
-  --text: var(--color-stone);
-  --text-muted: rgba(212, 206, 192, 0.70);
-  --accent: var(--color-sage);
-  --cta-bg: var(--color-gold);
-  --cta-text: var(--color-midnight);
+  --bg:         var(--color-midnight);
+  --surface:    rgba(28, 35, 64, 0.92);
+  --text:       var(--color-stone);
+  --text-muted: rgba(214, 210, 199, 0.70);
+  --accent:     var(--color-sage);
+  --highlight:  var(--color-gold);     /* singurul context unde gold e default */
+  --cta-bg:     var(--color-gold);
+  --cta-text:   var(--color-midnight);
 }
 ```
 
@@ -411,14 +426,14 @@ CTA secondary    transparent · 1px Sage border · Stone text
 
 ## 5. Typography
 
-Trei fonturi, trei roluri. Niciun font în plus.
+Patru fonturi, patru roluri. Niciun font în plus.
 
 ### 5.1 Cormorant Garamond — *display*
 
 Pentru momentele de brand: hero-uri, titluri mari de secțiune, citate, logotype, cover-uri.
 
 - **Regular 500** = default (NU 400, e prea fin pe ecran)
-- **Italic 500** = doar pentru cuvântul-highlight în interiorul unui H1/H2
+- **Italic 500** = doar pentru cuvântul-highlight în interiorul unui H1/H2, colorat **Aged Gold** (singurul context unde gold e folosit ca highlight pe light mode — îl rezervăm aici tocmai pentru că e momentul de impact al brandului)
 - Caracteristici cheie: high-contrast strokes, wide counters, classical serif feel
 - Tracking: la dimensiuni mari (>3rem) reduce tracking-ul cu -2% pentru densitate optică
 
@@ -432,25 +447,50 @@ Calul de povară. Tot ce nu e moment de brand.
 - **700** → H4, label caps emfatice
 - Caracteristici cheie: geometric humanist, lizibil la dimensiuni mici, nu obosește la paragraf lung
 
-### 5.3 Syne — *campaigns* (rezervat)
+### 5.3 Mrs Saint Delafield — *signature* (NEW)
+
+Font cursiv caligrafic, scanat dintr-un scris uman real. Folosit **strict ca semnătură** — un strat de prezență personală peste sistemul editorial.
+
+- **Regular 400** (single weight disponibil)
+- Caracteristici cheie: cursiv copperplate, bucle expresive, pen-strokes naturale, suportă diacritice românești (ț ș ă â î)
+- **Folosit pentru:**
+  - Semnătura lui Ilan la finalul scrisorilor / contact section / despre
+  - Pull-quote-uri scurte (max 6-8 cuvinte) pe pagini editoriale
+  - Tagline poetic pe materiale special-print (cover PDF premium)
+  - End-mark pe articol/email
+- **Dimensiune: 24–48px** pe semnături, max 64px pe pull-quote. NICIODATĂ peste 80px.
+- **Culoare: Midnight sau Sage.** Niciodată gold (re-creează problema „luxury-homes 149px gold rotated").
+- **Niciodată:** titluri întregi, paragrafe, navigation, formulare, butoane, ornamentat (umbră, rotație, gradient).
+
+### 5.4 Syne — *campaigns* (rezervat)
 
 Pentru social media banners, IG stories cu titluri de impact. **Nu apare pe site.** Apare doar pe materiale unde e nevoie de personalitate puternică, contrast mare cu DM Sans.
 
 - **600 / 700 / 800** weights
 - Folosit ca H1 pe IG stories, hero pe campanii speciale
 
-### 5.4 Regula de aur — italic
+### 5.5 Regula de aur — italic
 
 > **Italic se folosește DOAR pentru highlight punctual pe un cuvânt.** Niciodată pe titluri întregi, logo, headings sau paragrafe.
 
 Dacă vrei să atragi atenția, încearcă mai întâi: weight, dimensiune, culoare.
 
+**Culoarea italic-ului depinde de unde apare:**
+
+- În **H1/H2** (titluri mari, momente editoriale) = **Aged Gold**. Aici concentrăm singurul accent gold pe light mode. Max 1 cuvânt italic gold per ecran vizibil.
+- În **lede, body, card titles, pull-quotes mici** = **ink Midnight, italic fără culoare**. Forma italică face emfaza, nu culoarea. Aglomerarea de em-uri colorate (gold sau sage) diluează impactul real al titlului.
+- Sage NU mai apare pe italic în titluri sau em — el rămâne la eyebrow, rule, decor structural.
+
 #### Corect
 
 ```
-Construim încredere, nu doar tranzacții.
-                    ↑
-                    aici poate fi italic Sage pe cuvântul "tranzacții"
+Casa ta perfectă te așteaptă.
+        ↑
+        italic Cormorant 500 · AGED GOLD pe "perfectă" — momentul editorial
+
+Prezentate onest, fără surprize.
+            ↑
+            italic Cormorant inline · culoare ink — forma face treaba
 ```
 
 #### Greșit
@@ -459,14 +499,16 @@ Construim încredere, nu doar tranzacții.
 [H1 întreg italic — banal, look de blog din 2008]
 [Logo-ul scris cu italic — niciodată]
 [Paragraf întreg italic — obosește ochii]
+[3 em-uri gold în același ecran — anulează impactul fiecăruia]
+[Em sage în lede — accentul sage stagnează pe pagină]
 ```
 
-### 5.5 Scală tipografică
+### 5.6 Scală tipografică
 
 ```
 H1 hero          Cormorant 500 · 4rem (64px)        · line-height 1.05 · tracking -2%
                  Mobile: 2.5rem (40px)
-                 Highlight word: italic 500 · culoare Sage SAU Aged Gold
+                 Highlight word: italic 500 · culoare AGED GOLD (singurul highlight gold pe light)
 
 H2 secțiune      Cormorant 500 · 2.25rem (36px)     · line-height 1.15 · tracking -1%
                  Mobile: 1.75rem (28px)
@@ -483,21 +525,29 @@ Label caps       DM Sans 600 · 0.6875rem (11px)      · letter-spacing 0.14em �
 
 Button           DM Sans 600 · 0.9375rem (15px)      · letter-spacing 0.01em
 Caption          DM Sans 400 · 0.8125rem (13px)      · line-height 1.5
+
+Signature        Mrs Saint Delafield 400 · 2rem (32px) · line-height 1.1 · Midnight
+                 Mobile: 1.5rem (24px)
+                 Folosit pentru "— Ilan", end-mark, pull-quote scurt
+Pull-quote       Mrs Saint Delafield 400 · 3rem (48px) · line-height 1.05 · Sage
+                 Max 6-8 cuvinte, 1 instanță per pagină
 ```
 
-### 5.6 Reguli de combinare
+### 5.7 Reguli de combinare
 
-- **Cormorant + DM Sans = 95% din materiale.** Asta e brandul.
+- **Cormorant + DM Sans = 90% din materiale.** Asta e brandul.
+- **Mrs Saint Delafield** = strat de prezență personală, 1-2 instanțe per pagină max. Folosită ca semnătură punctuală, nu ca element decorativ generic.
 - **Cormorant lângă Cormorant** (H1 + H2 mari unul lângă altul) = doar pe cover-uri și hero-uri editoriale, nu pe pagini funcționale.
 - **DM Sans body cu cuvânt italic Cormorant inline** = NU. Italic-ul rămâne doar în headings Cormorant.
 - **Syne lângă Cormorant** = NU. Syne are propria scenă (social, banners). Nu se mixează.
+- **Mrs Saint Delafield lângă Mrs Saint Delafield** = NU. O singură semnătură per moment vizual.
 
-### 5.7 Web font loading
+### 5.8 Web font loading
 
 ```html
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=DM+Sans:wght@400;500;600;700&family=Syne:wght@600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=DM+Sans:wght@400;500;600;700&family=Mrs+Saint+Delafield&family=Syne:wght@600;700;800&display=swap" rel="stylesheet">
 ```
 
 Folosește `font-display: swap` mereu. Linen background previne FOIT vizibil.
@@ -762,7 +812,7 @@ Background       transparent
 Border           1px solid Sage #7A9B92
 Text             Midnight (light) / Stone (dark)
 Padding          13px 27px (1px less for border compensation)
-Hover            background Pebble Cream (light) / Midnight 80% (dark)
+Hover            background Pebble (light) / Midnight 80% (dark)
 ```
 
 #### Premium (rar — max 1 per pagină)
@@ -786,13 +836,16 @@ Hover            underline 100% Sage · color stays
 ### 9.2 Cards proprietăți
 
 ```
-Background       Pebble Cream  #E0DACC  (light) / Midnight 92% (dark)
+Background       Paper  #FAF8F2  (light) / Midnight 92% (dark)
+                 ← Paper este MAI LUMINOS decât Linen bg — cardul plutește
 Radius           20px (--radius-lg)
 Shadow           --shadow-md
 Image ratio      3:2 · radius top 20px · object-fit cover
 Padding interior 24px (mobile) · 28px (desktop)
 Hover            translateY(-2px) · shadow-lg · img scale 1.03 (transition 400ms)
 ```
+
+> **Regulă critică:** cardurile NU folosesc Pebble (`#E8E5DC`) ca fundal. Pebble e doar pentru fâșii/section bands plate (zone „de pauză" la nivel de pagină, nu obiecte individuale). Cardurile care folosesc o nuanță mai întunecată decât fundalul se topesc în pagină și fac brandul să pară ieftin — vezi 4.4 regula 2.
 
 #### Structură interior card
 
@@ -809,7 +862,7 @@ Hover            translateY(-2px) · shadow-lg · img scale 1.03 (transition 400
 
 ```
 Input height     48px
-Background       Linen (sub-form pe Pebble Cream surface)
+Background       Linen (sub-form pe Paper surface)
 Border           1px solid Sage
 Border-radius    12px
 Padding          14px 16px
@@ -826,7 +879,7 @@ Aceleași reguli, padding 16px, min-height 120px.
 
 #### Select
 
-Custom select cu chevron Sage la dreapta. Listă dropdown pe Pebble Cream cu shadow-md, max-height 320px scrollable.
+Custom select cu chevron Sage la dreapta. Listă dropdown pe Paper cu shadow-md, max-height 320px scrollable.
 
 ### 9.4 Navbar
 
@@ -1295,9 +1348,10 @@ Structură recomandată:
 |---|---|---|
 | Midnight | `#1C2340` | C89 M81 Y36 K56 |
 | Sage | `#7A9B92` | C56 M25 Y41 K9 |
-| Pebble Cream | `#E0DACC` | C11 M11 Y19 K0 |
-| Linen | `#F5F3EE` | C3 M3 Y6 K0 |
-| Stone | `#D4CEC0` | C17 M16 Y24 K0 |
+| Paper | `#FAF8F2` | C1 M2 Y5 K0 |
+| Linen | `#F1F0EC` | C3 M2 Y6 K1 |
+| Pebble | `#E8E5DC` | C7 M7 Y14 K0 |
+| Stone | `#D6D2C7` | C14 M13 Y22 K0 |
 | Aged Gold | `#C8A96E` | C22 M33 Y60 K4 |
 
 Pe materiale critice (business card, panou exterior) — comandă **proof print** înainte de tiraj. CMYK afișat pe ecran ≠ CMYK pe hârtie.
@@ -1308,7 +1362,9 @@ Pe materiale critice (business card, panou exterior) — comandă **proof print*
 |---|---|
 | Midnight | 533 C |
 | Sage | 5497 C |
-| Pebble Cream | 7527 C |
+| Paper | 7527 C extra light |
+| Linen | Cool Gray 1 C (warm tint) |
+| Pebble | 7527 C |
 | Stone | 7528 C |
 | Aged Gold | 7563 C |
 
@@ -1464,24 +1520,28 @@ Final memorabil = referral viitor.
 
 ### A. Quick reference — ce să nu uit niciodată
 
-1. **Niciodată alb pur** ca fundal de pagină — Linen `#F5F3EE` e baza
-2. **Italic doar pe cuvântul-highlight** — niciodată titluri întregi
-3. **Aged Gold = max 1× per pagină** — e seasoning, nu bază
-4. **Sage nu e CTA** — e accent
-5. **White space e parte din brand** — în dubiu, mai mult aer
-6. **Pietrele nu se separă de wordmark** dincolo de spacing-ul clear-space
-7. **Logo pe foto = doar cu overlay Midnight 60%** sau pe zonă uniformă
-8. **Master tagline:** "Imobiliare cu plan."
-9. **Owner tagline:** "Strategie înainte de listare."
-10. **Buyer tagline:** "Doar ce merită vizitat."
+1. **Niciodată alb pur** ca fundal de pagină — Linen `#F1F0EC` e baza
+2. **Cardurile MAI LUMINOASE decât fundalul** — Paper `#FAF8F2` pe Linen, niciodată invers
+3. **Italic doar pe cuvântul-highlight** — niciodată titluri întregi · culoarea în H1/H2: AGED GOLD · în body/lede/card: italic ink, fără culoare
+4. **Aged Gold = max 1 instanță per ECRAN VIZIBIL** — e bijuterie, locul lui e cuvântul italic din titlu. Interzis pe: dropcap, em în lede/body/card, trust nums pe light, plus signs, radial bg, vignete.
+5. **Sage e accent STRUCTURAL** — eyebrows, hair-rules, icoane, label-caps. NU pe italic în titluri (acolo e gold). NU pe em în paragrafe/lede/card.
+6. **Test Apartamento** — înainte de orice ornament nou, întreabă-te: l-ar pune Apartamento? Dacă nu, afară.
+7. **Mrs Saint Delafield doar ca semnătură** — max 48px, Midnight/Sage, niciodată gold, fără rotație
+8. **White space e parte din brand** — în dubiu, mai mult aer
+9. **Pietrele nu se separă de wordmark** dincolo de spacing-ul clear-space
+10. **Logo pe foto = doar cu overlay Midnight 60%** sau pe zonă uniformă
+11. **Master tagline:** "Imobiliare cu plan."
+12. **Owner tagline:** "Strategie înainte de listare."
+13. **Buyer tagline:** "Doar ce merită vizitat."
 
 ### B. Surse & extracție paletă
 
 Paleta este derivată direct din [`design/logo-realist.png`](../logo-realist.png):
 - **Midnight** = piatra de bază + wordmark (eyedropper aproape identic)
 - **Sage** = piatra de mijloc (recalibrat ușor mai luminos față de versiunea anterioară pentru a se potrivi cu real perceived color)
-- **Pebble Cream** = piatra de sus
-- **Linen, Stone, Aged Gold** = derivate care extind paleta menținând armonia pământie
+- **Pebble** = piatra de sus (desaturat de la `#E0DACC` la `#E8E5DC` în v1.1 pentru a reduce dominanța galbenă)
+- **Paper, Linen, Stone, Aged Gold** = derivate care extind paleta menținând armonia pământie
+- **v1.1 — calibrare restraint:** Linen răcit (de la `#F5F3EE` la `#F1F0EC`), Stone răcit (de la `#D4CEC0` la `#D6D2C7`), Paper introdus (`#FAF8F2`) ca surface principal pentru carduri (mai luminos decât fundalul = adâncime prin lift, nu prin contrast cald). Pebble Cream renamed Pebble, retrogradat la fâșii/plate.
 
 ### C. File structure recomandată pentru asset library
 
@@ -1517,6 +1577,16 @@ design/
 
 ```
 v1.0 — 2026-05-06 — Initial brand guidelines (rebuild from scratch)
+v1.1 — 2026-05-26 — Calibrare „restraint":
+                    · Paletă răcită (Linen #F5F3EE→#F1F0EC, Stone #D4CEC0→#D6D2C7)
+                    · Pebble Cream desaturat & retrogradat la plate (E0DACC→E8E5DC)
+                    · Paper introdus (#FAF8F2) ca surface card → adâncime prin lift
+                    · Aged Gold restrâns: locul lui e italic-cheie în H1/H2 + dark band stats
+                    · Sage retrogradat la accent structural (eyebrows, rules, icons)
+                      — NU mai apare pe italic în titluri, NU pe em în lede/body/card
+                    · Em în lede/body/card = italic ink, fără culoare (forma face emfaza)
+                    · Font 4: Mrs Saint Delafield — semnătură, max 48px, Midnight/Sage
+                    · Regula „Test Apartamento" în Appendix A
 ```
 
 Modifică **doar** când există un motiv strategic real. Brandul își construiește încredere prin consistență în timp — nu prin update-uri estetice.

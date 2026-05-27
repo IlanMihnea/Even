@@ -9,9 +9,9 @@ body[data-page="proiecte"] {
   --pj-rule: rgba(28, 35, 64, 0.14);
   --pj-rule-soft: rgba(28, 35, 64, 0.08);
   --pj-sage: #7A9B92;
-  --pj-pebble: #E0DACC;
-  --pj-linen: #F5F3EE;
-  --pj-stone: #D4CEC0;
+  --pj-pebble: #FAF8F2;
+  --pj-linen: #F1F0EC;
+  --pj-stone: #D6D2C7;
   --pj-gold: #C8A96E;
   background: var(--pj-linen);
   position: relative;
@@ -20,14 +20,13 @@ body[data-page="proiecte"] {
 
 .pj-bg-grain {
   position: fixed; inset: 0; z-index: 0; pointer-events: none;
-  opacity: 0.45; mix-blend-mode: multiply;
-  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='220' height='220'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='1.4' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.11 0 0 0 0 0.14 0 0 0 0 0.25 0 0 0 0.04 0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+  opacity: 0.28; mix-blend-mode: multiply;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='220' height='220'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='1.6' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.11 0 0 0 0 0.14 0 0 0 0 0.25 0 0 0 0.03 0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
 }
+/* v1.1 — gold radial scos */
 .pj-bg-light {
   position: fixed; inset: 0; z-index: 0; pointer-events: none;
-  background:
-    radial-gradient(900px 700px at 90% 10%, rgba(200, 169, 110, 0.08), transparent 60%),
-    radial-gradient(700px 600px at 0% 100%, rgba(122, 155, 146, 0.06), transparent 60%);
+  background: radial-gradient(900px 700px at 0% 100%, rgba(122, 155, 146, 0.05), transparent 60%);
 }
 
 .pj-masthead, .pj-hero, .pj-filters, .pj-grid-section {
@@ -62,7 +61,7 @@ body[data-page="proiecte"] {
   border-top: 1px solid var(--pj-rule);
   border-bottom: 1px solid var(--pj-rule);
   padding: 16px 0;
-  background: rgba(245, 243, 238, 0.7);
+  background: rgba(241, 240, 236, 0.7);
   backdrop-filter: blur(6px);
 }
 .pj-masthead-inner {
@@ -289,7 +288,7 @@ body[data-subpage="project-detail"] {
 .project-hero .project-loc {
   font-family: var(--font-body);
   font-size: 14px;
-  color: rgba(212, 206, 192, 0.8);
+  color: rgba(214, 210, 199, 0.8);
   display: flex;
   align-items: center;
   gap: 10px;
@@ -655,7 +654,7 @@ body[data-subpage="project-detail"] {
 #interestForm form input,
 #interestForm form select,
 #interestForm form textarea {
-  background: rgba(245, 243, 238, 0.6);
+  background: rgba(241, 240, 236, 0.6);
   border: 1px solid var(--pj-rule);
   border-radius: 2px;
   padding: 12px 14px;

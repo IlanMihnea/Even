@@ -2,18 +2,20 @@
    MAIN.CSS - Stiluri globale
    ============================================ */
 
-@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500;1,600&family=DM+Sans:wght@400;500;600;700&family=Syne:wght@600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500;1,600&family=DM+Sans:wght@400;500;600;700&family=Mrs+Saint+Delafield&family=Syne:wght@600;700;800&display=swap');
 
 :root {
-  /* === EVEN Brand Kit === */
+  /* === EVEN Brand Kit · v1.1 (calibrare restraint) === */
   --midnight: #1C2340;
-  --sage: #5F8A82;
-  --stone: #D4CEC0;
-  --linen: #F5F3EE;
-  --gold: #C8A96E;
+  --sage: #7A9B92;          /* brand kit standard (era #5F8A82) */
+  --paper: #FAF8F2;         /* NEW · card surface — mai luminos decât bg */
+  --linen: #F1F0EC;         /* răcit (era #F5F3EE) */
+  --pebble: #E8E5DC;        /* desaturat (era #E0DACC) — doar plate/band */
+  --stone: #D6D2C7;         /* răcit (era #D4CEC0) */
+  --gold: #C8A96E;          /* rar — italic-cheie în H1/H2 + dark band stats */
   --gold-light: #dbbe91;
   --slate-navy: #3B5A7A;
-  --warm-white: #E8E4DA;
+  --warm-white: #E8E5DC;    /* alias pentru --pebble */
 
   /* Alias pentru compatibilitate */
   --navy: #1C2340;
@@ -21,9 +23,9 @@
   --white: #ffffff;
 
   /* Gri neutru (UI utilitar) */
-  --gray-50: #F5F3EE;
-  --gray-100: #edeae3;
-  --gray-200: #ddd9d0;
+  --gray-50: #F1F0EC;
+  --gray-100: #e9e7e1;
+  --gray-200: #d8d5cc;
   --gray-300: #bfbab0;
   --gray-400: #9a9590;
   --gray-500: #6b6560;
@@ -110,13 +112,33 @@ h2 { font-size: 2.25rem; }
 h3 { font-size: 1.25rem; }
 h4 { font-size: 1rem; }
 
-/* Highlight — italic pe UN cuvânt într-un H1/H2 */
+/* Highlight — italic pe UN cuvânt într-un H1/H2.
+   Culoarea: GOLD (singurul highlight gold pe light mode, momentul de impact al brandului).
+   Pentru em în lede/body/card — italic ink, fără culoare (se setează în context). */
 .highlight,
 h1 em, h2 em {
   font-family: var(--font-heading);
   font-style: italic;
   font-weight: 500;
-  color: var(--sage);
+  color: var(--gold);
+}
+
+/* Em în context non-titlu: italic, ink, fără culoare */
+p em, li em, blockquote em, .lede em, .card-title em {
+  font-family: var(--font-heading);
+  font-style: italic;
+  font-weight: 500;
+  color: inherit;
+}
+
+/* Signature font — Mrs Saint Delafield, doar pe class explicit */
+.signature {
+  font-family: 'Mrs Saint Delafield', cursive;
+  font-weight: 400;
+  font-size: 2rem;
+  line-height: 1.1;
+  color: var(--midnight);
+  letter-spacing: 0.005em;
 }
 
 a {
@@ -211,11 +233,11 @@ button { font-family: var(--font-body); cursor: pointer; border: none; }
 .btn-outline-light {
   background: transparent;
   color: var(--stone);
-  border-color: rgba(212, 206, 192, 0.4);
+  border-color: rgba(214, 210, 199, 0.4);
 }
 .btn-outline-light:hover {
   border-color: var(--stone);
-  background: rgba(212, 206, 192, 0.08);
+  background: rgba(214, 210, 199, 0.08);
   color: var(--stone);
 }
 
@@ -236,7 +258,7 @@ button { font-family: var(--font-body); cursor: pointer; border: none; }
   position: sticky;
   top: 0;
   z-index: 100;
-  background: rgba(245, 243, 238, 0.94);
+  background: rgba(241, 240, 236, 0.94);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
   border-bottom: 1px solid rgba(28, 35, 64, 0.08);
@@ -247,7 +269,7 @@ button { font-family: var(--font-body); cursor: pointer; border: none; }
 }
 .navbar.nav-scrolled {
   height: 62px;
-  background: rgba(245, 243, 238, 0.99);
+  background: rgba(241, 240, 236, 0.99);
   box-shadow: 0 2px 20px rgba(28, 35, 64, 0.09);
 }
 
@@ -392,7 +414,7 @@ button { font-family: var(--font-body); cursor: pointer; border: none; }
 }
 
 .footer-brand p {
-  color: rgba(212, 206, 192, 0.65);
+  color: rgba(214, 210, 199, 0.65);
   margin-top: 16px;
   font-size: 14px;
   max-width: 320px;
@@ -405,11 +427,22 @@ button { font-family: var(--font-body); cursor: pointer; border: none; }
   margin-bottom: 10px;
 }
 .footer-links a {
-  color: rgba(212, 206, 192, 0.7);
+  color: rgba(214, 210, 199, 0.7);
   font-size: 14px;
   transition: var(--transition);
 }
 .footer-links a:hover { color: var(--gold); }
+
+.footer-tagline {
+  font-family: 'Mrs Saint Delafield', cursive !important;
+  font-weight: 400 !important;
+  font-size: 2rem !important;
+  line-height: 1 !important;
+  color: var(--stone) !important;
+  margin-top: 20px !important;
+  letter-spacing: 0.005em !important;
+  opacity: 0.92;
+}
 
 .footer-social {
   display: flex;
@@ -437,16 +470,16 @@ button { font-family: var(--font-body); cursor: pointer; border: none; }
 .footer-contact p {
   font-size: 14px;
   margin-bottom: 8px;
-  color: rgba(212, 206, 192, 0.75);
+  color: rgba(214, 210, 199, 0.75);
 }
 .footer-contact i { color: var(--sage); margin-right: 8px; width: 16px; }
 
 .footer-bottom {
   padding-top: 24px;
-  border-top: 1px solid rgba(212, 206, 192, 0.1);
+  border-top: 1px solid rgba(214, 210, 199, 0.1);
   text-align: center;
   font-size: 13px;
-  color: rgba(212, 206, 192, 0.45);
+  color: rgba(214, 210, 199, 0.45);
 }
 
 /* ============================================
@@ -710,7 +743,7 @@ textarea { resize: vertical; min-height: 100px; }
   background: var(--midnight);
   color: var(--stone);
   padding: 14px 20px;
-  border-top: 1px solid rgba(212, 206, 192, 0.18);
+  border-top: 1px solid rgba(214, 210, 199, 0.18);
   transform: translateY(100%);
   transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
   box-shadow: 0 -12px 40px rgba(28, 35, 64, 0.18);
@@ -732,7 +765,7 @@ textarea { resize: vertical; min-height: 100px; }
   font-family: var(--font-body);
   font-size: 13px;
   line-height: 1.55;
-  color: rgba(212, 206, 192, 0.85);
+  color: rgba(214, 210, 199, 0.85);
 }
 .cookie-banner-text strong {
   display: block;
@@ -757,7 +790,7 @@ textarea { resize: vertical; min-height: 100px; }
 }
 .cookie-btn {
   padding: 10px 22px;
-  border: 1px solid rgba(212, 206, 192, 0.35);
+  border: 1px solid rgba(214, 210, 199, 0.35);
   background: transparent;
   color: var(--stone);
   border-radius: 999px;

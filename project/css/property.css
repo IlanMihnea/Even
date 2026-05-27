@@ -11,9 +11,9 @@ body[data-page="terenuri"] {
   --ink-50:     rgba(28,35,64,.50);
   --ink-20:     rgba(28,35,64,.20);
   --ink-08:     rgba(28,35,64,.08);
-  --linen:      #F5F3EE;
-  --pebble:     #E0DACC;
-  --stone:      #D4CEC0;
+  --linen:      #F1F0EC;
+  --pebble:     #FAF8F2;
+  --stone:      #D6D2C7;
   --sage:       #7A9B92;
   --sage-dk:    #4F6B62;
   --gold:       #C8A96E;
@@ -103,7 +103,7 @@ body[data-page="terenuri"] {
 }
 .pp-mosaic-corner {
   position: absolute; width: 28px; height: 28px;
-  border: 1px solid rgba(245,243,238,.5);
+  border: 1px solid rgba(241,240,236,.5);
 }
 .pp-mosaic-corner-tl { top:0;left:0; border-right:none; border-bottom:none; }
 .pp-mosaic-corner-tr { top:0;right:0; border-left:none; border-bottom:none; }
@@ -143,13 +143,13 @@ body[data-page="terenuri"] {
 }
 .pp-mosaic-price small {
   font-size: .4em; font-weight: 500;
-  color: rgba(245,243,238,.6); margin-left: 4px;
+  color: rgba(241,240,236,.6); margin-left: 4px;
 }
 .pp-mosaic-addr {
   margin-top: 10px;
   font-family: var(--font-body);
   font-size: 14px; font-weight: 500;
-  color: rgba(245,243,238,.75);
+  color: rgba(241,240,236,.75);
   display: flex; align-items: center; gap: 8px;
 }
 .pp-mosaic-addr i { color: var(--sage); font-size: 12px; }
@@ -163,7 +163,7 @@ body[data-page="terenuri"] {
   display: inline-flex; align-items: center; gap: 7px;
   padding: 9px 14px;
   background: rgba(28,35,64,.3);
-  border: 1px solid rgba(245,243,238,.3);
+  border: 1px solid rgba(241,240,236,.3);
   border-radius: var(--r-pill);
   backdrop-filter: blur(8px);
   font-family: var(--font-body);
@@ -174,8 +174,8 @@ body[data-page="terenuri"] {
   pointer-events: auto;
 }
 .pp-mosaic-btn:hover {
-  background: rgba(245,243,238,.12);
-  border-color: rgba(245,243,238,.6);
+  background: rgba(241,240,236,.12);
+  border-color: rgba(241,240,236,.6);
   color: #fff;
 }
 .pp-mosaic-btn i { font-size: 11px; }
@@ -207,13 +207,13 @@ body[data-page="terenuri"] {
   display: flex; flex-direction: column; align-items: center; justify-content: center;
   gap: 16px;
   background: linear-gradient(135deg, var(--ink) 0%, #2a3358 100%);
-  color: rgba(212,206,192,.4);
+  color: rgba(214,210,199,.4);
   font-family: var(--font-body); font-size: 14px;
 }
 
 /* ---------- BREADCRUMBS STRIP ---------- */
 .pp-breadstrip {
-  background: rgba(245,243,238,.88);
+  background: rgba(241,240,236,.88);
   backdrop-filter: blur(8px);
   border-bottom: 1px solid var(--ink-08);
   padding: 0;
@@ -434,7 +434,7 @@ body[data-page="terenuri"] {
   position: absolute;
   left: 0; right: 0; bottom: 0;
   height: 120px;
-  background: linear-gradient(to bottom, rgba(245,243,238,0) 0%, var(--linen) 90%);
+  background: linear-gradient(to bottom, rgba(241,240,236,0) 0%, var(--linen) 90%);
   pointer-events: none;
   opacity: 0;
   transition: opacity .25s ease;
@@ -500,7 +500,7 @@ body[data-page="terenuri"] {
 .pp-cta-strip::before {
   content: '';
   position: absolute; inset: 10px;
-  border: 1px solid rgba(212,206,192,.15);
+  border: 1px solid rgba(214,210,199,.15);
   pointer-events: none;
 }
 .pp-cta-strip-label {
@@ -539,7 +539,7 @@ body[data-page="terenuri"] {
   display: inline-flex; align-items: center; gap: 8px;
   padding: 11px 19px; border-radius: var(--r-pill);
   background: transparent;
-  border: 1px solid rgba(212,206,192,.35);
+  border: 1px solid rgba(214,210,199,.35);
   color: var(--stone);
   font-family: var(--font-body);
   font-size: 13px; font-weight: 600;
@@ -547,8 +547,8 @@ body[data-page="terenuri"] {
   transition: border-color .25s, background .25s;
 }
 .pp-cta-book:hover {
-  border-color: rgba(212,206,192,.7);
-  background: rgba(245,243,238,.08);
+  border-color: rgba(214,210,199,.7);
+  background: rgba(241,240,236,.08);
 }
 
 /* ---------- CALCULATOR ---------- */
@@ -569,7 +569,7 @@ body[data-page="terenuri"] {
 }
 .pp-calc-tab {
   padding: 7px 14px;
-  background: rgba(245,243,238,.5);
+  background: rgba(241,240,236,.5);
   border: 1px solid var(--ink-20);
   border-radius: var(--r-pill);
   font-family: var(--font-body);
@@ -594,7 +594,7 @@ body[data-page="terenuri"] {
 }
 .pp-calc-field input {
   width: 100%;
-  background: rgba(245,243,238,.7);
+  background: rgba(241,240,236,.7);
   border: 1px solid var(--ink-20); border-radius: 2px;
   padding: 11px 14px;
   font-family: var(--font-body); font-size: 15px; color: var(--ink);
@@ -619,7 +619,7 @@ body[data-page="terenuri"] {
   font-family: var(--font-body);
   font-size: 10px; font-weight: 600;
   letter-spacing: .18em; text-transform: uppercase;
-  color: rgba(212,206,192,.65); margin-bottom: 8px;
+  color: rgba(214,210,199,.65); margin-bottom: 8px;
 }
 .pp-calc-result-val {
   font-family: var(--font-heading);
@@ -630,10 +630,10 @@ body[data-page="terenuri"] {
   font-variant-numeric: lining-nums;
 }
 .pp-calc-result-val.sm {
-  font-size: 1.4rem; color: rgba(212,206,192,.7);
+  font-size: 1.4rem; color: rgba(214,210,199,.7);
 }
 .pp-calc-result-side {
-  border-left: 1px solid rgba(212,206,192,.15); padding-left: 24px;
+  border-left: 1px solid rgba(214,210,199,.15); padding-left: 24px;
 }
 
 /* ---------- MAP ---------- */
@@ -726,7 +726,7 @@ body[data-page="terenuri"] {
 .pp-agent-card::before {
   content: '';
   position: absolute; inset: 10px;
-  border: 1px solid rgba(212,206,192,.12);
+  border: 1px solid rgba(214,210,199,.12);
   pointer-events: none;
 }
 .pp-agent-card > * { position: relative; z-index: 1; }
@@ -758,19 +758,19 @@ body[data-page="terenuri"] {
 .pp-agent-role {
   font-family: var(--font-body);
   font-size: 12px; font-weight: 400;
-  color: rgba(212,206,192,.65); margin-top: 3px;
+  color: rgba(214,210,199,.65); margin-top: 3px;
 }
 .pp-agent-divider {
-  border: none; border-top: 1px solid rgba(212,206,192,.12);
+  border: none; border-top: 1px solid rgba(214,210,199,.12);
   margin: 0 0 18px;
 }
 .pp-agent-contacts { display: flex; flex-direction: column; gap: 2px; margin-bottom: 18px; }
 .pp-agent-contacts a {
   display: flex; align-items: center; gap: 12px;
   padding: 10px 0;
-  border-bottom: 1px solid rgba(212,206,192,.08);
+  border-bottom: 1px solid rgba(214,210,199,.08);
   font-family: var(--font-body); font-size: 13px;
-  color: rgba(212,206,192,.85); text-decoration: none;
+  color: rgba(214,210,199,.85); text-decoration: none;
   transition: color .2s, padding-left .3s var(--ease);
 }
 .pp-agent-contacts a:last-child { border-bottom: none; }
@@ -788,8 +788,8 @@ body[data-page="terenuri"] {
   text-decoration: none; border: none; cursor: pointer;
   transition: transform .3s var(--ease), box-shadow .3s, background .25s;
 }
-.pp-btn-call { background: rgba(245,243,238,.1); color: var(--stone); border: 1px solid rgba(212,206,192,.25); }
-.pp-btn-call:hover { background: rgba(245,243,238,.18); transform: translateY(-1px); }
+.pp-btn-call { background: rgba(241,240,236,.1); color: var(--stone); border: 1px solid rgba(214,210,199,.25); }
+.pp-btn-call:hover { background: rgba(241,240,236,.18); transform: translateY(-1px); }
 .pp-btn-wa { background: #25D366; color: #fff; }
 .pp-btn-wa:hover { background: #1ebe5b; transform: translateY(-1px); box-shadow: 0 8px 20px -10px rgba(37,211,102,.7); }
 
@@ -801,7 +801,7 @@ body[data-page="terenuri"] {
 .pp-form-card::before {
   content: '';
   position: absolute; inset: 10px;
-  border: 1px solid rgba(212,206,192,.12); pointer-events: none;
+  border: 1px solid rgba(214,210,199,.12); pointer-events: none;
 }
 .pp-form-card > * { position: relative; z-index: 1; }
 .pp-form-label-top {
@@ -822,24 +822,24 @@ body[data-page="terenuri"] {
 .pp-form-field label {
   display: block;
   font-family: var(--font-body); font-size: 11px; font-weight: 500;
-  color: rgba(212,206,192,.6); margin-bottom: 6px; letter-spacing: .03em;
+  color: rgba(214,210,199,.6); margin-bottom: 6px; letter-spacing: .03em;
 }
 .pp-form-field input,
 .pp-form-field textarea {
   width: 100%;
-  background: rgba(245,243,238,.07);
-  border: 1px solid rgba(212,206,192,.2);
+  background: rgba(241,240,236,.07);
+  border: 1px solid rgba(214,210,199,.2);
   border-radius: 2px; padding: 11px 13px;
   font-family: var(--font-body); font-size: 14px; color: var(--stone);
   transition: border-color .2s, background .2s;
 }
 .pp-form-field textarea { min-height: 80px; resize: vertical; }
 .pp-form-field input::placeholder,
-.pp-form-field textarea::placeholder { color: rgba(212,206,192,.3); }
+.pp-form-field textarea::placeholder { color: rgba(214,210,199,.3); }
 .pp-form-field input:focus,
 .pp-form-field textarea:focus {
   outline: none; border-color: var(--sage);
-  background: rgba(245,243,238,.1);
+  background: rgba(241,240,236,.1);
 }
 .pp-form-submit {
   width: 100%; margin-top: 8px;
@@ -856,7 +856,7 @@ body[data-page="terenuri"] {
 }
 .pp-form-note {
   font-family: var(--font-body); font-size: 11px;
-  color: rgba(212,206,192,.5); text-align: center;
+  color: rgba(214,210,199,.5); text-align: center;
   margin-top: 10px; line-height: 1.5;
 }
 
@@ -921,32 +921,32 @@ body[data-page="terenuri"] {
 .pp-lightbox-close {
   position: fixed; top: 18px; right: 22px;
   width: 44px; height: 44px; border-radius: 50%;
-  background: rgba(245,243,238,.08);
-  border: 1px solid rgba(245,243,238,.25);
+  background: rgba(241,240,236,.08);
+  border: 1px solid rgba(241,240,236,.25);
   color: var(--stone); font-size: 16px; cursor: pointer;
   display: flex; align-items: center; justify-content: center;
   transition: background .25s, transform .3s; z-index: 10;
 }
-.pp-lightbox-close:hover { background: rgba(245,243,238,.15); transform: rotate(90deg); }
+.pp-lightbox-close:hover { background: rgba(241,240,236,.15); transform: rotate(90deg); }
 .pp-lightbox-nav {
   position: fixed; top: 50%; transform: translateY(-50%);
   width: 52px; height: 52px; border-radius: 50%;
-  background: rgba(245,243,238,.08);
-  border: 1px solid rgba(245,243,238,.2);
+  background: rgba(241,240,236,.08);
+  border: 1px solid rgba(241,240,236,.2);
   color: var(--stone); font-size: 16px; cursor: pointer;
   display: flex; align-items: center; justify-content: center;
   transition: background .25s, transform .3s; z-index: 10;
 }
 .pp-lightbox-prev { left: 20px; }
 .pp-lightbox-next { right: 20px; }
-.pp-lightbox-nav:hover { background: rgba(245,243,238,.14); }
+.pp-lightbox-nav:hover { background: rgba(241,240,236,.14); }
 .pp-lightbox-prev:hover { transform: translateY(-50%) translateX(-3px); }
 .pp-lightbox-next:hover { transform: translateY(-50%) translateX(3px); }
 .pp-lightbox-counter {
   margin-top: 18px;
   font-family: var(--font-body); font-size: 11px; font-weight: 600;
   letter-spacing: .28em; text-transform: uppercase;
-  color: rgba(245,243,238,.5);
+  color: rgba(241,240,236,.5);
 }
 .pp-lightbox-counter strong {
   font-family: var(--font-heading); font-style: italic;
@@ -980,7 +980,7 @@ body.pp-lb-open { overflow: hidden; }
   font-size: 1rem; color: var(--stone);
   display: block; margin-bottom: 3px;
 }
-.pp-toast-body { font-family: var(--font-body); font-size: 12px; color: rgba(212,206,192,.7); line-height: 1.5; }
+.pp-toast-body { font-family: var(--font-body); font-size: 12px; color: rgba(214,210,199,.7); line-height: 1.5; }
 
 /* ---------- MOBILE BOTTOM BAR ---------- */
 .pp-mobile-bar {
@@ -999,12 +999,12 @@ body.pp-lb-open { overflow: hidden; }
   padding: 10px 8px; border-radius: var(--r-md);
   font-family: var(--font-body); font-size: 11px; font-weight: 600;
   text-decoration: none; border: none; cursor: pointer;
-  background: rgba(245,243,238,.06);
+  background: rgba(241,240,236,.06);
   color: var(--stone); letter-spacing: .04em;
   transition: background .2s;
 }
 .pp-mb-btn i { font-size: 15px; }
-.pp-mb-btn:hover { background: rgba(245,243,238,.12); }
+.pp-mb-btn:hover { background: rgba(241,240,236,.12); }
 .pp-mb-btn.wa { background: rgba(37,211,102,.12); color: #25D366; }
 .pp-mb-btn.wa:hover { background: rgba(37,211,102,.2); }
 .pp-mb-btn.book { background: var(--gold); color: var(--ink); }
@@ -1059,7 +1059,7 @@ body.pp-lb-open { overflow: hidden; }
 
   .pp-calc-grid { grid-template-columns: 1fr; }
   .pp-calc-result { grid-template-columns: 1fr; }
-  .pp-calc-result-side { border-left: none; border-top: 1px solid rgba(212,206,192,.12); padding-left: 0; padding-top: 20px; }
+  .pp-calc-result-side { border-left: none; border-top: 1px solid rgba(214,210,199,.12); padding-left: 0; padding-top: 20px; }
 
   .pp-mobile-bar { display: grid; }
   .pp-layout { padding-bottom: 120px; }

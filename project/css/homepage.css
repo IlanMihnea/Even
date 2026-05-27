@@ -3,19 +3,20 @@
    Aligned with EVEN Brand Guidelines (design/brand)
    ============================================ */
 
-/* Local recalibrations from new brand kit */
+/* Local recalibrations · v1.1 restraint */
 body[data-page="home"] {
   --hp-ink: #1C2340;
   --hp-ink-soft: rgba(28, 35, 64, 0.78);
   --hp-ink-mute: rgba(28, 35, 64, 0.55);
-  --hp-rule: rgba(28, 35, 64, 0.16);
-  --hp-rule-soft: rgba(28, 35, 64, 0.08);
+  --hp-rule: rgba(28, 35, 64, 0.14);
+  --hp-rule-soft: rgba(28, 35, 64, 0.07);
 
   --hp-sage: #7A9B92;
-  --hp-pebble: #E0DACC;
-  --hp-linen: #F5F3EE;
-  --hp-stone: #D4CEC0;
-  --hp-gold: #C8A96E;
+  --hp-paper: #FAF8F2;       /* card surface — mai luminos decât bg */
+  --hp-linen: #F1F0EC;       /* răcit */
+  --hp-pebble: #E8E5DC;      /* desaturat, doar plate/band */
+  --hp-stone: #D6D2C7;       /* răcit */
+  --hp-gold: #C8A96E;        /* rar — italic H1 + dark band stats */
 
   background: var(--hp-linen);
   position: relative;
@@ -30,19 +31,19 @@ body[data-page="home"] {
   inset: 0;
   z-index: 0;
   pointer-events: none;
-  opacity: 0.55;
+  opacity: 0.28;
   mix-blend-mode: multiply;
-  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='220' height='220' viewBox='0 0 220 220'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='1.4' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.11   0 0 0 0 0.14   0 0 0 0 0.25   0 0 0 0.04 0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='220' height='220' viewBox='0 0 220 220'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='1.6' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.11   0 0 0 0 0.14   0 0 0 0 0.25   0 0 0 0.03 0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
 }
 
+/* v1.1 — scos radial gold wash (sursa principală a senzației „pagină gălbuie").
+   Păstrat doar un sage wash extrem de subtil în colțul opus pentru atmosferă. */
 .hp-bg-light {
   position: fixed;
   inset: 0;
   z-index: 0;
   pointer-events: none;
-  background:
-    radial-gradient(1100px 800px at 90% 20%, rgba(200, 169, 110, 0.10), transparent 60%),
-    radial-gradient(900px 700px at -5% 110%, rgba(122, 155, 146, 0.07), transparent 60%);
+  background: radial-gradient(900px 700px at -5% 110%, rgba(122, 155, 146, 0.05), transparent 60%);
 }
 
 /* Lift content above atmosphere */
@@ -71,7 +72,7 @@ body[data-page="home"] {
   color: var(--hp-sage);
   line-height: 1;
 }
-.hp-eyebrow-light { color: rgba(245, 243, 238, 0.78); }
+.hp-eyebrow-light { color: rgba(241, 240, 236, 0.78); }
 .hp-eyebrow-rule {
   display: inline-block;
   width: 28px;
@@ -132,10 +133,10 @@ body[data-page="home"] {
 .hp-btn-ghost {
   background: transparent;
   color: var(--hp-stone);
-  border-color: rgba(212, 206, 192, 0.42);
+  border-color: rgba(214, 210, 199, 0.42);
 }
 .hp-btn-ghost:hover {
-  background: rgba(212, 206, 192, 0.1);
+  background: rgba(214, 210, 199, 0.1);
   border-color: var(--hp-stone);
   color: var(--hp-stone);
 }
@@ -182,7 +183,7 @@ body[data-page="home"] {
   border-top: 1px solid var(--hp-rule);
   border-bottom: 1px solid var(--hp-rule);
   padding: 16px 0;
-  background: rgba(245, 243, 238, 0.7);
+  background: rgba(241, 240, 236, 0.7);
   backdrop-filter: blur(6px);
 }
 .hp-masthead-inner {
@@ -311,8 +312,8 @@ body[data-page="home"] {
 .hp-hero-vignette {
   position: absolute;
   inset: 0;
-  background:
-    radial-gradient(700px 500px at 95% 12%, rgba(200, 169, 110, 0.16), transparent 60%);
+  /* v1.1: vignette-ul gold a fost scos. Hero rămâne curat. */
+  background: transparent;
   pointer-events: none;
 }
 
@@ -352,15 +353,15 @@ body[data-page="home"] {
 .hp-hero-line { display: block; }
 .hp-hero-h1 em {
   font-style: italic;
-  color: var(--hp-gold);
+  color: var(--hp-gold);          /* singurul gold pe light — momentul de impact */
   font-weight: 500;
 }
 .hp-dropcap {
   font-family: var(--font-heading);
   font-style: italic;
   font-weight: 500;
-  font-size: 1.18em;
-  color: var(--hp-gold);
+  font-size: 1.05em;              /* redus de la 1.18em */
+  color: var(--hp-stone);          /* ink-soft pe dark hero — fără gold */
   letter-spacing: -0.025em;
   margin-right: 0.015em;
   display: inline-block;
@@ -368,7 +369,7 @@ body[data-page="home"] {
 .hp-hero-lede {
   font-family: var(--font-body);
   font-size: 1.05rem;
-  color: rgba(212, 206, 192, 0.88);
+  color: rgba(214, 210, 199, 0.88);
   line-height: 1.78;
   max-width: 500px;
   margin: 0 0 36px;
@@ -377,7 +378,7 @@ body[data-page="home"] {
   font-family: var(--font-heading);
   font-style: italic;
   font-weight: 500;
-  color: var(--hp-gold);
+  color: inherit;                  /* forma face emfaza, nu culoarea */
   font-size: 1.06em;
 }
 .hp-hero-actions {
@@ -391,7 +392,7 @@ body[data-page="home"] {
   display: flex;
   align-items: center;
   gap: 32px;
-  border-top: 1px solid rgba(212, 206, 192, 0.22);
+  border-top: 1px solid rgba(214, 210, 199, 0.22);
   padding-top: 24px;
   max-width: 480px;
 }
@@ -404,7 +405,7 @@ body[data-page="home"] {
   font-family: var(--font-heading);
   font-weight: 500;
   font-size: 2.4rem;
-  color: var(--hp-gold);
+  color: var(--hp-stone);          /* v1.1: pe dark hero = stone, nu gold */
   line-height: 1;
   letter-spacing: -0.015em;
   font-variant-numeric: lining-nums tabular-nums;
@@ -420,12 +421,12 @@ body[data-page="home"] {
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.16em;
-  color: rgba(212, 206, 192, 0.62);
+  color: rgba(214, 210, 199, 0.62);
 }
 .hp-trust-rule {
   width: 1px;
   height: 38px;
-  background: rgba(212, 206, 192, 0.22);
+  background: rgba(214, 210, 199, 0.22);
 }
 
 /* Hero feature card (editorial plate) */
@@ -439,7 +440,7 @@ body[data-page="home"] {
   position: relative;
   width: 100%;
   max-width: 380px;
-  background: var(--hp-pebble);
+  background: var(--hp-paper);     /* v1.1: paper (luminous) — hârtie pe masă */
   border-radius: 2px;
   box-shadow:
     0 36px 80px -28px rgba(0, 0, 0, 0.45),
@@ -492,7 +493,7 @@ body[data-page="home"] {
   aspect-ratio: 4 / 3;
   background:
     linear-gradient(135deg, rgba(28, 35, 64, 0.06), rgba(122, 155, 146, 0.10)),
-    var(--hp-pebble);
+    var(--hp-paper);
   display: flex;
   align-items: flex-end;
   padding: 18px;
@@ -510,21 +511,21 @@ body[data-page="home"] {
   background-position: center;
 }
 .hp-feature-image.has-photo::after { display: none; }
-.hp-feature-image.has-photo::before { border-color: rgba(245, 243, 238, 0.35); }
-/* Decorative stones inside the empty image */
+.hp-feature-image.has-photo::before { border-color: rgba(241, 240, 236, 0.35); }
+/* Decorative stones inside the empty image (când nu există foto) */
 .hp-feature-image::after {
   content: '';
   position: absolute;
   top: 38%;
   left: 50%;
   transform: translate(-50%, -50%);
-  width: 64px;
-  height: 64px;
+  width: 56px;
+  height: 56px;
   background:
-    radial-gradient(circle at 50% 25%, var(--hp-pebble) 0 9px, transparent 10px),
-    radial-gradient(circle at 50% 50%, var(--hp-sage) 0 11px, transparent 12px),
-    radial-gradient(circle at 50% 80%, var(--hp-ink) 0 13px, transparent 14px);
-  opacity: 0.6;
+    radial-gradient(circle at 50% 25%, rgba(28, 35, 64, 0.10) 0 8px, transparent 9px),
+    radial-gradient(circle at 50% 50%, var(--hp-sage) 0 10px, transparent 11px),
+    radial-gradient(circle at 50% 80%, var(--hp-ink) 0 12px, transparent 13px);
+  opacity: 0.4;
 }
 .hp-feature-tag {
   position: relative;
@@ -535,7 +536,7 @@ body[data-page="home"] {
   text-transform: uppercase;
   letter-spacing: 0.18em;
   color: var(--hp-ink);
-  background: rgba(245, 243, 238, 0.92);
+  background: rgba(241, 240, 236, 0.92);
   padding: 6px 12px;
   border-radius: 2px;
 }
@@ -743,7 +744,8 @@ body[data-page="home"] {
 }
 .hp-catalog-card {
   position: relative;
-  background: var(--hp-pebble);
+  background: var(--hp-paper);
+
   border-radius: 2px;
   padding: 32px 36px 36px;
   box-shadow:
@@ -806,7 +808,7 @@ body[data-page="home"] {
 .flux-tab.active {
   color: var(--hp-ink);
   border-color: var(--hp-ink);
-  background: rgba(245, 243, 238, 0.5);
+  background: rgba(241, 240, 236, 0.5);
 }
 .flux-tab.active .hp-tab-num {
   color: var(--hp-ink);
@@ -841,7 +843,7 @@ body[data-page="home"] {
 }
 .hp-catalog-filters input,
 .hp-catalog-filters select {
-  background: rgba(245, 243, 238, 0.6);
+  background: rgba(241, 240, 236, 0.6);
   border: 1px solid rgba(28, 35, 64, 0.14);
   border-radius: 2px;
   padding: 13px 14px;
@@ -1102,7 +1104,7 @@ body[data-page="home"] {
   transform: translateX(-50%);
   width: min(72%, 760px);
   height: 1px;
-  background: linear-gradient(to right, transparent, rgba(212, 206, 192, 0.28), transparent);
+  background: linear-gradient(to right, transparent, rgba(214, 210, 199, 0.28), transparent);
 }
 .hp-figures::before { top: 32px; }
 .hp-figures::after  { bottom: 32px; }
@@ -1146,7 +1148,7 @@ body[data-page="home"] {
 .hp-figures-lede {
   font-family: var(--font-body);
   font-size: 1rem;
-  color: rgba(212, 206, 192, 0.72);
+  color: rgba(214, 210, 199, 0.72);
   line-height: 1.75;
   margin: 0 auto 64px;
   max-width: 540px;
@@ -1186,13 +1188,13 @@ body[data-page="home"] {
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.24em;
-  color: rgba(212, 206, 192, 0.6);
+  color: rgba(214, 210, 199, 0.6);
   margin-top: 22px;
 }
 .hp-figure-rule {
   width: 1px;
   height: 96px;
-  background: rgba(212, 206, 192, 0.18);
+  background: rgba(214, 210, 199, 0.18);
 }
 .hp-figures-note {
   margin-top: 32px;
@@ -1201,7 +1203,7 @@ body[data-page="home"] {
   font-style: italic;
   font-weight: 500;
   font-size: 0.95rem;
-  color: rgba(212, 206, 192, 0.5);
+  color: rgba(214, 210, 199, 0.5);
   letter-spacing: 0.02em;
 }
 
@@ -1219,7 +1221,7 @@ body[data-page="home"] {
 .hp-voice {
   position: relative;
   padding: 36px 32px 32px;
-  background: var(--hp-pebble);
+  background: var(--hp-paper);
   border-radius: 2px;
   box-shadow: 0 24px 64px -28px rgba(28, 35, 64, 0.16);
   display: flex;
@@ -1337,6 +1339,16 @@ body[data-page="home"] {
   margin: 0 auto 48px;
   max-width: 540px;
 }
+.hp-letter-sig {
+  font-family: 'Mrs Saint Delafield', cursive;
+  font-weight: 400;
+  font-size: 3rem;
+  line-height: 1;
+  color: var(--hp-ink);
+  margin: 0 auto 40px;
+  letter-spacing: 0.005em;
+}
+
 .hp-letter-actions {
   display: inline-flex;
   gap: 14px;

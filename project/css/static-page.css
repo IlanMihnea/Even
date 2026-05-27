@@ -14,9 +14,9 @@ body[data-page="terms"] {
   --sp-rule: rgba(28, 35, 64, 0.14);
   --sp-rule-soft: rgba(28, 35, 64, 0.08);
   --sp-sage: #7A9B92;
-  --sp-pebble: #E0DACC;
-  --sp-linen: #F5F3EE;
-  --sp-stone: #D4CEC0;
+  --sp-pebble: #FAF8F2;
+  --sp-linen: #F1F0EC;
+  --sp-stone: #D6D2C7;
   --sp-gold: #C8A96E;
   background: var(--sp-linen);
   position: relative;
@@ -25,14 +25,13 @@ body[data-page="terms"] {
 
 .sp-bg-grain {
   position: fixed; inset: 0; z-index: 0; pointer-events: none;
-  opacity: 0.45; mix-blend-mode: multiply;
-  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='220' height='220'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='1.4' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.11 0 0 0 0 0.14 0 0 0 0 0.25 0 0 0 0.04 0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+  opacity: 0.28; mix-blend-mode: multiply;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='220' height='220'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='1.6' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.11 0 0 0 0 0.14 0 0 0 0 0.25 0 0 0 0.03 0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
 }
+/* v1.1 — gold radial scos */
 .sp-bg-light {
   position: fixed; inset: 0; z-index: 0; pointer-events: none;
-  background:
-    radial-gradient(900px 700px at 90% 10%, rgba(200, 169, 110, 0.08), transparent 60%),
-    radial-gradient(700px 600px at 0% 100%, rgba(122, 155, 146, 0.06), transparent 60%);
+  background: radial-gradient(900px 700px at 0% 100%, rgba(122, 155, 146, 0.05), transparent 60%);
 }
 
 .sp-masthead, .sp-hero, .sp-content, .sp-doc, .sp-cta, .sp-404, .sp-steps {
@@ -79,7 +78,7 @@ body[data-page="terms"] {
   border-top: 1px solid var(--sp-rule);
   border-bottom: 1px solid var(--sp-rule);
   padding: 16px 0;
-  background: rgba(245, 243, 238, 0.7);
+  background: rgba(241, 240, 236, 0.7);
   backdrop-filter: blur(6px);
 }
 .sp-masthead-inner {

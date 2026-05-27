@@ -13,9 +13,9 @@ body[data-page="about"] {
   --ed-rule-soft: rgba(28, 35, 64, 0.08);
 
   --ed-sage: #7A9B92;            /* recalibrated from new guidelines */
-  --ed-pebble: #E0DACC;
-  --ed-linen: #F5F3EE;
-  --ed-stone: #D4CEC0;
+  --ed-pebble: #FAF8F2;
+  --ed-linen: #F1F0EC;
+  --ed-stone: #D6D2C7;
   --ed-gold: #C8A96E;
 
   background: var(--ed-linen);
@@ -31,19 +31,18 @@ body[data-page="about"] {
   inset: 0;
   z-index: 0;
   pointer-events: none;
-  opacity: 0.55;
+  opacity: 0.28;
   mix-blend-mode: multiply;
-  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='220' height='220' viewBox='0 0 220 220'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='1.4' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.11   0 0 0 0 0.14   0 0 0 0 0.25   0 0 0 0.04 0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='220' height='220' viewBox='0 0 220 220'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='1.6' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.11   0 0 0 0 0.14   0 0 0 0 0.25   0 0 0 0.03 0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
 }
 
+/* v1.1 — gold radial scos */
 .ab-bg-light {
   position: fixed;
   inset: 0;
   z-index: 0;
   pointer-events: none;
-  background:
-    radial-gradient(1200px 800px at 88% -10%, rgba(200, 169, 110, 0.10), transparent 62%),
-    radial-gradient(900px 700px at -5% 105%, rgba(122, 155, 146, 0.08), transparent 60%);
+  background: radial-gradient(900px 700px at -5% 105%, rgba(122, 155, 146, 0.05), transparent 60%);
 }
 
 /* Lift content above atmosphere */
@@ -75,7 +74,7 @@ body[data-page="about"] {
   color: rgba(28, 35, 64, 0.65);
 }
 .ab-eyebrow-light {
-  color: rgba(212, 206, 192, 0.72);
+  color: rgba(214, 210, 199, 0.72);
 }
 
 /* ============================================
@@ -293,7 +292,7 @@ body[data-page="about"] {
 .ab-photo-edge {
   position: absolute;
   inset: 10px;
-  border: 1px solid rgba(245, 243, 238, 0.18);
+  border: 1px solid rgba(241, 240, 236, 0.18);
   pointer-events: none;
   z-index: 1;
 }
@@ -485,11 +484,13 @@ body[data-page="about"] {
   margin-bottom: 8px;
 }
 .ab-sig-name {
-  font-family: var(--font-heading);
-  font-style: italic;
-  font-weight: 500;
-  font-size: 1.05rem;
+  font-family: 'Mrs Saint Delafield', cursive;
+  font-weight: 400;
+  font-size: 2.4rem;
+  line-height: 1;
   color: var(--ed-ink);
+  letter-spacing: 0.005em;
+  margin-bottom: 4px;
 }
 .ab-sig-role {
   font-family: var(--font-body);
@@ -634,7 +635,7 @@ body[data-page="about"] {
   transform: translateX(-50%);
   width: min(72%, 720px);
   height: 1px;
-  background: linear-gradient(to right, transparent, rgba(212, 206, 192, 0.28), transparent);
+  background: linear-gradient(to right, transparent, rgba(214, 210, 199, 0.28), transparent);
 }
 .ab-figures::before { top: 32px; }
 .ab-figures::after  { bottom: 32px; }
@@ -705,13 +706,13 @@ body[data-page="about"] {
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.24em;
-  color: rgba(212, 206, 192, 0.6);
+  color: rgba(214, 210, 199, 0.6);
   margin-top: 22px;
 }
 .ab-figures-rule {
   width: 1px;
   height: 96px;
-  background: rgba(212, 206, 192, 0.18);
+  background: rgba(214, 210, 199, 0.18);
 }
 
 .ab-figures-note {
@@ -720,7 +721,7 @@ body[data-page="about"] {
   font-style: italic;
   font-weight: 500;
   font-size: 0.95rem;
-  color: rgba(212, 206, 192, 0.5);
+  color: rgba(214, 210, 199, 0.5);
   letter-spacing: 0.02em;
 }
 

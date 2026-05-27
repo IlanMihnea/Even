@@ -13,9 +13,9 @@
   --pc-rule-soft: rgba(28, 35, 64, 0.08);
   --pc-sage: #7A9B92;
   --pc-sage-text: #4F6B62;
-  --pc-pebble: #E0DACC;
-  --pc-linen: #F5F3EE;
-  --pc-stone: #D4CEC0;
+  --pc-pebble: #FAF8F2;
+  --pc-linen: #F1F0EC;
+  --pc-stone: #D6D2C7;
   --pc-gold: #C8A96E;
 }
 
@@ -112,7 +112,7 @@
   width: 34px;
   height: 34px;
   border-radius: 50%;
-  border: 1px solid rgba(245, 243, 238, 0.6);
+  border: 1px solid rgba(241, 240, 236, 0.6);
   background: rgba(28, 35, 64, 0.25);
   backdrop-filter: blur(6px);
   -webkit-backdrop-filter: blur(6px);
@@ -184,7 +184,7 @@
   color: var(--pc-linen);
   background: rgba(28, 35, 64, 0.8);
   padding: 8px 18px;
-  border: 1px solid rgba(245, 243, 238, 0.4);
+  border: 1px solid rgba(241, 240, 236, 0.4);
   transform: rotate(-6deg);
 }
 
@@ -458,7 +458,7 @@
   letter-spacing: 0;
   border: 1px solid var(--pc-rule);
   border-radius: 999px;
-  background: rgba(245, 243, 238, 0.5);
+  background: rgba(241, 240, 236, 0.5);
   color: var(--pc-ink-soft);
   cursor: pointer;
   transition: all 0.2s;
