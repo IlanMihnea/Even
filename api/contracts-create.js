@@ -9,7 +9,7 @@
 // → 201 { ok, contract_id, signers: [{ role, name, email, token, url }] }
 
 const supabase = require('./_supabase');
-const { buildSections } = require('./_contracts/content');
+const { buildBody, parseBody } = require('./_contracts/content');
 const { sendEmail, inviteEmail } = require('./_contracts/notify');
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -35,7 +35,7 @@ module.exports = async function handler(req, res) {
   const { data: userData, error: authErr } = await supabase.auth.getUser(jwt);
   if (authErr || !userData || !userData.user) return res.status(401).json({ error: 'Sesiune invalidă' });
 
-  const { title, template, meta = {}, terms = {}, signers } = req.body || {};
+  const { title, template, meta = {}, terms = {}, signers, bodyText, collectData } = req.body || {};
 
   if (!Array.isArray(signers) || signers.length === 0)
     return res.status(400).json({ error: 'Cel puțin un semnatar este obligatoriu' });
@@ -46,6 +46,9 @@ module.exports = async function handler(req, res) {
 
   const contractTitle = title || meta.title || 'Contract de intermediere imobiliară';
 
+  // Contract body: admin-composed text, or the default body.
+  const sections = bodyText && bodyText.trim() ? parseBody(bodyText) : buildBody(terms);
+
   // 1) contract row
   const { data: contract, error: cErr } = await supabase
     .from('contracts')
@@ -53,7 +56,7 @@ module.exports = async function handler(req, res) {
       status: 'sent',
       template: template || 'intermediere',
       title: contractTitle,
-      data: { meta, terms, sections: buildSections(terms) },
+      data: { meta, terms, sections, collectData: collectData !== false },
       sent_at: new Date().toISOString(),
     })
     .select('id')

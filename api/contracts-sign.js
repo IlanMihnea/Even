@@ -41,15 +41,21 @@ module.exports = async function handler(req, res) {
   if (!consent) return res.status(400).json({ error: 'Consimțământul este obligatoriu' });
   if (!signatureDataUrl || !/^data:image\/png;base64,/.test(signatureDataUrl))
     return res.status(400).json({ error: 'Semnătură lipsă' });
-  if (!client.name || !client.cnp) return res.status(400).json({ error: 'Nume și CNP obligatorii' });
 
-  // find signer
+  // find signer + its contract (to know whether personal data is required)
   const { data: signer, error } = await supabase
     .from('contract_signers')
-    .select('id, contract_id, role, name, email, status')
+    .select('id, contract_id, role, name, email, status, contracts(data)')
     .eq('token', token)
     .single();
   if (error || !signer) return res.status(404).json({ error: 'Link invalid sau expirat' });
+
+  const collectData = !(signer.contracts && signer.contracts.data && signer.contracts.data.collectData === false);
+  if (collectData) {
+    if (!client.name || !client.cnp) return res.status(400).json({ error: 'Nume și CNP obligatorii' });
+  } else if (!client.name) {
+    client.name = signer.name; // sign-only: fall back to the admin-provided name
+  }
 
   // idempotent: already signed → just report current state
   if (signer.status === 'signed') {

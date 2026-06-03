@@ -2,7 +2,7 @@
 // Returns the clauses + this signer's context. Never exposes other signers' CNP/CI.
 
 const supabase = require('./_supabase');
-const { buildSections } = require('./_contracts/content');
+const { pageParties, buildBody } = require('./_contracts/content');
 
 module.exports = async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -41,11 +41,13 @@ module.exports = async function handler(req, res) {
   const all = siblings || [];
   const signedSoFar = all.filter((s) => s.status === 'signed').map((s) => ({ name: s.name, role: s.role }));
 
+  const body = data.sections || buildBody(data.terms || {});
   return res.status(200).json({
     eyebrow: meta.eyebrow || 'Contract',
     title: contract.title || meta.title || 'Contract',
     subtitle: meta.subtitle || '',
-    sections: data.sections || buildSections(data.terms || {}),
+    sections: [pageParties()].concat(body),       // generic "Părțile" + authored body
+    collectData: data.collectData !== false,       // false → sign-only (no personal-data form)
     signer: { role: signer.role, name: signer.name },
     total: all.length,
     signedSoFar,

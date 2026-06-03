@@ -168,13 +168,17 @@
     $('sgnLoading').hidden = true;
     $('sgnApp').hidden = false;
 
+    // sign-only contracts: hide the personal-data form, just sign
+    const collect = data.collectData !== false;
+    if (!collect) $('sgnDataCard').hidden = true;
+
     const pad = SignaturePad($('sgnPad'));
     const form = $('sgnForm');
     const consent = $('sgnConsent');
     const submit = $('sgnSubmit');
 
     function valid() {
-      return form.checkValidity() && consent.checked && !pad.isEmpty();
+      return (collect ? form.checkValidity() : true) && consent.checked && !pad.isEmpty();
     }
     function refresh() { submit.disabled = !valid(); }
 
@@ -190,7 +194,7 @@
       const fd = new FormData(form);
       const payload = {
         token,
-        client: Object.fromEntries(fd.entries()),
+        client: collect ? Object.fromEntries(fd.entries()) : { name: (data.signer && data.signer.name) || '' },
         signatureDataUrl: pad.toDataURL(),
         consent: true,
         signedAtClient: new Date().toISOString(),

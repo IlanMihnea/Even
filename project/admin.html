@@ -14,6 +14,7 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   <link rel="stylesheet" href="css/main.css">
   <link rel="stylesheet" href="css/admin.css">
+  <link rel="stylesheet" href="css/admin-contracts.css">
 </head>
 <body data-page="admin" class="apl">
 
@@ -66,6 +67,9 @@
         </a>
         <a class="apl-nav-link" data-route="agenti" href="#agenti">
           <i class="fa-solid fa-id-badge"></i><span>Agenți</span>
+        </a>
+        <a class="apl-nav-link" data-route="contracte" href="#contracte">
+          <i class="fa-solid fa-file-signature"></i><span>Contracte</span>
         </a>
         <div class="apl-nav-sep"></div>
         <a class="apl-nav-link" data-route="setari" href="#setari">
@@ -282,6 +286,25 @@
         </div>
       </section>
 
+      <!-- VIEW: CONTRACTE -->
+      <section class="apl-view" id="view-contracte" data-route="contracte">
+        <header class="apl-view-head">
+          <div>
+            <span class="apl-eyebrow">Documente</span>
+            <h1>Contracte</h1>
+            <p class="apl-view-sub">Trimite contracte la semnat digital. Fiecare semnatar primește linkul lui; PDF-ul semnat ajunge la toți pe email.</p>
+          </div>
+          <div class="apl-view-actions">
+            <button class="apl-btn apl-btn-secondary" onclick="renderContracts()"><i class="fa-solid fa-rotate"></i> Reîncarcă</button>
+            <button class="apl-btn apl-btn-primary btn-gold" onclick="openContractModal()"><i class="fa-solid fa-plus"></i> Contract nou</button>
+          </div>
+        </header>
+
+        <div class="apl-section">
+          <div id="contractsWrap" class="apl-tablewrap"></div>
+        </div>
+      </section>
+
       <!-- VIEW: SETARI -->
       <section class="apl-view" id="view-setari" data-route="setari">
         <header class="apl-view-head">
@@ -412,6 +435,52 @@
     </div>
   </div>
 
+  <!-- MODAL CONTRACT NOU -->
+  <div class="modal" id="contractModal">
+    <div class="modal-card" style="max-width:780px">
+      <div class="modal-close" onclick="closeContractModal()"><i class="fa-solid fa-xmark"></i></div>
+      <h2>Contract nou</h2>
+      <p class="modal-sub">Compune contractul, adaugă semnatarii și trimite. Fiecare primește linkul lui de semnare pe email.</p>
+      <form onsubmit="submitContract(event)">
+        <div class="ct-grid">
+          <label class="ct-field ct-col2"><span>Titlu contract</span>
+            <input type="text" id="ctTitle" required value="Contract de intermediere imobiliară"></label>
+          <label class="ct-field ct-col2"><span>Subtitlu (opțional)</span>
+            <input type="text" id="ctSubtitle" placeholder="— mandat de vânzare —"></label>
+          <label class="ct-field"><span>Nr. (opțional)</span>
+            <input type="text" id="ctNr" placeholder="2026-014"></label>
+          <label class="ct-field"><span>Data (opțional)</span>
+            <input type="text" id="ctDate" placeholder="03.06.2026"></label>
+        </div>
+
+        <label class="ct-check">
+          <input type="checkbox" id="ctSignOnly">
+          <span><b>Doar semnătură</b> — semnatarii nu completează date personale (CNP/CI), doar semnează.</span>
+        </label>
+
+        <label class="ct-field"><span>Corpul contractului</span>
+          <textarea id="ctBody" rows="14" spellcheck="false"></textarea>
+        </label>
+        <p class="ct-hint">
+          Secțiunea <b>I. Părțile</b> e generată automat (agenția + semnatarii) — scrie de la <b>art. II</b> încolo.
+          Format: rândurile care încep cu <code>#</code> sunt titluri de secțiune; pune numărul clauzei la început
+          (ex. <code>2.1.</code>); încadrează textul cu <code>**…**</code> pentru <b>îngroșat</b>.
+        </p>
+
+        <div class="ct-signers-head">
+          <span>Semnatari</span>
+          <button type="button" class="apl-btn apl-btn-ghost apl-btn-sm" onclick="addSignerRow()"><i class="fa-solid fa-plus"></i> Adaugă</button>
+        </div>
+        <div id="ctSigners"></div>
+
+        <div class="modal-actions">
+          <button type="button" class="apl-btn apl-btn-ghost" onclick="closeContractModal()">Anulează</button>
+          <button type="submit" class="apl-btn apl-btn-primary" id="ctSubmitBtn"><i class="fa-solid fa-paper-plane"></i> Creează și trimite</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
   <!-- MODAL MATCH LIST -->
   <div class="modal" id="matchesModal">
     <div class="modal-card" style="max-width:600px">
@@ -464,10 +533,10 @@
   <!-- ROUTER -->
   <script>
     (function(){
-      const ROUTES = ['cereri','proprietati','cumparatori','proiecte','agenti','setari'];
+      const ROUTES = ['cereri','proprietati','cumparatori','proiecte','agenti','contracte','setari'];
       const LABELS = {
         cereri:'Cereri', proprietati:'Proprietăți', cumparatori:'Cumpărători',
-        proiecte:'Proiecte', agenti:'Agenți', setari:'Setări'
+        proiecte:'Proiecte', agenti:'Agenți', contracte:'Contracte', setari:'Setări'
       };
       function go(route){
         if(!ROUTES.includes(route)) route = 'cereri';
@@ -496,7 +565,7 @@
         addModal:'closeAddModal', projectModal:'closeProjectModal',
         agentModal:'closeAgentModal', leadModal:'closeLeadModal',
         buyerModal:'closeBuyerModal', matchesModal:'closeMatchesModal',
-        importModal:'closeImportModal'
+        importModal:'closeImportModal', contractModal:'closeContractModal'
       };
       function closeTopModal(){
         const open = document.querySelector('.modal.open');
@@ -553,5 +622,6 @@
   <script src="js/db.js"></script>
   <script src="js/main.js"></script>
   <script src="js/admin.js"></script>
+  <script src="js/admin-contracts.js"></script>
 </body>
 </html>

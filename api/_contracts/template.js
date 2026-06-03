@@ -24,7 +24,7 @@ const SERIF = 'Cormorant';
 const SANS = 'DMSans';
 const CONTENT_W = 467; // A4 width (595.28) minus 64pt L/R margins
 
-const { buildSections, parseRuns, AGENCY_CLAUSE } = require('./content');
+const { buildBody, parseRuns, AGENCY_CLAUSE } = require('./content');
 
 // ---- fixed agency identity ----
 const AGENCY = {
@@ -93,15 +93,18 @@ function centeredAnd() {
 
 // ---------- parties ----------
 function personRun(p) {
-  return [
-    b((p.name || '____________________').toUpperCase()),
-    t(', domiciliat'), p.feminine ? t('ă') : t(''), t(' în '), field(p.domiciliu, '[domiciliu]'),
-    t(', CNP '), field(p.cnp, '[__________]'),
-    t(', CI seria '), field(p.ciSeria, '[___]'), t(' nr. '), field(p.ciNr, '[______]'),
-    ...(p.telefon || p.email
-      ? [t(', telefon '), field(p.telefon, '[__________]'), t(', e-mail '), field(p.email, '[__________]')]
-      : []),
-  ];
+  const name = b((p.name || '____________________').toUpperCase());
+  // sign-only (no personal data collected): just the name.
+  const hasData = p.cnp || p.domiciliu || p.ciSeria || p.ciNr;
+  if (!hasData) return [name];
+
+  const out = [name];
+  if (p.domiciliu) out.push(t(', domiciliat'), p.feminine ? t('ă') : t(''), t(' în '), field(p.domiciliu));
+  if (p.cnp) out.push(t(', CNP '), field(p.cnp));
+  if (p.ciSeria || p.ciNr) out.push(t(', CI seria '), field(p.ciSeria), t(' nr. '), field(p.ciNr));
+  if (p.telefon) out.push(t(', telefon '), field(p.telefon));
+  if (p.email) out.push(t(', e-mail '), field(p.email));
+  return out;
 }
 
 function buildClientClause(persons, label) {
@@ -205,7 +208,7 @@ function buildContractDoc(data = {}) {
         name: p.name, role: client.label || 'Semnatar', position: i + 1, clientData: p,
       }));
   const persons = signers.map((s) => ({ name: s.name, role: s.role, ...(s.clientData || {}) }));
-  const sections = data.sections || buildSections(terms);
+  const sections = data.sections || buildBody(terms);
 
   const content = [];
 
@@ -240,9 +243,9 @@ function buildContractDoc(data = {}) {
   content.push(buildClientClause(persons, clientLabel));
   content.push(clause(null, 'au convenit încheierea prezentului contract.'));
 
-  // === II.+ — clauses from the shared single source (content.js) ===
-  sections.slice(1).forEach((s) => {
-    content.push(section(s.h));
+  // === II.+ — the authored contract body (admin-composed, or default) ===
+  sections.forEach((s) => {
+    if (s.h) content.push(section(s.h));
     (s.c || []).forEach((cl) => content.push(clause(cl.n, runs(cl.t))));
   });
 

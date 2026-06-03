@@ -1,7 +1,9 @@
-// EVEN — single source of truth for the contract clause text.
-// Consumed by BOTH the signing page (via /api/contracts-get) and the final PDF
-// (via template.js), so the legal text can never drift between them.
-// Bold is marked inline with **double asterisks**.
+// EVEN — contract clause content + the text⇄structure converters used by the
+// admin composer, the signing page (/api/contracts-get) and the final PDF
+// (template.js). Bold is marked inline with **double asterisks**.
+//
+// Section I ("Părțile") is ALWAYS generated automatically (agency + the signers).
+// The admin authors the BODY (art. II onward); buildBody() is the default text.
 
 const AGENCY_CLAUSE =
   '**AMIT ESTATE S.R.L.**, cu sediul social în România, Piatra Neamț, jud. Neamț, ' +
@@ -11,9 +13,16 @@ const AGENCY_CLAUSE =
   'telefon +40745609366, e-mail ilan@even-imobiliare.ro, denumită în continuare ' +
   '**AGENȚIA** (Intermediarul),';
 
-// Returns the full clause structure (I–VII). Section I is shown generically here;
-// the PDF replaces section I's client paragraph with the actual signers' data.
-function buildSections(terms = {}) {
+// Generic "Părțile" section for the signing page (the PDF builds it from real data).
+function pageParties() {
+  return { h: 'I. Părțile', c: [
+    { n: '1.', t: AGENCY_CLAUSE },
+    { n: '2.', t: '**PROPRIETARUL** (Clientul), reprezentat de semnatarii identificați mai jos, care semnează prezentul contract.' },
+  ]};
+}
+
+// Default contract BODY (art. II onward) as structured sections.
+function buildBody(terms = {}) {
   const pret = terms.pret || '350.000 EUR';
   const comision = terms.comision || '3% din prețul de vânzare';
   const comisionPrag = terms.comisionPrag || '4% din prețul de vânzare';
@@ -23,10 +32,6 @@ function buildSections(terms = {}) {
     'face obiectul prezentului contract, conform descrierii și actelor puse la dispoziție de Proprietar.';
 
   return [
-    { h: 'I. Părțile', c: [
-      { n: '1.', t: AGENCY_CLAUSE },
-      { n: '2.', t: '**PROPRIETARUL** (Clientul), reprezentat de semnatarii identificați mai jos, care își completează datele personale și semnează prezentul contract.' },
-    ]},
     { h: 'II. Obiectul contractului', c: [
       { n: '2.1.', t: propertyText },
       { n: '2.3.', t: 'Prețul de vânzare solicitat este de **' + pret + '**. Poate fi modificat numai prin acordul scris al părților.' },
@@ -54,6 +59,31 @@ function buildSections(terms = {}) {
   ];
 }
 
+// sections -> editable text (for the admin composer textarea).
+//   "# Heading" starts a section; clause lines keep their number prefix.
+function sectionsToText(sections) {
+  return (sections || []).map((s) =>
+    '# ' + s.h + '\n' + (s.c || []).map((cl) => (cl.n ? cl.n + ' ' : '') + cl.t).join('\n')
+  ).join('\n\n');
+}
+
+// editable text -> sections. Lines starting with "#" are headings; a leading
+// "1." / "2.1." / "3.3." becomes the clause number; everything else is body text.
+function parseBody(text) {
+  const sections = [];
+  let cur = null;
+  for (const raw of String(text || '').split(/\r?\n/)) {
+    const line = raw.trim();
+    if (!line) continue;
+    if (line.startsWith('#')) { cur = { h: line.replace(/^#+\s*/, ''), c: [] }; sections.push(cur); continue; }
+    if (!cur) { cur = { h: '', c: [] }; sections.push(cur); }
+    const m = line.match(/^(\d+(?:\.\d+)*\.)\s+(.*)$/);
+    if (m) cur.c.push({ n: m[1], t: m[2] });
+    else cur.c.push({ n: null, t: line });
+  }
+  return sections;
+}
+
 // "a **b** c" -> [{text:'a '},{text:'b',bold:true},{text:' c'}]
 function parseRuns(text) {
   const parts = [];
@@ -68,4 +98,4 @@ function parseRuns(text) {
   return parts;
 }
 
-module.exports = { buildSections, parseRuns, AGENCY_CLAUSE };
+module.exports = { AGENCY_CLAUSE, pageParties, buildBody, sectionsToText, parseBody, parseRuns };
