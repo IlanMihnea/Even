@@ -73,6 +73,7 @@ module.exports = async function handler(req, res) {
     role: s.role || null,
     name: s.name || null,
     email: s.email,
+    client_data: s.clientData || null, // admin pre-fills this in sign-only mode
     status: 'pending',
   }));
   const { data: signerRows, error: sErr } = await supabase

@@ -454,8 +454,8 @@
         </div>
 
         <label class="ct-check">
-          <input type="checkbox" id="ctSignOnly">
-          <span><b>Doar semnătură</b> — semnatarii nu completează date personale (CNP/CI), doar semnează.</span>
+          <input type="checkbox" id="ctSignOnly" onchange="applySignOnly()">
+          <span><b>Doar semnătură</b> — completez eu datele personale (CNP/CI) aici, iar semnatarii doar semnează. Lasă nebifat dacă vrei ca semnatarii să-și completeze singuri datele.</span>
         </label>
 
         <label class="ct-field"><span>Corpul contractului</span>

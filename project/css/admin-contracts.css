@@ -51,7 +51,10 @@
 .ct-signers-head > span { font-size: 0.74rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; color: var(--gray-500); }
 .apl-btn-sm { padding: 6px 12px !important; font-size: 0.8rem !important; }
 
-.ct-signer-row { display: grid; grid-template-columns: 1fr 1.2fr 1.4fr auto; gap: 8px; margin-bottom: 8px; align-items: center; }
+.ct-signer-row { display: flex; flex-direction: column; gap: 8px; margin-bottom: 12px; padding-bottom: 12px; border-bottom: 1px dashed var(--pebble); }
+.ct-signer-row:last-child { border-bottom: none; }
+.ct-s-main { display: grid; grid-template-columns: 1fr 1.2fr 1.4fr auto; gap: 8px; align-items: center; }
+.ct-s-extra { display: none; grid-template-columns: 1.6fr 1.1fr 0.7fr 0.8fr 1fr; gap: 8px; }
 .ct-signer-row input {
   font-family: var(--font-body); font-size: 0.9rem; color: var(--midnight);
   background: var(--white); border: 1px solid var(--stone); border-radius: var(--r-sm); padding: 10px 11px; width: 100%; box-sizing: border-box;
@@ -72,6 +75,7 @@
 
 @media (max-width: 600px) {
   .ct-grid { grid-template-columns: 1fr; }
-  .ct-signer-row { grid-template-columns: 1fr 1fr; }
-  .ct-signer-row .ct-s-email { grid-column: 1 / -1; }
+  .ct-s-main { grid-template-columns: 1fr 1fr auto; }
+  .ct-s-main .ct-s-email { grid-column: 1 / -1; }
+  .ct-s-extra { grid-template-columns: 1fr 1fr; }
 }

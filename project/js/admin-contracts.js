@@ -100,26 +100,57 @@ function closeContractModal() { document.getElementById('contractModal').classLi
 
 function addSignerRow(data) {
   data = data || {};
+  const cd = data.clientData || {};
   const box = document.getElementById('ctSigners');
   const row = document.createElement('div');
   row.className = 'ct-signer-row';
   row.innerHTML =
-    '<input type="text" placeholder="Rol (ex. Proprietar)" class="ct-s-role" value="' + escapeHtmlAdm(data.role || '') + '">' +
-    '<input type="text" placeholder="Nume" class="ct-s-name" value="' + escapeHtmlAdm(data.name || '') + '">' +
-    '<input type="email" placeholder="Email" class="ct-s-email" value="' + escapeHtmlAdm(data.email || '') + '">' +
-    '<button type="button" class="ct-s-del" onclick="this.closest(\'.ct-signer-row\').remove()" aria-label="Șterge"><i class="fa-solid fa-xmark"></i></button>';
+    '<div class="ct-s-main">' +
+      '<input type="text" placeholder="Rol (ex. Proprietar)" class="ct-s-role" value="' + escapeHtmlAdm(data.role || '') + '">' +
+      '<input type="text" placeholder="Nume și prenume" class="ct-s-name" value="' + escapeHtmlAdm(data.name || '') + '">' +
+      '<input type="email" placeholder="Email" class="ct-s-email" value="' + escapeHtmlAdm(data.email || '') + '">' +
+      '<button type="button" class="ct-s-del" onclick="this.closest(\'.ct-signer-row\').remove()" aria-label="Șterge"><i class="fa-solid fa-xmark"></i></button>' +
+    '</div>' +
+    '<div class="ct-s-extra">' +
+      '<input type="text" placeholder="Domiciliu (localitate, județ)" class="ct-s-domiciliu" value="' + escapeHtmlAdm(cd.domiciliu || '') + '">' +
+      '<input type="text" placeholder="CNP" class="ct-s-cnp" value="' + escapeHtmlAdm(cd.cnp || '') + '">' +
+      '<input type="text" placeholder="CI seria" class="ct-s-ciSeria" value="' + escapeHtmlAdm(cd.ciSeria || '') + '">' +
+      '<input type="text" placeholder="CI nr." class="ct-s-ciNr" value="' + escapeHtmlAdm(cd.ciNr || '') + '">' +
+      '<input type="text" placeholder="Telefon" class="ct-s-telefon" value="' + escapeHtmlAdm(cd.telefon || '') + '">' +
+    '</div>';
   box.appendChild(row);
+  applySignOnly();
+}
+
+// Show the per-signer personal-data fields only in "doar semnătură" mode (admin fills them).
+function applySignOnly() {
+  const on = document.getElementById('ctSignOnly').checked;
+  document.querySelectorAll('#ctSigners .ct-s-extra').forEach(function (e) { e.style.display = on ? 'grid' : 'none'; });
 }
 
 async function submitContract(e) {
   e.preventDefault();
   const btn = document.getElementById('ctSubmitBtn');
+  const signOnly = document.getElementById('ctSignOnly').checked;
   const signers = [].slice.call(document.querySelectorAll('#ctSigners .ct-signer-row')).map(function (r) {
-    return {
+    const name = r.querySelector('.ct-s-name').value.trim();
+    const s = {
       role: r.querySelector('.ct-s-role').value.trim(),
-      name: r.querySelector('.ct-s-name').value.trim(),
+      name: name,
       email: r.querySelector('.ct-s-email').value.trim(),
     };
+    if (signOnly) {
+      // admin fills the personal data here; signer just signs
+      s.clientData = {
+        name: name,
+        domiciliu: r.querySelector('.ct-s-domiciliu').value.trim(),
+        cnp: r.querySelector('.ct-s-cnp').value.trim(),
+        ciSeria: r.querySelector('.ct-s-ciSeria').value.trim(),
+        ciNr: r.querySelector('.ct-s-ciNr').value.trim(),
+        telefon: r.querySelector('.ct-s-telefon').value.trim(),
+      };
+    }
+    return s;
   }).filter(function (s) { return s.email; });
   if (!signers.length) { ctNotify('Adaugă cel puțin un semnatar cu email.', false); return; }
 

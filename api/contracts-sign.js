@@ -45,16 +45,24 @@ module.exports = async function handler(req, res) {
   // find signer + its contract (to know whether personal data is required)
   const { data: signer, error } = await supabase
     .from('contract_signers')
-    .select('id, contract_id, role, name, email, status, contracts(data)')
+    .select('id, contract_id, role, name, email, status, client_data, contracts(data)')
     .eq('token', token)
     .single();
   if (error || !signer) return res.status(404).json({ error: 'Link invalid sau expirat' });
 
   const collectData = !(signer.contracts && signer.contracts.data && signer.contracts.data.collectData === false);
+
+  // What gets stored as this signer's data:
+  //  - "with completion": the data the signer typed on the page
+  //  - "sign-only": the data the admin pre-filled at creation (don't overwrite it)
+  let finalClientData;
   if (collectData) {
     if (!client.name || !client.cnp) return res.status(400).json({ error: 'Nume și CNP obligatorii' });
-  } else if (!client.name) {
-    client.name = signer.name; // sign-only: fall back to the admin-provided name
+    finalClientData = client;
+  } else {
+    finalClientData = (signer.client_data && Object.keys(signer.client_data).length)
+      ? signer.client_data
+      : { name: client.name || signer.name };
   }
 
   // idempotent: already signed → just report current state
@@ -64,7 +72,7 @@ module.exports = async function handler(req, res) {
   }
 
   const signedAtLocal = nowLocal();
-  const audit = { email: client.email || signer.email, ip: clientIp(req), userAgent: userAgent || req.headers['user-agent'] || null, signedAtLocal };
+  const audit = { email: finalClientData.email || signer.email, ip: clientIp(req), userAgent: userAgent || req.headers['user-agent'] || null, signedAtLocal };
 
   // record this signature
   const { error: upErr } = await supabase
@@ -73,7 +81,7 @@ module.exports = async function handler(req, res) {
       status: 'signed',
       signed_at: new Date().toISOString(),
       gdpr_consent: true,
-      client_data: client,
+      client_data: finalClientData,
       signature: { imageDataUrl: signatureDataUrl, signedAt: signedAtLocal },
       audit,
     })
