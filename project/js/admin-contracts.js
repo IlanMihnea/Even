@@ -32,6 +32,15 @@ async function adminToken() {
   return (data && data.session && data.session.access_token) || null;
 }
 
+// Build an API URL on the canonical host. The apex domain 308-redirects to www,
+// which breaks the CORS preflight on POST (authorization header) → "failed to fetch".
+// Targeting www directly avoids the redirect.
+function apiUrl(path) {
+  let origin = location.origin;
+  if (location.hostname === 'even-imobiliare.ro') origin = 'https://www.even-imobiliare.ro';
+  return origin + path;
+}
+
 async function renderContracts() {
   const wrap = document.getElementById('contractsWrap');
   if (!wrap) return;
@@ -133,7 +142,7 @@ async function submitContract(e) {
   const old = btn.innerHTML;
   btn.innerHTML = 'Se trimite...';
   try {
-    const res = await fetch('/api/contracts-create', {
+    const res = await fetch(apiUrl('/api/contracts-create'), {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
       body: JSON.stringify(payload),

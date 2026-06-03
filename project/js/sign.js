@@ -8,6 +8,11 @@
   const $ = (id) => document.getElementById(id);
   const token = new URLSearchParams(location.search).get('token');
 
+  // Target the canonical host: the apex domain 308-redirects to www, which breaks
+  // the CORS preflight on the sign POST → "failed to fetch".
+  const apiUrl = (path) =>
+    (location.hostname === 'even-imobiliare.ro' ? 'https://www.even-imobiliare.ro' : location.origin) + path;
+
   // ── sample contract for preview mode (mirrors api/_contracts/template.js) ──
   const SAMPLE = {
     eyebrow: 'Contract',
@@ -154,7 +159,7 @@
     let data = SAMPLE;
     if (token) {
       try {
-        const res = await fetch('/api/contracts-get?token=' + encodeURIComponent(token));
+        const res = await fetch(apiUrl('/api/contracts-get?token=' + encodeURIComponent(token)));
         if (!res.ok) throw new Error('not_found');
         data = await res.json();
       } catch (err) {
@@ -211,7 +216,7 @@
           result = remaining > 0 ? { status: 'partial', remaining, preview: true }
                                  : { status: 'signed', preview: true };
         } else {
-          const res = await fetch('/api/contracts-sign', {
+          const res = await fetch(apiUrl('/api/contracts-sign'), {
             method: 'POST', headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(payload),
           });
