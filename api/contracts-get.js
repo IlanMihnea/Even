@@ -2,7 +2,7 @@
 // Returns the clauses + this signer's context. Never exposes other signers' CNP/CI.
 
 const supabase = require('./_supabase');
-const { pageParties, buildBody } = require('./_contracts/content');
+const { partiesSection, buildBody } = require('./_contracts/content');
 
 module.exports = async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -36,17 +36,20 @@ module.exports = async function handler(req, res) {
   // siblings: total count + who already signed (names/roles only — no personal data)
   const { data: siblings } = await supabase
     .from('contract_signers')
-    .select('name, role, status')
-    .eq('contract_id', signer.contract_id);
+    .select('name, role, status, position, client_data')
+    .eq('contract_id', signer.contract_id)
+    .order('position', { ascending: true });
   const all = siblings || [];
   const signedSoFar = all.filter((s) => s.status === 'signed').map((s) => ({ name: s.name, role: s.role }));
 
+  // "Părțile" built from the real signers (incl. data the admin filled in sign-only mode)
+  const parties = partiesSection(all.map((s) => ({ name: s.name, role: s.role, clientData: s.client_data })));
   const body = data.sections || buildBody(data.terms || {});
   return res.status(200).json({
     eyebrow: meta.eyebrow || 'Contract',
     title: contract.title || meta.title || 'Contract',
     subtitle: meta.subtitle || '',
-    sections: [pageParties()].concat(body),       // generic "Părțile" + authored body
+    sections: [parties].concat(body),              // real "Părțile" + authored body
     collectData: data.collectData !== false,       // false → sign-only (no personal-data form)
     signer: { role: signer.role, name: signer.name },
     total: all.length,

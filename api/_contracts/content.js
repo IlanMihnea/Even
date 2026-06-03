@@ -13,11 +13,34 @@ const AGENCY_CLAUSE =
   'telefon +40745609366, e-mail ilan@even-imobiliare.ro, denumită în continuare ' +
   '**AGENȚIA** (Intermediarul),';
 
-// Generic "Părțile" section for the signing page (the PDF builds it from real data).
-function pageParties() {
+// Builds the client paragraph of "Părțile" from the signers' data (names + any
+// personal data the admin filled / the signer entered). Used by BOTH the signing
+// page and the PDF so they always match. Bold via ** markers.
+function clientClauseText(signers, label) {
+  label = label || 'PROPRIETARUL';
+  const list = (signers || []).length ? signers : [{}];
+  const parts = list.map((s) => {
+    const cd = s.clientData || s.client_data || {};
+    const name = (s.name || cd.name || '____________________').toUpperCase();
+    let line = '**' + name + '**';
+    const bits = [];
+    if (cd.domiciliu) bits.push((cd.feminine ? 'domiciliată' : 'domiciliat') + ' în ' + cd.domiciliu);
+    if (cd.cnp) bits.push('CNP ' + cd.cnp);
+    if (cd.ciSeria || cd.ciNr) bits.push('CI seria ' + (cd.ciSeria || '—') + ' nr. ' + (cd.ciNr || '—'));
+    if (cd.telefon) bits.push('telefon ' + cd.telefon);
+    if (cd.email) bits.push('e-mail ' + cd.email);
+    if (bits.length) line += ', ' + bits.join(', ');
+    return line;
+  });
+  return parts.join(', împreună cu ') +
+    ', denumi' + (parts.length > 1 ? 'ți' : 't') + ' în continuare **' + label + '** (Clientul).';
+}
+
+// Section I ("Părțile") = fixed agency clause + the signers paragraph.
+function partiesSection(signers, label) {
   return { h: 'I. Părțile', c: [
     { n: '1.', t: AGENCY_CLAUSE },
-    { n: '2.', t: '**PROPRIETARUL** (Clientul), reprezentat de semnatarii identificați mai jos, care semnează prezentul contract.' },
+    { n: '2.', t: clientClauseText(signers, label) },
   ]};
 }
 
@@ -98,4 +121,4 @@ function parseRuns(text) {
   return parts;
 }
 
-module.exports = { AGENCY_CLAUSE, pageParties, buildBody, sectionsToText, parseBody, parseRuns };
+module.exports = { AGENCY_CLAUSE, partiesSection, clientClauseText, buildBody, sectionsToText, parseBody, parseRuns };

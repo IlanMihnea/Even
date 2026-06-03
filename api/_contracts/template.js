@@ -24,7 +24,7 @@ const SERIF = 'Cormorant';
 const SANS = 'DMSans';
 const CONTENT_W = 467; // A4 width (595.28) minus 64pt L/R margins
 
-const { buildBody, parseRuns, AGENCY_CLAUSE } = require('./content');
+const { buildBody, parseRuns, AGENCY_CLAUSE, clientClauseText } = require('./content');
 
 // ---- fixed agency identity ----
 const AGENCY = {
@@ -240,7 +240,7 @@ function buildContractDoc(data = {}) {
   content.push(section('I.  Părțile'));
   content.push(clause('1.', runs(AGENCY_CLAUSE)));
   content.push(centeredAnd());
-  content.push(buildClientClause(persons, clientLabel));
+  content.push(clause('2.', runs(clientClauseText(signers, clientLabel))));
   content.push(clause(null, 'au convenit încheierea prezentului contract.'));
 
   // === II.+ — the authored contract body (admin-composed, or default) ===
