@@ -2,5 +2,8 @@
   "outputDirectory": "project",
   "rewrites": [
     { "source": "/banner", "destination": "/banner.html" }
-  ]
+  ],
+  "functions": {
+    "api/contracts-sign.js": { "includeFiles": "api/_contracts/fonts/**" }
+  }
 }

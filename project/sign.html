@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+  <meta charset="UTF-8">
+  <link rel="icon" href="favicon.ico" sizes="any">
+  <link rel="icon" type="image/svg+xml" href="design/logomark-even.svg">
+  <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Semnează contractul · EVEN</title>
+  <meta name="robots" content="noindex">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500;1,600&family=DM+Sans:wght@400;500;600;700&family=Mrs+Saint+Delafield&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/main.css">
+  <link rel="stylesheet" href="css/sign.css">
+</head>
+<body class="sgn">
+
+  <!-- top bar -->
+  <header class="sgn-top">
+    <div class="sgn-top-inner">
+      <a class="sgn-mark" href="/">E V E N</a>
+      <span class="sgn-secure"><i class="lock" aria-hidden="true"></i>Semnătură electronică securizată</span>
+    </div>
+  </header>
+
+  <!-- loading -->
+  <div id="sgnLoading" class="sgn-loading">
+    <div class="sgn-spinner" aria-hidden="true"></div>
+    <p>Se încarcă contractul…</p>
+  </div>
+
+  <!-- error / expired -->
+  <div id="sgnError" class="sgn-state" hidden>
+    <h1>Link indisponibil</h1>
+    <p id="sgnErrorMsg">Acest link de semnare nu este valid sau a expirat. Contactează agenția pentru un link nou.</p>
+  </div>
+
+  <!-- main flow -->
+  <main id="sgnApp" class="sgn-wrap" hidden>
+
+    <!-- intro -->
+    <section class="sgn-intro">
+      <div class="sgn-progress" id="sgnProgress" hidden>
+        <span class="sgn-progress-pill" id="sgnProgressRole">Proprietar</span>
+        <span class="sgn-progress-note" id="sgnProgressNote">Acest contract are 2 semnatari. Fiecare semnează din linkul lui, în orice ordine — pe același document.</span>
+      </div>
+      <p class="sgn-eyebrow" id="sgnEyebrow">Contract</p>
+      <h1 id="sgnTitle">Contract de intermediere imobiliară</h1>
+      <p class="sgn-sub" id="sgnSubtitle">— mandat de vânzare —</p>
+      <p class="sgn-lede">
+        Te rugăm să citești contractul, să completezi datele tale și să semnezi în spațiul de mai jos.
+        Vei primi pe email o copie PDF semnată, identică cu cea păstrată de agenție.
+      </p>
+      <div class="sgn-signed-so-far" id="sgnSignedSoFar" hidden></div>
+    </section>
+
+    <!-- the contract -->
+    <section class="sgn-card sgn-contract" aria-label="Conținutul contractului">
+      <div class="sgn-card-head">
+        <h2>Contractul</h2>
+        <span class="sgn-scrollhint">derulează pentru a citi</span>
+      </div>
+      <div class="sgn-doc" id="sgnDoc" tabindex="0"><!-- clauses injected --></div>
+    </section>
+
+    <!-- client data -->
+    <section class="sgn-card" aria-label="Datele tale">
+      <div class="sgn-card-head"><h2>Datele tale</h2></div>
+      <form id="sgnForm" class="sgn-form" novalidate>
+        <label class="sgn-field sgn-col-2">
+          <span>Nume și prenume</span>
+          <input type="text" name="name" autocomplete="name" required placeholder="ex. Brotnei Alexa">
+        </label>
+        <label class="sgn-field sgn-col-2">
+          <span>Domiciliu (localitate, județ)</span>
+          <input type="text" name="domiciliu" autocomplete="address-level2" required placeholder="ex. Piatra Neamț, jud. Neamț">
+        </label>
+        <label class="sgn-field">
+          <span>CNP</span>
+          <input type="text" name="cnp" inputmode="numeric" pattern="[0-9]{13}" maxlength="13" required placeholder="13 cifre">
+        </label>
+        <label class="sgn-field sgn-field-sm">
+          <span>CI seria</span>
+          <input type="text" name="ciSeria" maxlength="2" required placeholder="NT" style="text-transform:uppercase">
+        </label>
+        <label class="sgn-field sgn-field-sm">
+          <span>CI număr</span>
+          <input type="text" name="ciNr" inputmode="numeric" maxlength="6" required placeholder="456789">
+        </label>
+        <label class="sgn-field">
+          <span>Telefon</span>
+          <input type="tel" name="telefon" autocomplete="tel" required placeholder="+40 7xx xxx xxx">
+        </label>
+        <label class="sgn-field">
+          <span>Email</span>
+          <input type="email" name="email" autocomplete="email" required placeholder="nume@email.ro">
+        </label>
+      </form>
+    </section>
+
+    <!-- signature -->
+    <section class="sgn-card" aria-label="Semnătura ta">
+      <div class="sgn-card-head">
+        <h2>Semnătura ta</h2>
+        <button type="button" class="sgn-clear" id="sgnClear">Șterge</button>
+      </div>
+      <div class="sgn-pad-wrap">
+        <canvas id="sgnPad" class="sgn-pad" aria-label="Zonă de semnătură"></canvas>
+        <span class="sgn-pad-baseline" aria-hidden="true"></span>
+        <span class="sgn-pad-hint" id="sgnPadHint">Semnează cu degetul sau mouse-ul</span>
+      </div>
+    </section>
+
+    <!-- consent + submit -->
+    <section class="sgn-card sgn-finish">
+      <label class="sgn-consent">
+        <input type="checkbox" id="sgnConsent">
+        <span>
+          Confirm că datele de mai sus sunt corecte, am citit și accept contractul, și sunt de acord cu
+          prelucrarea datelor mele conform <a href="/confidentialitate" target="_blank" rel="noopener">politicii de confidențialitate</a>
+          (Reg. UE 2016/679 — GDPR). Înțeleg că semnătura electronică are valoare juridică (eIDAS).
+        </span>
+      </label>
+      <button type="button" class="sgn-submit" id="sgnSubmit" disabled>
+        <span class="sgn-submit-label">Semnează contractul</span>
+        <span class="sgn-submit-spin" aria-hidden="true"></span>
+      </button>
+      <p class="sgn-legal">
+        La semnare se înregistrează data, ora, adresa IP și o amprentă digitală (SHA-256) a documentului,
+        pentru integritate juridică. Datele sunt stocate securizat în Uniunea Europeană.
+      </p>
+    </section>
+  </main>
+
+  <!-- success / handoff -->
+  <div id="sgnDone" class="sgn-done" hidden>
+    <div class="sgn-done-card">
+      <div class="sgn-done-check" aria-hidden="true"><svg viewBox="0 0 52 52"><circle cx="26" cy="26" r="24"/><path d="M16 27 l7 7 l13 -15"/></svg></div>
+      <h1 id="sgnDoneTitle">Contract semnat</h1>
+      <p id="sgnDoneMsg">Îți mulțumim. Contractul a fost semnat cu succes și o copie PDF a fost trimisă pe emailul tău.</p>
+      <a id="sgnDownload" class="sgn-done-btn" href="#" hidden>Descarcă PDF-ul semnat</a>
+    </div>
+  </div>
+
+  <footer class="sgn-foot">
+    EVEN · Imobiliare cu plan · AMIT ESTATE S.R.L. · CUI 53340194
+  </footer>
+
+  <script src="js/sign.js"></script>
+</body>
+</html>
