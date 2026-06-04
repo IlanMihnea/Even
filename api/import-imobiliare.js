@@ -44,9 +44,21 @@ function parseSlug(url) {
     birouri:    { categorie: 'comercial',   tip: 'birouri' },
     hala:       { categorie: 'comercial',   tip: 'industrial' },
     depozit:    { categorie: 'comercial',   tip: 'depozit' },
+    hotel:      { categorie: 'comercial',   tip: 'hotel' },
+    motel:      { categorie: 'comercial',   tip: 'hotel' },
+    pensiune:   { categorie: 'comercial',   tip: 'hotel' },
+    restaurant: { categorie: 'comercial',   tip: 'retail' },
   };
   for (const k of Object.keys(typeMap)) {
     if (slug.startsWith(k + '-')) { Object.assign(out, typeMap[k]); break; }
+  }
+
+  // Safety net: any slug mentioning "comercial" / "hotel" / "motel" / "pensiune"
+  // is commercial even if it didn't start with a mapped keyword (e.g.
+  // "spatiu-comercial-...", "cladire-hotel-..."). Avoids defaulting to rezidential.
+  if (!out.categorie) {
+    if (/\b(motel|hotel|pensiune)\b/.test(slug)) { out.categorie = 'comercial'; out.tip = out.tip || 'hotel'; }
+    else if (/comercial/.test(slug)) { out.categorie = 'comercial'; out.tip = out.tip || 'birouri'; }
   }
 
   // camere

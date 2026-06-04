@@ -78,7 +78,7 @@ CREATE TABLE IF NOT EXISTS properties (
   tip_incalzire       TEXT CHECK (tip_incalzire IN ('centrala-proprie','centrala-bloc','termoficare','pompa-caldura','podea-radianta','semineu','aer-conditionat')),
 
   -- Commercial-specific
-  tip_spatiu          TEXT,          -- birouri | retail | depozit | showroom | industrial | medical | hala
+  tip_spatiu          TEXT,          -- birouri | retail | depozit | showroom | industrial | medical | hala | hotel
   suprafata_birouri   NUMERIC,
   inaltime_libera     NUMERIC,
   specificatii        JSONB,         -- electric, rampa, climatizare, pardoseala, iluminat

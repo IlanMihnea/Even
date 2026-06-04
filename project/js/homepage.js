@@ -41,7 +41,8 @@ const FLUX_CONFIGS = {
         { v: 'retail', l: 'Retail' },
         { v: 'depozit', l: 'Depozit/Hală' },
         { v: 'industrial', l: 'Industrial' },
-        { v: 'showroom', l: 'Showroom' }
+        { v: 'showroom', l: 'Showroom' },
+        { v: 'hotel', l: 'Hotel / Pensiune' }
       ]},
       { name: 'oras', label: 'Oraș', type: 'text', placeholder: 'București, Cluj…' },
       { name: 'suprafataMin', label: 'Suprafață min (mp)', type: 'number', placeholder: 'ex: 200' },
@@ -186,11 +187,11 @@ function buildHomePropCard({ link, id, titlu, eyebrow, meta, price, sub, utilsHt
 }
 
 function homeComCardHTML(p) {
-  const tipLabels = { birouri: 'Birouri', retail: 'Retail', depozit: 'Depozit', industrial: 'Industrial', showroom: 'Showroom' };
+  const tipLabels = { birouri: 'Birouri', retail: 'Retail', depozit: 'Depozit', industrial: 'Industrial', showroom: 'Showroom', hotel: 'Hotel / Pensiune' };
   const eyebrow = `${p.regim === 'vanzare' ? 'Vânzare' : 'Închiriere'} · ${tipLabels[p.tipSpatiu] || ''}`;
   const meta = [
     p.suprafataTotala ? `${p.suprafataTotala} m²` : null,
-    p.clasaCladire ? `Clasa ${p.clasaCladire}` : null,
+    p.tipSpatiu !== 'hotel' && p.clasaCladire ? `Clasa ${p.clasaCladire}` : null,
     p.etaj != null ? `Et. ${p.etaj}` : null
   ].filter(Boolean).join('<span class="sep"> · </span>');
   const price = p.pret ? `${p.pret} €<span class="per-month">/m²/lună</span>` : formatPrice(p.pretTotal);

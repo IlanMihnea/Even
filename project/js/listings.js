@@ -162,11 +162,11 @@ function renderRezCard(p, link) {
 }
 
 function renderComCard(p, link) {
-  const tipLabels = { birouri: 'Birouri', retail: 'Retail', depozit: 'Depozit', industrial: 'Industrial', showroom: 'Showroom' };
+  const tipLabels = { birouri: 'Birouri', retail: 'Retail', depozit: 'Depozit', industrial: 'Industrial', showroom: 'Showroom', hotel: 'Hotel / Pensiune' };
   const eyebrow = `${p.regim === 'vanzare' ? 'Vânzare' : 'Închiriere'} · ${tipLabels[p.tipSpatiu] || ''}`;
   const meta = [
     `${p.suprafataTotala} m²`,
-    `Clasa ${p.clasaCladire}`,
+    p.tipSpatiu !== 'hotel' && p.clasaCladire ? `Clasa ${p.clasaCladire}` : null,
     p.etaj != null ? `Et. ${p.etaj}` : null
   ].filter(Boolean).join('<span class="sep"> · </span>');
   const price = p.pret
@@ -359,6 +359,7 @@ function initFiltersUI() {
           <span class="pill" data-value="depozit">Depozit</span>
           <span class="pill" data-value="industrial">Industrial</span>
           <span class="pill" data-value="showroom">Showroom</span>
+          <span class="pill" data-value="hotel">Hotel / Pensiune</span>
         </div>
       </div>
       <div class="filter-group">

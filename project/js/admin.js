@@ -1292,7 +1292,7 @@ function renderDynamicForm() {
         </div>
         <div class="form-group">
           <label>Tip spațiu</label>
-          <select name="tipSpatiu"><option value="birouri">Birouri</option><option value="retail">Retail</option><option value="depozit">Depozit</option><option value="industrial">Industrial</option><option value="showroom">Showroom</option></select>
+          <select name="tipSpatiu"><option value="birouri">Birouri</option><option value="retail">Retail</option><option value="depozit">Depozit</option><option value="industrial">Industrial</option><option value="showroom">Showroom</option><option value="hotel">Hotel / Pensiune</option></select>
         </div>
         <div class="form-group"><label>Suprafață totală (mp)</label><input type="number" name="suprafataTotala"></div>
         <div class="form-group"><label>Suprafață utilă (mp)</label><input type="number" name="suprafataUtila"></div>

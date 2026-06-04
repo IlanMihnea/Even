@@ -624,7 +624,7 @@ function renderFisaTehnica(p) {
     { l: 'Iluminat',             v: s.iluminat },
     { l: 'Rampă încărcare',      v: s.rampa ? 'Da' : null },
     { l: 'Încărcătoare EV',      v: s.incarcator ? 'Da' : null },
-    { l: 'Clasă energetică',     v: p.clasaCladire ? `Clasa ${p.clasaCladire}` : null },
+    { l: 'Clasă energetică',     v: p.tipSpatiu !== 'hotel' && p.clasaCladire ? `Clasa ${p.clasaCladire}` : null },
     { l: 'Locuri parcare',       v: p.locuriParcare != null ? String(p.locuriParcare) : null }
   ].filter(r => r.v != null && r.v !== '');
   if (!rows.length) return '';
@@ -1035,8 +1035,8 @@ function renderRezidential(p) {
 }
 
 function renderComercial(p) {
-  const tipMap    = { birouri:'Birouri', retail:'Retail', depozit:'Depozit/Hală', industrial:'Industrial', showroom:'Showroom' };
-  const eyebrow   = `${regimLabel(p.regim)} · ${tipMap[p.tipSpatiu]||''} · Clasa ${p.clasaCladire||'—'}`;
+  const tipMap    = { birouri:'Birouri', retail:'Retail', depozit:'Depozit/Hală', industrial:'Industrial', showroom:'Showroom', hotel:'Hotel / Pensiune' };
+  const eyebrow   = [regimLabel(p.regim), tipMap[p.tipSpatiu] || '', p.tipSpatiu !== 'hotel' ? `Clasa ${p.clasaCladire||'—'}` : null].filter(Boolean).join(' · ');
   const address   = escapeHtml([p.adresa, p.cartier, p.oras].filter(Boolean).join(', '));
   const priceMain = p.pret ? `${p.pret} €<small>/m²/lună</small>` : formatPrice(p.pretTotal);
   const priceSub  = p.pret && p.suprafataTotala ? `~ ${fmtNum(p.pret * p.suprafataTotala)} €/lună` : null;
