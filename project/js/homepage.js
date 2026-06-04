@@ -95,6 +95,74 @@ const FLUX_CONFIGS = {
 
 let activeFlux = 'rezidential';
 
+// Shared, cached projects loader (used by the Nº IV grid + the inline
+// results shown under the "Proiecte noi" catalog tab).
+let _homeProjectsPromise = null;
+function loadHomeProjects() {
+  if (!_homeProjectsPromise) _homeProjectsPromise = getProjects().catch(err => {
+    console.error('Projects error:', err);
+    _homeProjectsPromise = null;
+    return [];
+  });
+  return _homeProjectsPromise;
+}
+
+function projectCardHTML(p) {
+  const hasPret = p.intervalPret.min != null && p.intervalPret.min > 0;
+  const img = (p.imagini && p.imagini[0])
+    ? `<img src="${p.imagini[0]}" alt="${p.nume}" loading="lazy">`
+    : `<div class="img-placeholder"></div>`;
+  return `
+      <a class="project-card project-compact" href="project-detail.html?id=${p.id}">
+        <div class="project-card-img">
+          ${img}
+          <div class="status-tag">
+            <span class="status-dot status-${p.status}"></span> ${formatStatus(p.status)}
+          </div>
+          <div class="available-tag">${p.unitatiDisponibile} unități disponibile</div>
+        </div>
+        <div class="project-card-body">
+          <div class="project-dev">${p.dezvoltator}</div>
+          <h3>${p.nume}</h3>
+          <div class="project-loc"><i class="fa-solid fa-location-dot"></i> ${p.cartier}, ${p.oras}</div>
+          <div class="project-price-range">
+            ${hasPret
+              ? `${formatPrice(p.intervalPret.min)} - ${formatPrice(p.intervalPret.max)}<span>preț unitate</span>`
+              : `Preț la cerere<span>consultant dedicat</span>`}
+          </div>
+          <div class="project-meta">
+            <span>Livrare <strong>${formatLivrare(p.dataLivrare)}</strong></span>
+            <span>Progres <strong>${p.progres}%</strong></span>
+          </div>
+        </div>
+      </a>`;
+}
+
+// Inline project results rendered directly under the "Proiecte noi" tab,
+// so selecting that tab immediately shows the projects (not just filters).
+async function renderInlineProjects() {
+  const filters = document.getElementById('fluxFilters');
+  if (!filters) return;
+  let wrap = document.getElementById('fluxInlineProjects');
+  if (!wrap) {
+    wrap = document.createElement('div');
+    wrap.id = 'fluxInlineProjects';
+    wrap.className = 'hp-projects-grid flux-inline-projects';
+    filters.insertAdjacentElement('afterend', wrap);
+  }
+  wrap.style.display = '';
+  wrap.innerHTML = '<div class="flux-inline-loading">Se încarcă proiectele…</div>';
+  const projects = await loadHomeProjects();
+  wrap.innerHTML = projects.length
+    ? projects.map(projectCardHTML).join('')
+    : '<div class="flux-inline-loading">Niciun proiect momentan.</div>';
+}
+
+function clearInlineProjects() {
+  const wrap = document.getElementById('fluxInlineProjects');
+  if (wrap) wrap.style.display = 'none';
+}
+
 function renderFilters() {
   const cfg = FLUX_CONFIGS[activeFlux];
   const container = document.getElementById('fluxFilters');
@@ -137,6 +205,8 @@ function setFluxTab(flux) {
     t.classList.toggle('active', t.dataset.flux === flux);
   });
   renderFilters();
+  if (flux === 'proiecte') renderInlineProjects();
+  else clearInlineProjects();
 }
 
 async function renderHeroFeature() {
@@ -281,42 +351,8 @@ function renderHomePropCard(p) {
 async function renderHomeProjects() {
   const grid = document.getElementById('projectsHomeGrid');
   if (!grid) return;
-  try {
-    const projects = await getProjects();
-    grid.innerHTML = projects.map(p => {
-      const hasPret = p.intervalPret.min != null && p.intervalPret.min > 0;
-      const img = (p.imagini && p.imagini[0])
-        ? `<img src="${p.imagini[0]}" alt="${p.nume}" loading="lazy">`
-        : `<div class="img-placeholder"></div>`;
-      return `
-      <a class="project-card project-compact" href="project-detail.html?id=${p.id}">
-        <div class="project-card-img">
-          ${img}
-          <div class="status-tag">
-            <span class="status-dot status-${p.status}"></span> ${formatStatus(p.status)}
-          </div>
-          <div class="available-tag">${p.unitatiDisponibile} unități disponibile</div>
-        </div>
-        <div class="project-card-body">
-          <div class="project-dev">${p.dezvoltator}</div>
-          <h3>${p.nume}</h3>
-          <div class="project-loc"><i class="fa-solid fa-location-dot"></i> ${p.cartier}, ${p.oras}</div>
-          <div class="project-price-range">
-            ${hasPret
-              ? `${formatPrice(p.intervalPret.min)} - ${formatPrice(p.intervalPret.max)}<span>preț unitate</span>`
-              : `Preț la cerere<span>consultant dedicat</span>`}
-          </div>
-          <div class="project-meta">
-            <span>Livrare <strong>${formatLivrare(p.dataLivrare)}</strong></span>
-            <span>Progres <strong>${p.progres}%</strong></span>
-          </div>
-        </div>
-      </a>
-    `;
-    }).join('');
-  } catch (err) {
-    console.error('Projects error:', err);
-  }
+  const projects = await loadHomeProjects();
+  grid.innerHTML = projects.map(projectCardHTML).join('');
 }
 
 function formatStatus(s) {
