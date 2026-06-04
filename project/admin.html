@@ -15,6 +15,7 @@
   <link rel="stylesheet" href="css/main.css">
   <link rel="stylesheet" href="css/admin.css">
   <link rel="stylesheet" href="css/admin-contracts.css">
+  <link rel="stylesheet" href="css/admin-editor.css">
 </head>
 <body data-page="admin" class="apl">
 
@@ -70,6 +71,9 @@
         </a>
         <a class="apl-nav-link" data-route="contracte" href="#contracte">
           <i class="fa-solid fa-file-signature"></i><span>Contracte</span>
+        </a>
+        <a class="apl-nav-link" data-route="editor" href="#editor">
+          <i class="fa-solid fa-wand-magic-sparkles"></i><span>Editor poze</span>
         </a>
         <div class="apl-nav-sep"></div>
         <a class="apl-nav-link" data-route="setari" href="#setari">
@@ -305,6 +309,87 @@
         </div>
       </section>
 
+      <!-- VIEW: EDITOR POZE -->
+      <section class="apl-view" id="view-editor" data-route="editor">
+        <header class="apl-view-head">
+          <div>
+            <span class="apl-eyebrow">Imagini</span>
+            <h1>Editor poze</h1>
+            <p class="apl-view-sub">Reglează lumina și culoarea, salvează un <b>preset</b> și aplică-l pe mai multe poze deodată. Apoi descarci pozele editate.</p>
+          </div>
+          <div class="apl-view-actions">
+            <button class="apl-btn apl-btn-primary btn-gold" onclick="document.getElementById('peFileInput').click()">
+              <i class="fa-solid fa-images"></i> Adaugă poze
+            </button>
+          </div>
+        </header>
+
+        <div class="apl-section">
+          <input type="file" id="peFileInput" accept="image/*" multiple hidden>
+
+          <!-- bară de acțiune lot -->
+          <div class="pe-actionbar" style="margin-bottom:14px">
+            <span class="pe-count" id="peCountPhotos"></span>
+            <span class="pe-sep"></span>
+            <button class="apl-btn apl-btn-secondary apl-btn-sm" id="peSelectAll" disabled><i class="fa-solid fa-check-double"></i> Selectează tot</button>
+            <button class="apl-btn apl-btn-ghost apl-btn-sm" id="peClearAll" disabled>Deselectează</button>
+            <span class="pe-sel-info" id="peSelInfo">0 selectate</span>
+            <span class="pe-sep"></span>
+            <button class="apl-btn apl-btn-secondary apl-btn-sm" id="peApplySel" disabled title="Copiază reglajele pozei curente pe pozele selectate"><i class="fa-solid fa-copy"></i> Aplică pe selectate</button>
+            <button class="apl-btn apl-btn-secondary apl-btn-sm" id="peApplyAll" disabled title="Copiază reglajele pozei curente pe toate pozele"><i class="fa-solid fa-layer-group"></i> Pe toate</button>
+            <span class="pe-spacer"></span>
+            <span class="pe-export-prog" id="peExportProg"></span>
+            <button class="apl-btn apl-btn-secondary apl-btn-sm" id="peExportSel" disabled title="Descarcă pozele selectate, fiecare separat"><i class="fa-solid fa-download"></i> Descarcă selectate</button>
+            <button class="apl-btn apl-btn-primary apl-btn-sm" id="peExportZip" disabled title="Descarcă pozele într-o arhivă .zip"><i class="fa-solid fa-file-zipper"></i> Descarcă .zip</button>
+          </div>
+
+          <div class="pe-wrap">
+            <!-- STÂNGA -->
+            <div class="pe-main">
+              <div class="pe-drop" id="peDrop">
+                <div class="pe-drop-text">
+                  <i class="fa-solid fa-cloud-arrow-up"></i>
+                  <span><b>Trage pozele aici</b> sau apasă „Adaugă poze”. Editarea e locală — nimic nu se urcă pe server.</span>
+                </div>
+                <button class="apl-btn apl-btn-secondary apl-btn-sm" type="button" onclick="document.getElementById('peFileInput').click()">Răsfoiește</button>
+              </div>
+
+              <div class="pe-empty" id="peEmpty">
+                <i class="fa-solid fa-image"></i>
+                <h3>Nicio poză încărcată</h3>
+                <p>Adaugă pozele imobilului ca să începi editarea.</p>
+              </div>
+
+              <div class="pe-stage" id="peStage" style="display:none">
+                <canvas id="peCanvas"></canvas>
+                <div class="pe-stage-bar">
+                  <span class="pe-stage-meta"><b id="peStageName"></b><span class="pe-stage-dims" id="peStageDims"></span></span>
+                  <button type="button" class="pe-before" id="peBefore"><i class="fa-regular fa-eye"></i> Ține apăsat: original</button>
+                </div>
+              </div>
+
+              <div class="pe-strip" id="peStrip"></div>
+            </div>
+
+            <!-- DREAPTA: panou -->
+            <aside class="pe-panel">
+              <div class="pe-panel-sec">
+                <div class="pe-panel-title">Presetări</div>
+                <div id="pePresets"></div>
+              </div>
+              <div class="pe-panel-sec">
+                <div class="pe-panel-title">Reglaje</div>
+                <div id="peControls"></div>
+              </div>
+              <div class="pe-panel-sec" style="display:flex; gap:8px; flex-wrap:wrap">
+                <button class="apl-btn apl-btn-primary apl-btn-sm" id="peSavePreset" disabled><i class="fa-solid fa-floppy-disk"></i> Salvează ca preset</button>
+                <button class="apl-btn apl-btn-ghost apl-btn-sm" id="peResetActive" disabled><i class="fa-solid fa-arrow-rotate-left"></i> Reset</button>
+              </div>
+            </aside>
+          </div>
+        </div>
+      </section>
+
       <!-- VIEW: SETARI -->
       <section class="apl-view" id="view-setari" data-route="setari">
         <header class="apl-view-head">
@@ -533,10 +618,10 @@
   <!-- ROUTER -->
   <script>
     (function(){
-      const ROUTES = ['cereri','proprietati','cumparatori','proiecte','agenti','contracte','setari'];
+      const ROUTES = ['cereri','proprietati','cumparatori','proiecte','agenti','contracte','editor','setari'];
       const LABELS = {
         cereri:'Cereri', proprietati:'Proprietăți', cumparatori:'Cumpărători',
-        proiecte:'Proiecte', agenti:'Agenți', contracte:'Contracte', setari:'Setări'
+        proiecte:'Proiecte', agenti:'Agenți', contracte:'Contracte', editor:'Editor poze', setari:'Setări'
       };
       function go(route){
         if(!ROUTES.includes(route)) route = 'cereri';
@@ -623,5 +708,7 @@
   <script src="js/main.js"></script>
   <script src="js/admin.js"></script>
   <script src="js/admin-contracts.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
+  <script src="js/admin-editor.js"></script>
 </body>
 </html>

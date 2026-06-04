@@ -1,0 +1,258 @@
+/* ============================================================
+   ADMIN-EDITOR — Editor de poze imobiliare
+   Se bazează pe tokenii --apl-* definiți în admin.css
+   ============================================================ */
+
+body[data-page="admin"] .pe-wrap{
+  display:grid;
+  grid-template-columns: 1fr 320px;
+  gap:16px;
+  align-items:start;
+}
+
+/* ---------- Coloana stângă: stage + filmstrip ---------- */
+body[data-page="admin"] .pe-main{
+  display:flex;
+  flex-direction:column;
+  gap:14px;
+  min-width:0;
+}
+
+/* Dropzone / upload */
+body[data-page="admin"] .pe-drop{
+  border:1.5px dashed var(--apl-border);
+  border-radius: var(--apl-r-lg);
+  background: var(--apl-bg-2);
+  padding:18px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:14px;
+  transition: border-color .15s, background .15s;
+}
+body[data-page="admin"] .pe-drop.is-over{
+  border-color: var(--apl-blue);
+  background: var(--apl-blue-soft);
+}
+body[data-page="admin"] .pe-drop-text{ display:flex; align-items:center; gap:12px; color:var(--apl-text-3); font-size:14px; }
+body[data-page="admin"] .pe-drop-text i{ font-size:22px; color:var(--apl-text-4); }
+body[data-page="admin"] .pe-drop-text b{ color:var(--apl-text); }
+
+/* Stage (poza activă) */
+body[data-page="admin"] .pe-stage{
+  position:relative;
+  background:
+    linear-gradient(45deg,#f0f0f3 25%,transparent 25%),
+    linear-gradient(-45deg,#f0f0f3 25%,transparent 25%),
+    linear-gradient(45deg,transparent 75%,#f0f0f3 75%),
+    linear-gradient(-45deg,transparent 75%,#f0f0f3 75%);
+  background-size:20px 20px;
+  background-position:0 0,0 10px,10px -10px,-10px 0;
+  border:1px solid var(--apl-border-2);
+  border-radius: var(--apl-r-lg);
+  overflow:hidden;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  min-height:360px;
+}
+body[data-page="admin"] .pe-stage canvas{
+  max-width:100%;
+  max-height:62vh;
+  display:block;
+  object-fit:contain;
+}
+body[data-page="admin"] .pe-stage-bar{
+  position:absolute;
+  left:0; right:0; bottom:0;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  padding:8px 12px;
+  background:linear-gradient(transparent, rgba(0,0,0,.55));
+  color:#fff;
+  font-size:12.5px;
+}
+body[data-page="admin"] .pe-stage-meta b{ font-weight:600; }
+body[data-page="admin"] .pe-stage-dims{ opacity:.8; margin-left:8px; }
+body[data-page="admin"] .pe-before{
+  border:1px solid rgba(255,255,255,.5);
+  background:rgba(255,255,255,.12);
+  color:#fff;
+  border-radius: var(--apl-r-sm);
+  padding:5px 11px;
+  font-size:12px;
+  cursor:pointer;
+  user-select:none;
+  -webkit-user-select:none;
+}
+body[data-page="admin"] .pe-before:active{ background:rgba(255,255,255,.28); }
+
+/* Empty state */
+body[data-page="admin"] .pe-empty{
+  text-align:center;
+  padding:64px 20px;
+  color:var(--apl-text-4);
+}
+body[data-page="admin"] .pe-empty i{ font-size:42px; margin-bottom:14px; color:var(--apl-border); }
+body[data-page="admin"] .pe-empty h3{ font-size:17px; margin-bottom:6px; color:var(--apl-text-2); }
+body[data-page="admin"] .pe-empty p{ font-size:13.5px; }
+
+/* Filmstrip */
+body[data-page="admin"] .pe-strip{
+  display:flex;
+  gap:10px;
+  overflow-x:auto;
+  padding:4px 2px 10px;
+  scroll-snap-type:x proximity;
+}
+body[data-page="admin"] .pe-thumb{
+  position:relative;
+  flex:0 0 auto;
+  width:128px;
+  border-radius: var(--apl-r-md);
+  overflow:hidden;
+  cursor:pointer;
+  border:2px solid transparent;
+  background:var(--apl-bg-3);
+  scroll-snap-align:start;
+  transition: border-color .12s, transform .12s;
+}
+body[data-page="admin"] .pe-thumb:hover{ transform:translateY(-2px); }
+body[data-page="admin"] .pe-thumb.is-active{ border-color: var(--apl-blue); }
+body[data-page="admin"] .pe-thumb-img{ width:100%; height:92px; display:flex; align-items:center; justify-content:center; background:#000; }
+body[data-page="admin"] .pe-thumb-img canvas{ max-width:100%; max-height:100%; display:block; }
+body[data-page="admin"] .pe-thumb-name{
+  display:block;
+  padding:5px 7px;
+  font-size:11px;
+  color:var(--apl-text-3);
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+body[data-page="admin"] .pe-thumb-check{
+  position:absolute; top:6px; left:6px;
+  width:22px; height:22px;
+  border-radius:50%;
+  border:1.5px solid #fff;
+  background:rgba(0,0,0,.35);
+  color:transparent;
+  display:flex; align-items:center; justify-content:center;
+  font-size:11px; cursor:pointer;
+}
+body[data-page="admin"] .pe-thumb.is-sel .pe-thumb-check{
+  background:var(--apl-blue); border-color:var(--apl-blue); color:#fff;
+}
+body[data-page="admin"] .pe-thumb-x{
+  position:absolute; top:6px; right:6px;
+  width:22px; height:22px;
+  border-radius:50%;
+  border:none;
+  background:rgba(0,0,0,.45);
+  color:#fff;
+  display:flex; align-items:center; justify-content:center;
+  font-size:11px; cursor:pointer;
+  opacity:0; transition:opacity .12s;
+}
+body[data-page="admin"] .pe-thumb:hover .pe-thumb-x{ opacity:1; }
+body[data-page="admin"] .pe-thumb-x:hover{ background:var(--apl-red); }
+
+/* ---------- Coloana dreaptă: panou reglaje ---------- */
+body[data-page="admin"] .pe-panel{
+  background:var(--apl-bg-elev);
+  border:1px solid var(--apl-border-2);
+  border-radius: var(--apl-r-lg);
+  box-shadow: var(--apl-shadow-pop);
+  position:sticky;
+  top:16px;
+  overflow:hidden;
+}
+body[data-page="admin"] .pe-panel-sec{ padding:14px 16px; border-bottom:1px solid var(--apl-border-3); }
+body[data-page="admin"] .pe-panel-sec:last-child{ border-bottom:none; }
+body[data-page="admin"] .pe-panel-title{
+  font-size:12px; font-weight:600; letter-spacing:.02em;
+  text-transform:uppercase; color:var(--apl-text-4);
+  margin-bottom:10px;
+}
+
+/* Presetări */
+body[data-page="admin"] .pe-preset-row{ display:flex; flex-wrap:wrap; gap:8px; }
+body[data-page="admin"] .pe-preset-sub{ font-size:11.5px; color:var(--apl-text-4); margin:12px 0 8px; }
+body[data-page="admin"] .pe-preset{ position:relative; display:flex; }
+body[data-page="admin"] .pe-preset-apply{
+  display:inline-flex; align-items:center; gap:7px;
+  padding:7px 12px;
+  border:1px solid var(--apl-border);
+  background:var(--apl-bg);
+  border-radius:999px;
+  font-size:12.5px; font-weight:500;
+  color:var(--apl-text);
+  cursor:pointer;
+  transition: border-color .12s, background .12s, color .12s;
+}
+body[data-page="admin"] .pe-preset-apply i{ color:var(--apl-blue); font-size:11px; }
+body[data-page="admin"] .pe-preset-apply:hover{ border-color:var(--apl-blue); background:var(--apl-blue-soft); }
+body[data-page="admin"] .pe-preset-del{
+  border:none; background:none; cursor:pointer;
+  color:var(--apl-text-4); font-size:11px;
+  padding:0 4px; margin-left:-2px;
+}
+body[data-page="admin"] .pe-preset-del:hover{ color:var(--apl-red); }
+
+/* Slidere */
+body[data-page="admin"] .pe-ctrl-group{ margin-bottom:14px; }
+body[data-page="admin"] .pe-ctrl-group:last-child{ margin-bottom:0; }
+body[data-page="admin"] .pe-ctrl-group-title{
+  font-size:11px; font-weight:600; color:var(--apl-text-4);
+  text-transform:uppercase; letter-spacing:.03em;
+  margin-bottom:8px;
+}
+body[data-page="admin"] .pe-ctrl{ margin-bottom:11px; }
+body[data-page="admin"] .pe-ctrl-head{ display:flex; justify-content:space-between; align-items:baseline; margin-bottom:3px; }
+body[data-page="admin"] .pe-ctrl-head label{ font-size:13px; color:var(--apl-text-2); }
+body[data-page="admin"] .pe-ctrl-val{ font-size:12px; color:var(--apl-text-4); font-variant-numeric:tabular-nums; min-width:28px; text-align:right; }
+body[data-page="admin"] .pe-ctrl.is-touched .pe-ctrl-head label{ color:var(--apl-text); font-weight:500; }
+body[data-page="admin"] .pe-ctrl.is-touched .pe-ctrl-val{ color:var(--apl-blue); font-weight:600; }
+
+body[data-page="admin"] input.pe-range{
+  -webkit-appearance:none; appearance:none;
+  width:100%; height:4px; border-radius:4px;
+  background:var(--apl-border-2);
+  outline:none; cursor:pointer;
+}
+body[data-page="admin"] input.pe-range::-webkit-slider-thumb{
+  -webkit-appearance:none; appearance:none;
+  width:16px; height:16px; border-radius:50%;
+  background:#fff; border:1px solid var(--apl-border);
+  box-shadow:0 1px 3px rgba(0,0,0,.18);
+  cursor:pointer; transition:transform .1s;
+}
+body[data-page="admin"] input.pe-range::-webkit-slider-thumb:active{ transform:scale(1.12); }
+body[data-page="admin"] input.pe-range::-moz-range-thumb{
+  width:16px; height:16px; border-radius:50%;
+  background:#fff; border:1px solid var(--apl-border);
+  box-shadow:0 1px 3px rgba(0,0,0,.18); cursor:pointer;
+}
+
+/* ---------- Bare de acțiune ---------- */
+body[data-page="admin"] .pe-actionbar{
+  display:flex; flex-wrap:wrap; align-items:center; gap:8px;
+  padding:12px 14px;
+  background:var(--apl-bg-2);
+  border:1px solid var(--apl-border-2);
+  border-radius: var(--apl-r-md);
+}
+body[data-page="admin"] .pe-actionbar .pe-sep{ width:1px; align-self:stretch; background:var(--apl-border-2); margin:0 2px; }
+body[data-page="admin"] .pe-actionbar .pe-spacer{ flex:1 1 auto; }
+body[data-page="admin"] .pe-sel-info{ font-size:12.5px; color:var(--apl-text-4); font-variant-numeric:tabular-nums; }
+body[data-page="admin"] .pe-count{ font-size:12.5px; color:var(--apl-text-3); font-weight:500; }
+body[data-page="admin"] .pe-export-prog{ font-size:12.5px; color:var(--apl-blue); font-variant-numeric:tabular-nums; }
+
+/* ---------- Responsive ---------- */
+@media (max-width: 960px){
+  body[data-page="admin"] .pe-wrap{ grid-template-columns:1fr; }
+  body[data-page="admin"] .pe-panel{ position:static; }
+  body[data-page="admin"] .pe-stage canvas{ max-height:48vh; }
+}
