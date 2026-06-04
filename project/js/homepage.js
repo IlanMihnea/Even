@@ -138,29 +138,125 @@ function projectCardHTML(p) {
       </a>`;
 }
 
-// Inline project results rendered directly under the "Proiecte noi" tab,
-// so selecting that tab immediately shows the projects (not just filters).
-async function renderInlineProjects() {
-  const filters = document.getElementById('fluxFilters');
-  if (!filters) return;
-  let wrap = document.getElementById('fluxInlineProjects');
-  if (!wrap) {
-    wrap = document.createElement('div');
-    wrap.id = 'fluxInlineProjects';
-    wrap.className = 'hp-projects-grid flux-inline-projects';
-    filters.insertAdjacentElement('afterend', wrap);
-  }
-  wrap.style.display = '';
-  wrap.innerHTML = '<div class="flux-inline-loading">Se încarcă proiectele…</div>';
-  const projects = await loadHomeProjects();
-  wrap.innerHTML = projects.length
-    ? projects.map(projectCardHTML).join('')
-    : '<div class="flux-inline-loading">Niciun proiect momentan.</div>';
+// ---- Property cards for inline catalog results (com / teren / rez) ----
+let _homePropsCache = {};
+function loadHomeProperties(cat) {
+  if (!_homePropsCache[cat]) _homePropsCache[cat] = getProperties(cat).catch(err => {
+    console.error('Properties error:', err);
+    _homePropsCache[cat] = null;
+    return [];
+  });
+  return _homePropsCache[cat];
 }
 
-function clearInlineProjects() {
-  const wrap = document.getElementById('fluxInlineProjects');
-  if (wrap) wrap.style.display = 'none';
+function homePropPhoto(imagini, titlu) {
+  return (imagini && imagini[0])
+    ? `<img src="${imagini[0]}" alt="${titlu || ''}" loading="lazy">`
+    : `<div class="img-placeholder"></div>`;
+}
+
+function buildHomePropCard({ link, id, titlu, eyebrow, meta, price, sub, utilsHtml, photo }) {
+  return `
+    <a class="prop-card" href="${link}" aria-label="${titlu}">
+      <figure class="prop-card-media">
+        <div class="prop-card-img">${photo}</div>
+        <button class="prop-card-fav" type="button" data-prop-id="${id}"
+                onclick="event.preventDefault(); event.stopPropagation(); toggleFav(this)"
+                aria-label="Salvează la favorite">
+          <i class="fa-regular fa-heart"></i>
+        </button>
+      </figure>
+      <div class="prop-card-body">
+        <div class="prop-card-eyebrow">
+          <span>${eyebrow}</span>
+          <span class="prop-card-num">Nº ${shortPropNum(id)}</span>
+        </div>
+        <h3 class="prop-card-title">${titlu}</h3>
+        <p class="prop-card-meta">${meta}</p>
+        ${utilsHtml ? `<div class="prop-card-utils">${utilsHtml}</div>` : ''}
+        <div class="prop-card-foot">
+          <div>
+            <span class="prop-card-price">${price}</span>
+            ${sub ? `<span class="prop-card-price-sub">${sub}</span>` : ''}
+          </div>
+          <span class="prop-card-cta">Detalii <i class="fa-solid fa-arrow-right"></i></span>
+        </div>
+      </div>
+    </a>`;
+}
+
+function homeComCardHTML(p) {
+  const tipLabels = { birouri: 'Birouri', retail: 'Retail', depozit: 'Depozit', industrial: 'Industrial', showroom: 'Showroom' };
+  const eyebrow = `${p.regim === 'vanzare' ? 'Vânzare' : 'Închiriere'} · ${tipLabels[p.tipSpatiu] || ''}`;
+  const meta = [
+    p.suprafataTotala ? `${p.suprafataTotala} m²` : null,
+    p.clasaCladire ? `Clasa ${p.clasaCladire}` : null,
+    p.etaj != null ? `Et. ${p.etaj}` : null
+  ].filter(Boolean).join('<span class="sep"> · </span>');
+  const price = p.pret ? `${p.pret} €<span class="per-month">/m²/lună</span>` : formatPrice(p.pretTotal);
+  const sub = p.pret && p.suprafataTotala ? `~ ${new Intl.NumberFormat('ro-RO').format(p.pret * p.suprafataTotala)} €/lună` : '';
+  return buildHomePropCard({ link: `property-comercial.html?id=${p.id}`, id: p.id, titlu: p.titlu, eyebrow, meta, price, sub, photo: homePropPhoto(p.imagini, p.titlu) });
+}
+
+function homeTerCardHTML(p) {
+  const tipLabels = { 'intravilan-rezidential': 'Intravilan rez.', 'intravilan-comercial': 'Intravilan com.', 'extravilan-agricol': 'Extravilan agricol', 'industrial': 'Industrial' };
+  const eyebrow = `${tipLabels[p.tip] || 'Teren'} · ${p.localitate || p.judet || ''}`;
+  const utilsAll = [
+    { k: 'apa', i: 'fa-droplet', t: 'Apă' }, { k: 'curent', i: 'fa-bolt', t: 'Curent' },
+    { k: 'gaz', i: 'fa-fire', t: 'Gaz' }, { k: 'canalizare', i: 'fa-toilet', t: 'Canal.' }
+  ];
+  const meta = [
+    p.suprafata ? `${p.suprafata} ${p.unitate || 'mp'}` : null,
+    p.frontStradal ? `Front ${p.frontStradal}m` : null,
+    p.accesDrum ? `Acces ${p.accesDrum}` : null
+  ].filter(Boolean).join('<span class="sep"> · </span>');
+  const utilsHtml = utilsAll.map(u => `<span class="prop-card-util ${(p.utilitati || []).includes(u.k) ? 'active' : ''}"><i class="fa-solid ${u.i}"></i>${u.t}</span>`).join('');
+  const price = formatPrice(p.pretTotal);
+  const sub = p.pretMp ? `${p.pretMp} €/m²` : '';
+  return buildHomePropCard({ link: `property-teren.html?id=${p.id}`, id: p.id, titlu: p.titlu, eyebrow, meta, price, sub, utilsHtml, photo: homePropPhoto(p.imagini, p.titlu) });
+}
+
+function homePropCardHTML(p) {
+  if (p.categorie === 'comercial') return homeComCardHTML(p);
+  if (p.categorie === 'terenuri') return homeTerCardHTML(p);
+  return renderHomePropCard(p);
+}
+
+// Inline results rendered directly under the active catalog tab, so
+// selecting a category immediately shows real listings (not just filters).
+let _inlineToken = 0;
+async function renderInlineResults(flux) {
+  const filters = document.getElementById('fluxFilters');
+  if (!filters) return;
+  let wrap = document.getElementById('fluxInline');
+  if (!wrap) {
+    wrap = document.createElement('div');
+    wrap.id = 'fluxInline';
+    wrap.className = 'flux-inline';
+    // Place results full-width below the catalog card (not inside it).
+    const anchor = filters.closest('.hp-catalog-card') || filters;
+    anchor.insertAdjacentElement('afterend', wrap);
+  }
+  const token = ++_inlineToken;
+  wrap.innerHTML = '<div class="flux-inline-loading">Se încarcă…</div>';
+  const target = (FLUX_CONFIGS[flux] || {}).target || '#';
+  const footer = `<div class="flux-inline-foot"><a href="${target}" class="hp-link-arrow"><span>Vezi toate</span><i class="fa-solid fa-arrow-right"></i></a></div>`;
+
+  if (flux === 'proiecte') {
+    const projects = await loadHomeProjects();
+    if (token !== _inlineToken) return;
+    wrap.innerHTML = projects.length
+      ? `<div class="hp-projects-grid">${projects.map(projectCardHTML).join('')}</div>${footer}`
+      : '<div class="flux-inline-loading">Niciun proiect momentan.</div>';
+    return;
+  }
+
+  const props = await loadHomeProperties(flux);
+  if (token !== _inlineToken) return;
+  wrap.innerHTML = props.length
+    ? `<div class="featured-grid hp-featured-grid">${props.slice(0, 6).map(homePropCardHTML).join('')}</div>${footer}`
+    : '<div class="flux-inline-loading">Nicio proprietate momentan.</div>';
+  if (props.length && typeof applyFavStates === 'function') applyFavStates(wrap);
 }
 
 function renderFilters() {
@@ -205,8 +301,7 @@ function setFluxTab(flux) {
     t.classList.toggle('active', t.dataset.flux === flux);
   });
   renderFilters();
-  if (flux === 'proiecte') renderInlineProjects();
-  else clearInlineProjects();
+  renderInlineResults(flux);
 }
 
 async function renderHeroFeature() {
@@ -348,13 +443,6 @@ function renderHomePropCard(p) {
   `;
 }
 
-async function renderHomeProjects() {
-  const grid = document.getElementById('projectsHomeGrid');
-  if (!grid) return;
-  const projects = await loadHomeProjects();
-  grid.innerHTML = projects.map(projectCardHTML).join('');
-}
-
 function formatStatus(s) {
   return { 'pre-vanzare': 'Pre-vânzare', 'construire': 'În construcție', 'finalizat': 'Finalizat' }[s] || s;
 }
@@ -494,6 +582,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     tab.addEventListener('click', () => setFluxTab(tab.dataset.flux));
   });
   renderFilters();
+  renderInlineResults(activeFlux);
 
   initHeroScrub();
 
@@ -501,8 +590,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     fetchCategoryCounts(),
     renderHeroFeature(),
     renderFeaturedProperties(),
-    renderHomeProjects(),
   ]);
   applyFluxTabVisibility(counts);
+  renderInlineResults(activeFlux);
   setTimeout(() => initScrollReveal(), 50);
 });

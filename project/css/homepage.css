@@ -1094,7 +1094,12 @@ body[data-page="home"] {
   font-size: 12px;
   color: var(--gray-500, #6b6760);
 }
-.flux-inline-projects { margin-top: 28px; }
+.flux-inline { margin-top: 28px; }
+.flux-inline-foot {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 22px;
+}
 .flux-inline-loading {
   grid-column: 1 / -1;
   text-align: center;
