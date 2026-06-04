@@ -1683,6 +1683,9 @@ function acceptImportedDraft() {
     adresa: d.adresa,
     descriere: d.descriere,
   };
+  // The comercial form uses `tipSpatiu` (not `tip`) for its type <select>, so the
+  // imported `tip` (e.g. 'hotel') must be mapped over or the select defaults to birouri.
+  if (d.categorie === 'comercial') { draft.tipSpatiu = d.tip; delete draft.tip; }
   Object.keys(draft).forEach(k => (draft[k] === undefined || draft[k] === null) && delete draft[k]);
 
   // Close import modal, open add modal in correct category, then hydrate.
