@@ -272,13 +272,23 @@ function initScrollToTop() {
 
 // ---------- CATEGORY VISIBILITY ----------
 async function fetchCategoryCounts() {
-  const cached = sessionStorage.getItem('categoryCounts');
-  if (cached) return JSON.parse(cached);
+  // Short-lived sessionStorage cache so category tabs reflect newly added
+  // properties within the same browser session. The endpoint is also edge-cached
+  // (s-maxage=60), so a 60s TTL here just avoids redundant fetches between page
+  // navigations without going stale for the whole session.
+  const TTL_MS = 60 * 1000;
+  try {
+    const raw = sessionStorage.getItem('categoryCounts');
+    if (raw) {
+      const { counts, ts } = JSON.parse(raw);
+      if (counts && ts && Date.now() - ts < TTL_MS) return counts;
+    }
+  } catch {}
   try {
     const res = await fetch('/api/category-counts');
     if (!res.ok) return null;
     const counts = await res.json();
-    sessionStorage.setItem('categoryCounts', JSON.stringify(counts));
+    try { sessionStorage.setItem('categoryCounts', JSON.stringify({ counts, ts: Date.now() })); } catch {}
     return counts;
   } catch {
     return null;
