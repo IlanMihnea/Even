@@ -246,7 +246,7 @@ async function renderInlineResults(flux) {
     const projects = await loadHomeProjects();
     if (token !== _inlineToken) return;
     wrap.innerHTML = projects.length
-      ? `<div class="hp-projects-grid">${projects.map(projectCardHTML).join('')}</div>${footer}`
+      ? `<div class="hp-projects-grid">${projects.slice(0, 4).map(projectCardHTML).join('')}</div>${footer}`
       : '<div class="flux-inline-loading">Niciun proiect momentan.</div>';
     return;
   }
@@ -254,7 +254,7 @@ async function renderInlineResults(flux) {
   const props = await loadHomeProperties(flux);
   if (token !== _inlineToken) return;
   wrap.innerHTML = props.length
-    ? `<div class="featured-grid hp-featured-grid">${props.slice(0, 6).map(homePropCardHTML).join('')}</div>${footer}`
+    ? `<div class="featured-grid hp-featured-grid">${props.slice(0, 4).map(homePropCardHTML).join('')}</div>${footer}`
     : '<div class="flux-inline-loading">Nicio proprietate momentan.</div>';
   if (props.length && typeof applyFavStates === 'function') applyFavStates(wrap);
 }
