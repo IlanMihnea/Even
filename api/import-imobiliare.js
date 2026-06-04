@@ -41,9 +41,11 @@ function parseSlug(url) {
     duplex:     { categorie: 'rezidential', tip: 'duplex' },
     teren:      { categorie: 'terenuri',    tip: 'intravilan-rezidential' },
     spatiu:     { categorie: 'comercial',   tip: 'birouri' },
+    birou:      { categorie: 'comercial',   tip: 'birouri' },
     birouri:    { categorie: 'comercial',   tip: 'birouri' },
     hala:       { categorie: 'comercial',   tip: 'industrial' },
     depozit:    { categorie: 'comercial',   tip: 'depozit' },
+    showroom:   { categorie: 'comercial',   tip: 'showroom' },
     hotel:      { categorie: 'comercial',   tip: 'hotel' },
     motel:      { categorie: 'comercial',   tip: 'hotel' },
     pensiune:   { categorie: 'comercial',   tip: 'hotel' },
@@ -58,7 +60,7 @@ function parseSlug(url) {
   // "spatiu-comercial-...", "cladire-hotel-..."). Avoids defaulting to rezidential.
   if (!out.categorie) {
     if (/\b(motel|hotel|pensiune)\b/.test(slug)) { out.categorie = 'comercial'; out.tip = out.tip || 'hotel'; }
-    else if (/comercial/.test(slug)) { out.categorie = 'comercial'; out.tip = out.tip || 'birouri'; }
+    else if (/comercial|\bbirou(ri)?\b|\bspati[ui]\b|\bhal[ae]\b|\bdepozit/.test(slug)) { out.categorie = 'comercial'; out.tip = out.tip || 'birouri'; }
   }
 
   // camere
