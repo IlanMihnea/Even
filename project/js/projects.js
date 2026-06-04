@@ -13,6 +13,9 @@ function formatLivrareLong(d) {
   return new Date(d).toLocaleDateString('ro-RO', { month: 'long', year: 'numeric' });
 }
 
+// A project/unit price may be intentionally withheld (null/0) → "la cerere".
+function hasPrice(n) { return n != null && n > 0; }
+
 // ---------- LISTĂ PROIECTE ----------
 function shortPjNum(id) {
   return String(id || '').replace(/-/g, '').slice(0, 4).toUpperCase() || '----';
@@ -65,8 +68,11 @@ function renderProjectsList() {
           </div>
           <div class="prop-card-foot">
             <div>
-              <span class="prop-card-price">${formatPrice(p.intervalPret.min)}</span>
-              <span class="prop-card-price-sub">de la · până la ${formatPrice(p.intervalPret.max)}</span>
+              ${hasPrice(p.intervalPret.min)
+                ? `<span class="prop-card-price">${formatPrice(p.intervalPret.min)}</span>
+                   <span class="prop-card-price-sub">de la · până la ${formatPrice(p.intervalPret.max)}</span>`
+                : `<span class="prop-card-price">Preț la cerere</span>
+                   <span class="prop-card-price-sub">consultant dedicat</span>`}
             </div>
             <span class="prop-card-cta">Detalii <i class="fa-solid fa-arrow-right"></i></span>
           </div>
@@ -104,8 +110,11 @@ function renderProjectDetail(p) {
   currentProject = p;
   document.title = `${p.nume} - EVEN`;
 
+  const heroImg = (p.imagini && p.imagini[0])
+    ? `<img src="${p.imagini[0]}" alt="${p.nume}" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover">`
+    : `<div class="img-placeholder" style="position:absolute;inset:0"></div>`;
   document.getElementById('projectHero').innerHTML = `
-    <div class="img-placeholder" style="position:absolute;inset:0"></div>
+    ${heroImg}
     <div class="overlay"></div>
     <div class="project-hero-content">
       <div class="container">
@@ -131,8 +140,10 @@ function renderProjectDetail(p) {
       <div class="summary-val">${p.unitatiDisponibile} / ${p.unitatiTotal}</div>
     </div>
     <div class="summary-item">
-      <div class="summary-label">Interval preț</div>
-      <div class="summary-val">${formatPrice(p.intervalPret.min)} – ${formatPrice(p.intervalPret.max)}</div>
+      <div class="summary-label">Preț</div>
+      <div class="summary-val">${hasPrice(p.intervalPret.min)
+        ? `${formatPrice(p.intervalPret.min)} – ${formatPrice(p.intervalPret.max)}`
+        : 'La solicitare'}</div>
     </div>
   `;
 
@@ -164,18 +175,21 @@ function renderProjectDetail(p) {
 
   renderTimeline(p);
 
-  document.getElementById('paymentPlanWrap').innerHTML = `
-    <h2>Plan de plată</h2>
-    <p style="color:var(--gray-500);margin-bottom:20px">Avans inițial: <strong>${p.planPlata.avans}%</strong> · Restul în tranșe pe etape de construcție</p>
-    <div class="payment-plan">
-      ${p.planPlata.rate.map(r => `
-        <div class="payment-step">
-          <div class="step-pct">${r.procent}%</div>
-          <div class="step-label">${r.etapa}</div>
-        </div>
-      `).join('')}
-    </div>
-  `;
+  const pp = p.planPlata || {};
+  document.getElementById('paymentPlanWrap').innerHTML = (pp.rate && pp.rate.length)
+    ? `
+      <h2>Plan de plată</h2>
+      <p style="color:var(--gray-500);margin-bottom:20px">Avans inițial: <strong>${pp.avans}%</strong> · Restul în tranșe pe etape de construcție</p>
+      <div class="payment-plan">
+        ${pp.rate.map(r => `
+          <div class="payment-step">
+            <div class="step-pct">${r.procent}%</div>
+            <div class="step-label">${r.etapa}</div>
+          </div>
+        `).join('')}
+      </div>
+    `
+    : '';
 
   renderUnitsTable(p);
 
@@ -204,14 +218,33 @@ function renderProjectDetail(p) {
 }
 
 function renderGalleryProj(imagini) {
+  imagini = imagini || [];
+  if (!imagini.length) {
+    return `
+      <h2>Galerie</h2>
+      <div class="gallery">
+        <div class="gallery-main"><div class="img-placeholder"></div></div>
+        <div class="gallery-thumb"><div class="img-placeholder"></div></div>
+        <div class="gallery-thumb"><div class="img-placeholder"></div></div>
+        <div class="gallery-thumb"><div class="img-placeholder"></div></div>
+        <div class="gallery-thumb"><div class="img-placeholder"></div></div>
+      </div>
+    `;
+  }
+  const cell = (src, extra = '') =>
+    `<a href="${src}" target="_blank" rel="noopener">${extra}<img src="${src}" alt="" loading="lazy"></a>`;
+  const main = imagini[0];
+  const thumbs = imagini.slice(1, 5);
+  const remaining = Math.max(0, imagini.length - 5);
   return `
     <h2>Galerie</h2>
     <div class="gallery">
-      <div class="gallery-main"><div class="img-placeholder"></div></div>
-      <div class="gallery-thumb"><div class="img-placeholder"></div></div>
-      <div class="gallery-thumb"><div class="img-placeholder"></div></div>
-      <div class="gallery-thumb"><div class="img-placeholder"></div></div>
-      <div class="gallery-thumb"><div class="img-placeholder"></div><div class="more-overlay">+${Math.max(0, imagini.length - 4)} foto</div></div>
+      <div class="gallery-main">${cell(main)}</div>
+      ${thumbs.map((src, i) => {
+        const overlay = (i === thumbs.length - 1 && remaining > 0)
+          ? `<div class="more-overlay">+${remaining} foto</div>` : '';
+        return `<div class="gallery-thumb">${cell(src, overlay)}</div>`;
+      }).join('')}
     </div>
   `;
 }
@@ -286,11 +319,11 @@ function renderUnitsTable(p) {
               <td>${u.tip}</td>
               <td>Etaj ${u.etaj}</td>
               <td>${u.suprafata} mp</td>
-              <td><strong>${formatPrice(u.pret)}</strong></td>
+              <td><strong>${hasPrice(u.pret) ? formatPrice(u.pret) : 'La cerere'}</strong></td>
               <td><span class="unit-status ${u.status}">${u.status}</span></td>
               <td>
                 ${u.status === 'disponibil' ?
-                  `<button class="btn btn-outline" style="padding:6px 14px;font-size:12px" onclick="alert('Solicitare detalii pentru ${u.numar}')">Detalii</button>` :
+                  `<a class="btn btn-outline" style="padding:6px 14px;font-size:12px" href="#interestForm">Cere ofertă</a>` :
                   ''
                 }
               </td>
