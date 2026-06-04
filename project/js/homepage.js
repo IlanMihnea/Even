@@ -283,10 +283,15 @@ async function renderHomeProjects() {
   if (!grid) return;
   try {
     const projects = await getProjects();
-    grid.innerHTML = projects.map(p => `
+    grid.innerHTML = projects.map(p => {
+      const hasPret = p.intervalPret.min != null && p.intervalPret.min > 0;
+      const img = (p.imagini && p.imagini[0])
+        ? `<img src="${p.imagini[0]}" alt="${p.nume}" loading="lazy">`
+        : `<div class="img-placeholder"></div>`;
+      return `
       <a class="project-card project-compact" href="project-detail.html?id=${p.id}">
         <div class="project-card-img">
-          <div class="img-placeholder"></div>
+          ${img}
           <div class="status-tag">
             <span class="status-dot status-${p.status}"></span> ${formatStatus(p.status)}
           </div>
@@ -297,8 +302,9 @@ async function renderHomeProjects() {
           <h3>${p.nume}</h3>
           <div class="project-loc"><i class="fa-solid fa-location-dot"></i> ${p.cartier}, ${p.oras}</div>
           <div class="project-price-range">
-            ${formatPrice(p.intervalPret.min)} - ${formatPrice(p.intervalPret.max)}
-            <span>preț unitate</span>
+            ${hasPret
+              ? `${formatPrice(p.intervalPret.min)} - ${formatPrice(p.intervalPret.max)}<span>preț unitate</span>`
+              : `Preț la cerere<span>consultant dedicat</span>`}
           </div>
           <div class="project-meta">
             <span>Livrare <strong>${formatLivrare(p.dataLivrare)}</strong></span>
@@ -306,7 +312,8 @@ async function renderHomeProjects() {
           </div>
         </div>
       </a>
-    `).join('');
+    `;
+    }).join('');
   } catch (err) {
     console.error('Projects error:', err);
   }
