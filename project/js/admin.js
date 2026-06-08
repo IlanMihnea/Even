@@ -2149,11 +2149,14 @@ function buildShareToken(prop, branded) {
   return b64.replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
 }
 
+// Branded links use the main brand domain; neutral links use a domain
+// that doesn't contain "even-imobiliare" so the URL itself stays anonymous.
+const SHARE_ORIGIN_BRANDED = 'https://www.even-imobiliare.ro';
+const SHARE_ORIGIN_NEUTRAL = 'https://even-silk.vercel.app';
+
 function shareUrl(prop, branded) {
-  const o = window.location.origin && window.location.origin.startsWith('http')
-    ? window.location.origin
-    : 'https://www.even-imobiliare.ro';
-  return `${o.replace(/\/$/, '')}/p/${buildShareToken(prop, branded)}`;
+  const o = (branded ? SHARE_ORIGIN_BRANDED : SHARE_ORIGIN_NEUTRAL).replace(/\/$/, '');
+  return `${o}/p/${buildShareToken(prop, branded)}`;
 }
 
 function openShareModal(id) {
