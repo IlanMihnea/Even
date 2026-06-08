@@ -575,6 +575,16 @@
     </div>
   </div>
 
+  <!-- MODAL SHARE (link de prezentare neutru) -->
+  <div class="modal" id="shareModal">
+    <div class="modal-card" style="max-width:600px">
+      <div class="modal-close" onclick="closeShareModal()"><i class="fa-solid fa-xmark"></i></div>
+      <h2>Link de prezentare</h2>
+      <p class="modal-sub">Pagină web pe link neutru (<code>/p/…</code>), fără numele site-ului în adresă. Alege varianta brand-uită (cu EVEN și agent) sau neutră (doar proprietatea).</p>
+      <div id="shareBody"></div>
+    </div>
+  </div>
+
   <!-- MODAL IMPORT -->
   <div class="modal" id="importModal">
     <div class="modal-card" style="max-width:720px">
@@ -650,7 +660,8 @@
         addModal:'closeAddModal', projectModal:'closeProjectModal',
         agentModal:'closeAgentModal', leadModal:'closeLeadModal',
         buyerModal:'closeBuyerModal', matchesModal:'closeMatchesModal',
-        importModal:'closeImportModal', contractModal:'closeContractModal'
+        importModal:'closeImportModal', contractModal:'closeContractModal',
+        shareModal:'closeShareModal'
       };
       function closeTopModal(){
         const open = document.querySelector('.modal.open');

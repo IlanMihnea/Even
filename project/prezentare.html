@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Prezentare proprietate</title>
+  <!-- Untrackable share page: no indexing, neutral by default. -->
+  <meta name="robots" content="noindex, nofollow">
+  <meta name="theme-color" content="#1C2340">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=DM+Sans:wght@400;500;600;700&family=Mrs+Saint+Delafield&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <style>
+    :root {
+      --navy: #1C2340;
+      --navy-soft: #243056;
+      --gold: #C8A96E;
+      --ink: #232323;
+      --muted: #6f6f6f;
+      --line: #e4e0d8;
+      --paper: #faf8f3;
+      --bg: #f3f1ec;
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0; background: var(--bg); color: var(--ink);
+      font-family: 'DM Sans', -apple-system, sans-serif;
+      -webkit-font-smoothing: antialiased;
+      line-height: 1.6;
+    }
+    img { display: block; max-width: 100%; }
+    a { color: inherit; }
+
+    /* ---------- top bar (branded only) ---------- */
+    .topbar {
+      position: sticky; top: 0; z-index: 40;
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 14px clamp(18px, 5vw, 48px);
+      background: rgba(28,35,64,0.92);
+      backdrop-filter: blur(10px);
+      color: #fff;
+    }
+    .topbar.hidden { display: none; }
+    .tb-brand {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 24px; font-weight: 600; letter-spacing: 0.12em; line-height: 1;
+    }
+    .tb-brand small {
+      display: block; font-family: 'DM Sans', sans-serif;
+      font-size: 8.5px; letter-spacing: 0.4em; opacity: 0.8;
+      margin-top: 3px; font-weight: 400;
+    }
+    .tb-cta {
+      font-size: 13px; font-weight: 600; letter-spacing: 0.04em;
+      padding: 9px 18px; border-radius: 999px;
+      background: var(--gold); color: var(--navy);
+      text-decoration: none; transition: transform .15s, filter .15s;
+      white-space: nowrap;
+    }
+    .tb-cta:hover { transform: translateY(-1px); filter: brightness(1.05); }
+
+    /* ---------- hero ---------- */
+    .hero {
+      position: relative;
+      min-height: clamp(420px, 78vh, 760px);
+      display: flex; align-items: flex-end;
+      background: var(--navy) center/cover no-repeat;
+      color: #fff; overflow: hidden;
+    }
+    .hero::after {
+      content: ''; position: absolute; inset: 0;
+      background: linear-gradient(to top, rgba(15,20,38,0.86) 0%, rgba(15,20,38,0.25) 45%, rgba(15,20,38,0.12) 100%);
+    }
+    .hero-inner {
+      position: relative; z-index: 2;
+      width: 100%; max-width: 1080px; margin: 0 auto;
+      padding: clamp(28px, 6vw, 64px) clamp(18px, 5vw, 48px);
+    }
+    .hero-tag {
+      display: inline-block;
+      font-size: 11px; letter-spacing: 0.28em; text-transform: uppercase;
+      font-weight: 600; color: var(--gold);
+      padding-bottom: 12px;
+    }
+    .hero-script {
+      font-family: 'Mrs Saint Delafield', cursive;
+      font-size: clamp(30px, 6vw, 46px); color: var(--gold);
+      line-height: 0.9; margin-bottom: 2px; opacity: 0.95;
+    }
+    .hero h1 {
+      font-family: 'Cormorant Garamond', serif;
+      font-weight: 500; font-size: clamp(30px, 5.5vw, 56px);
+      line-height: 1.08; margin: 6px 0 12px; max-width: 18ch;
+    }
+    .hero-loc {
+      font-size: clamp(14px, 2vw, 16px); color: rgba(255,255,255,0.85);
+      display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+    }
+    .hero-loc i { color: var(--gold); }
+    .hero-price {
+      margin-top: 18px;
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(26px, 4.5vw, 40px); font-weight: 600;
+      color: #fff;
+    }
+    .hero-price small {
+      font-family: 'DM Sans', sans-serif; font-size: 14px;
+      color: rgba(255,255,255,0.7); font-weight: 400; margin-left: 6px;
+    }
+    .hero-scroll {
+      position: absolute; bottom: 18px; left: 50%; transform: translateX(-50%);
+      z-index: 2; color: rgba(255,255,255,0.6); font-size: 18px;
+      animation: bob 2s ease-in-out infinite;
+    }
+    @keyframes bob { 0%,100%{ transform: translate(-50%,0);} 50%{ transform: translate(-50%,6px);} }
+
+    /* ---------- layout ---------- */
+    .wrap { max-width: 1080px; margin: 0 auto; padding: 0 clamp(18px, 5vw, 48px); }
+    section.block { padding: clamp(40px, 7vw, 72px) 0; }
+    .eyebrow {
+      font-size: 11px; letter-spacing: 0.26em; text-transform: uppercase;
+      color: var(--gold); font-weight: 600; margin-bottom: 12px;
+    }
+    .block h2 {
+      font-family: 'Cormorant Garamond', serif;
+      font-weight: 500; font-size: clamp(24px, 4vw, 36px);
+      color: var(--navy); margin: 0 0 24px; line-height: 1.15;
+    }
+
+    /* facts */
+    .facts {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 1px; background: var(--line);
+      border: 1px solid var(--line); border-radius: 10px; overflow: hidden;
+    }
+    .fact { background: #fff; padding: 22px 20px; }
+    .fact-label {
+      font-size: 10.5px; letter-spacing: 0.16em; text-transform: uppercase;
+      color: var(--muted); margin-bottom: 8px;
+    }
+    .fact-val {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 26px; font-weight: 600; color: var(--navy); line-height: 1;
+    }
+
+    /* description */
+    .desc {
+      font-size: clamp(15px, 1.8vw, 17px); line-height: 1.85; color: #3a3a3a;
+      white-space: pre-line; max-width: 70ch;
+    }
+
+    /* features chips */
+    .feats { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 26px; }
+    .feat {
+      display: inline-flex; align-items: center; gap: 8px;
+      font-size: 13.5px; color: var(--navy);
+      background: var(--paper); border: 1px solid var(--line);
+      padding: 9px 16px; border-radius: 999px;
+    }
+    .feat i { color: var(--gold); font-size: 12px; }
+
+    /* gallery */
+    .gallery {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px;
+    }
+    .gallery .g {
+      aspect-ratio: 4/3; background: #ddd center/cover no-repeat;
+      border-radius: 8px; cursor: zoom-in;
+      transition: transform .25s, box-shadow .25s; overflow: hidden;
+    }
+    .gallery .g:hover { transform: translateY(-3px); box-shadow: 0 12px 30px rgba(0,0,0,0.14); }
+    .gallery .g.wide { grid-column: span 2; aspect-ratio: 16/8; }
+    @media (max-width: 640px) {
+      .gallery { grid-template-columns: repeat(2, 1fr); }
+      .gallery .g.wide { grid-column: span 2; }
+    }
+
+    /* contact (branded only) */
+    .contact {
+      background: var(--navy); color: #fff;
+      border-radius: 16px; padding: clamp(28px, 5vw, 48px);
+      display: flex; gap: 28px; align-items: center; flex-wrap: wrap;
+      justify-content: space-between;
+    }
+    .contact .c-left { max-width: 30ch; }
+    .contact .eyebrow { color: var(--gold); }
+    .contact h3 {
+      font-family: 'Cormorant Garamond', serif; font-weight: 500;
+      font-size: clamp(22px, 3.5vw, 30px); margin: 0 0 8px;
+    }
+    .contact p { color: rgba(255,255,255,0.78); margin: 0; font-size: 14.5px; }
+    .agent-card {
+      display: flex; gap: 16px; align-items: center;
+      background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 12px; padding: 18px 22px;
+    }
+    .agent-photo {
+      width: 64px; height: 64px; border-radius: 50%;
+      background: #444 center/cover no-repeat; border: 2px solid var(--gold);
+      flex-shrink: 0;
+    }
+    .agent-name { font-weight: 600; font-size: 16px; }
+    .agent-role {
+      font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase;
+      color: var(--gold); margin: 3px 0 10px;
+    }
+    .agent-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+    .agent-actions a {
+      display: inline-flex; align-items: center; gap: 7px;
+      font-size: 13px; font-weight: 600; text-decoration: none;
+      padding: 9px 15px; border-radius: 999px;
+    }
+    .a-wa { background: #25D366; color: #fff; }
+    .a-call { background: var(--gold); color: var(--navy); }
+    .a-mail { background: rgba(255,255,255,0.12); color: #fff; }
+    .agent-actions a:hover { filter: brightness(1.06); }
+
+    /* footer */
+    footer {
+      text-align: center; padding: 40px 20px 56px; color: var(--muted);
+      font-size: 12px;
+    }
+    footer .f-brand {
+      font-family: 'Cormorant Garamond', serif; font-size: 20px;
+      letter-spacing: 0.1em; color: var(--navy); margin-bottom: 6px;
+    }
+    footer.neutral .f-brand { display: none; }
+
+    /* lightbox */
+    .lb {
+      position: fixed; inset: 0; z-index: 100;
+      background: rgba(10,12,22,0.94); display: none;
+      align-items: center; justify-content: center;
+    }
+    .lb.open { display: flex; }
+    .lb img { max-width: 92vw; max-height: 88vh; border-radius: 6px; }
+    .lb-close, .lb-nav {
+      position: absolute; color: #fff; cursor: pointer;
+      font-size: 24px; opacity: 0.8; user-select: none;
+      width: 52px; height: 52px; display: flex; align-items: center; justify-content: center;
+    }
+    .lb-close { top: 14px; right: 16px; }
+    .lb-nav { top: 50%; transform: translateY(-50%); font-size: 34px; }
+    .lb-prev { left: 8px; } .lb-next { right: 8px; }
+    .lb-close:hover, .lb-nav:hover { opacity: 1; }
+
+    .state { padding: 100px 24px; text-align: center; color: var(--muted); }
+    .state .f-brand { font-family:'Cormorant Garamond',serif; font-size:26px; color:var(--navy); letter-spacing:0.1em; margin-bottom:10px; }
+  </style>
+</head>
+<body>
+
+  <div id="topbar"></div>
+  <div id="root">
+    <div class="state"><div class="f-brand">Se încarcă…</div></div>
+  </div>
+
+  <!-- lightbox -->
+  <div class="lb" id="lb">
+    <span class="lb-close" onclick="closeLb()"><i class="fa-solid fa-xmark"></i></span>
+    <span class="lb-nav lb-prev" onclick="lbStep(-1)"><i class="fa-solid fa-chevron-left"></i></span>
+    <img id="lbImg" alt="">
+    <span class="lb-nav lb-next" onclick="lbStep(1)"><i class="fa-solid fa-chevron-right"></i></span>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/db.js"></script>
+  <script>
+    // ── token: "<brandFlag><catChar><id>" base64url-encoded ──────────
+    // brandFlag: 1 branded / 0 neutral.  catChar: r/c/t.
+    const CAT = { r: 'rezidential', c: 'comercial', t: 'terenuri' };
+
+    function decodeToken(tok) {
+      try {
+        let b64 = tok.replace(/-/g, '+').replace(/_/g, '/');
+        while (b64.length % 4) b64 += '=';
+        const raw = decodeURIComponent(escape(atob(b64)));
+        const branded = raw[0] === '1';
+        const categorie = CAT[raw[1]] || 'rezidential';
+        const id = raw.slice(2);
+        if (!id) return null;
+        return { id, categorie, branded };
+      } catch { return null; }
+    }
+
+    function getToken() {
+      // Path form: /p/<token>  (rewritten to this file)
+      const m = location.pathname.match(/\/p\/([^\/?#]+)/);
+      if (m) return decodeURIComponent(m[1]);
+      // Fallback query form: ?t=<token>
+      return new URLSearchParams(location.search).get('t');
+    }
+
+    function esc(s) {
+      return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({
+        '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
+      }[c]));
+    }
+    function fmtPrice(v, currency) {
+      if (!v && v !== 0) return '';
+      return new Intl.NumberFormat('ro-RO').format(+v) + ' ' + (currency || '€');
+    }
+
+    function buildFacts(p) {
+      const f = [];
+      if (p.categorie === 'rezidential') {
+        if (p.camere) f.push(['Camere', p.camere]);
+        if (p.suprafata) f.push(['Suprafață', p.suprafata + ' mp']);
+        if (p.etaj != null) f.push(['Etaj', p.etaj + (p.etajTotal ? '/' + p.etajTotal : '')]);
+        if (p.bai) f.push(['Băi', p.bai]);
+        if (p.anConstructie) f.push(['An', p.anConstructie]);
+        if (p.compartimentare) f.push(['Compartim.', p.compartimentare]);
+      } else if (p.categorie === 'comercial') {
+        if (p.tipSpatiu) f.push(['Tip spațiu', p.tipSpatiu]);
+        if (p.suprafataTotala) f.push(['Suprafață', p.suprafataTotala + ' mp']);
+        if (p.suprafataUtila) f.push(['Suprafață utilă', p.suprafataUtila + ' mp']);
+        if (p.clasaCladire) f.push(['Clasă', p.clasaCladire]);
+        if (p.etaj != null) f.push(['Etaj', p.etaj]);
+        if (p.locuriParcare) f.push(['Parcare', p.locuriParcare + ' locuri']);
+      } else if (p.categorie === 'terenuri') {
+        if (p.tip) f.push(['Tip', p.tip]);
+        if (p.suprafata) f.push(['Suprafață', p.suprafata + ' ' + (p.unitate || 'mp')]);
+        if (p.frontStradal) f.push(['Front stradal', p.frontStradal + ' ml']);
+        if (p.zonarePUG) f.push(['PUG', p.zonarePUG]);
+        if (p.POT) f.push(['POT', p.POT + '%']);
+        if (p.CUT) f.push(['CUT', p.CUT]);
+      }
+      return f;
+    }
+
+    // ── gallery / lightbox ──────────────────────────────────────────
+    let GALLERY = [], lbIdx = 0;
+    function openLb(i) { lbIdx = i; document.getElementById('lbImg').src = GALLERY[i]; document.getElementById('lb').classList.add('open'); }
+    function closeLb() { document.getElementById('lb').classList.remove('open'); }
+    function lbStep(d) { lbIdx = (lbIdx + d + GALLERY.length) % GALLERY.length; document.getElementById('lbImg').src = GALLERY[lbIdx]; }
+    document.addEventListener('keydown', e => {
+      if (!document.getElementById('lb').classList.contains('open')) return;
+      if (e.key === 'Escape') closeLb();
+      if (e.key === 'ArrowRight') lbStep(1);
+      if (e.key === 'ArrowLeft') lbStep(-1);
+    });
+
+    function render(p, branded) {
+      const catLabel = { rezidential:'Rezidențial', comercial:'Comercial', terenuri:'Teren' }[p.categorie] || '';
+      const regim = p.regim === 'inchiriere' ? 'De închiriat' : (p.regim === 'vanzare' ? 'De vânzare' : '');
+      const loc = [p.cartier, p.oras || p.localitate || p.judet].filter(Boolean).join(', ');
+      const imgs = p.imagini || [];
+      const cover = imgs[0] || '';
+      GALLERY = imgs.slice();
+
+      const price = p.pret ?? p.pretTotal;
+      const unit = (p.regim === 'inchiriere' && p.categorie === 'rezidential') ? '/lună'
+                 : (p.categorie === 'comercial' && p.regim === 'inchiriere') ? '€/mp/lună' : '';
+
+      const facts = buildFacts(p);
+      const feats = p.facilitati || p.utilitati || [];
+
+      document.title = branded ? `${p.titlu || 'Prezentare'} · EVEN` : (p.titlu || 'Prezentare proprietate');
+
+      // top bar
+      const a = p.agent || {};
+      const waNum = (a.telefon || '').replace(/[^\d]/g, '').replace(/^0/, '40');
+      document.getElementById('topbar').outerHTML = branded ? `
+        <div class="topbar" id="topbar">
+          <div class="tb-brand">EVEN<small>IMOBILIARE</small></div>
+          <a class="tb-cta" href="#contact"><i class="fa-solid fa-calendar-check"></i> Programează vizionare</a>
+        </div>` : '<div class="topbar hidden" id="topbar"></div>';
+
+      // hero
+      const heroScript = branded ? `<div class="hero-script">prezentare exclusivă</div>` : '';
+      const hero = `
+        <div class="hero" style="${cover ? `background-image:url('${esc(cover)}')` : ''}">
+          <div class="hero-inner">
+            ${heroScript}
+            <span class="hero-tag">${esc([catLabel, regim].filter(Boolean).join(' · '))}</span>
+            <h1>${esc(p.titlu || 'Proprietate')}</h1>
+            ${loc ? `<div class="hero-loc"><i class="fa-solid fa-location-dot"></i> ${esc(loc)}${p.adresa ? ' · ' + esc(p.adresa) : ''}</div>` : ''}
+            ${price ? `<div class="hero-price">${fmtPrice(price, p.moneda || '€')}${unit ? `<small>${unit}</small>` : ''}</div>` : ''}
+          </div>
+          ${imgs.length ? '<a class="hero-scroll" href="#detalii"><i class="fa-solid fa-chevron-down"></i></a>' : ''}
+        </div>`;
+
+      // facts
+      const factsBlock = facts.length ? `
+        <section class="block" id="detalii"><div class="wrap">
+          <div class="eyebrow">Caracteristici</div>
+          <div class="facts">
+            ${facts.map(([l, v]) => `<div class="fact"><div class="fact-label">${esc(l)}</div><div class="fact-val">${esc(String(v))}</div></div>`).join('')}
+          </div>
+        </div></section>` : '';
+
+      // description + features
+      const descBlock = (p.descriere || feats.length) ? `
+        <section class="block" style="padding-top:0"><div class="wrap">
+          ${p.descriere ? `<div class="eyebrow">Descriere</div><h2>Despre proprietate</h2><div class="desc">${esc(p.descriere)}</div>` : ''}
+          ${feats.length ? `<div class="feats">${feats.map(x => `<span class="feat"><i class="fa-solid fa-check"></i>${esc(x)}</span>`).join('')}</div>` : ''}
+        </div></section>` : '';
+
+      // gallery (skip cover, already in hero)
+      const rest = imgs.slice(1);
+      const galleryBlock = rest.length ? `
+        <section class="block" style="padding-top:0"><div class="wrap">
+          <div class="eyebrow">Galerie</div><h2>Imagini</h2>
+          <div class="gallery">
+            ${rest.map((url, i) => `<div class="g${(i % 5 === 0 && rest.length > 3) ? ' wide' : ''}" style="background-image:url('${esc(url)}')" onclick="openLb(${i + 1})"></div>`).join('')}
+          </div>
+        </div></section>` : '';
+
+      // contact (branded only)
+      let contactBlock = '';
+      if (branded) {
+        const photo = a.foto ? `<div class="agent-photo" style="background-image:url('${esc(a.foto)}')"></div>` : '<div class="agent-photo"></div>';
+        const actions = [];
+        if (a.telefon && waNum) actions.push(`<a class="a-wa" href="https://wa.me/${waNum}" target="_blank" rel="noopener"><i class="fa-brands fa-whatsapp"></i> WhatsApp</a>`);
+        if (a.telefon) actions.push(`<a class="a-call" href="tel:${esc(a.telefon)}"><i class="fa-solid fa-phone"></i> ${esc(a.telefon)}</a>`);
+        if (a.email) actions.push(`<a class="a-mail" href="mailto:${esc(a.email)}?subject=${encodeURIComponent('Interes: ' + (p.titlu || 'proprietate'))}"><i class="fa-solid fa-envelope"></i> Email</a>`);
+        contactBlock = `
+          <section class="block" id="contact"><div class="wrap">
+            <div class="contact">
+              <div class="c-left">
+                <div class="eyebrow">Hai să vorbim</div>
+                <h3>Programează o vizionare</h3>
+                <p>Contactează agentul pentru detalii sau o vizită la fața locului.</p>
+              </div>
+              <div class="agent-card">
+                ${photo}
+                <div>
+                  <div class="agent-name">${esc(a.nume || 'Agent EVEN')}</div>
+                  <div class="agent-role">${esc(a.rol || 'Agent imobiliar')}</div>
+                  <div class="agent-actions">${actions.join('')}</div>
+                </div>
+              </div>
+            </div>
+          </div></section>`;
+      }
+
+      const footer = branded
+        ? `<footer><div class="f-brand">EVEN IMOBILIARE</div><div>even-imobiliare.ro</div></footer>`
+        : `<footer class="neutral"><div>Prezentare proprietate</div></footer>`;
+
+      document.getElementById('root').innerHTML = hero + factsBlock + descBlock + galleryBlock + contactBlock + footer;
+    }
+
+    async function init() {
+      const tok = getToken();
+      const data = tok && decodeToken(tok);
+      if (!data) {
+        document.getElementById('root').innerHTML = '<div class="state"><div class="f-brand">Link invalid</div><div>Acest link de prezentare nu este valid.</div></div>';
+        return;
+      }
+      try {
+        const p = await getPropertyById(data.id, data.categorie);
+        if (!p || p.activ === false) {
+          document.getElementById('root').innerHTML = '<div class="state"><div class="f-brand">Indisponibil</div><div>Această proprietate nu mai este disponibilă.</div></div>';
+          return;
+        }
+        render(p, data.branded);
+      } catch (err) {
+        document.getElementById('root').innerHTML = '<div class="state"><div class="f-brand">Eroare</div><div>Nu am putut încărca proprietatea.</div></div>';
+      }
+    }
+
+    init();
+  </script>
+</body>
+</html>

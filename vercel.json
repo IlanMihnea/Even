@@ -1,7 +1,8 @@
 {
   "outputDirectory": "project",
   "rewrites": [
-    { "source": "/banner", "destination": "/banner.html" }
+    { "source": "/banner", "destination": "/banner.html" },
+    { "source": "/p/:token", "destination": "/prezentare.html" }
   ],
   "functions": {
     "api/contracts-sign.js": { "includeFiles": "api/_contracts/fonts/**" }

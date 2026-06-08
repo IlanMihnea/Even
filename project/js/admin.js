@@ -842,7 +842,7 @@ async function renderTable() {
                     : `<span class="icon-btn icon-btn-banner${row.homeHero ? ' is-on' : ''}" onclick="toggleHomeHero('${row.id}', ${row.homeHero ? 'true' : 'false'})" title="${row.homeHero ? 'În hero pe homepage · click pentru a scoate' : 'Pune în hero pe homepage'}"><i class="fa-solid fa-star"></i></span>`}
                   ${row.activ === false ? '' : `<span class="icon-btn" onclick="copyPropertyLink('${row.id}')" title="Copiază linkul public"><i class="fa-solid fa-link"></i></span>`}
                   <span class="icon-btn" onclick="openBrochure('${row.id}', '${activeAdminTab}', false)" title="Brochure PDF"><i class="fa-solid fa-file-pdf"></i></span>
-                  <span class="icon-btn" onclick="openBrochure('${row.id}', '${activeAdminTab}', true)" title="Brochure pentru colaborator (fără agent)"><i class="fa-solid fa-share-from-square"></i></span>
+                  <span class="icon-btn" onclick="openShareModal('${row.id}')" title="Link de prezentare (brand-uit sau neutru)"><i class="fa-solid fa-share-from-square"></i></span>
                   <span class="icon-btn" onclick="editProperty('${row.id}', '${activeAdminTab}')" title="Editează"><i class="fa-solid fa-pen"></i></span>
                   ${row.activ === false
                     ? `<span class="icon-btn" onclick="restoreProperty('${row.id}')" title="Restaurează"><i class="fa-solid fa-rotate-left"></i></span>`
@@ -2119,6 +2119,7 @@ function openMatchesForBuyer(buyerId) {
           <div class="match-item-actions">
             <a class="icon-btn" href="${publicPropertyUrl(p)}" target="_blank" title="Vezi anunțul"><i class="fa-solid fa-eye"></i></a>
             <a class="icon-btn" onclick="openBrochure('${p.id}', '${p.categorie}', false); return false;" href="#" title="Brochure"><i class="fa-solid fa-file-pdf"></i></a>
+            <a class="icon-btn" onclick="openShareModal('${p.id}'); return false;" href="#" title="Link de prezentare (brand-uit sau neutru)"><i class="fa-solid fa-share-from-square"></i></a>
           </div>
         </div>`;
     }).join('')}</div>`;
@@ -2132,6 +2133,77 @@ function openMatchesForBuyer(buyerId) {
 function openBrochure(id, cat, blind) {
   const url = `brochure.html?id=${encodeURIComponent(id)}&cat=${encodeURIComponent(cat)}${blind ? '&blind=1' : ''}`;
   window.open(url, '_blank', 'noopener');
+}
+
+// ============================================================
+// SHARE — neutral web presentation link ( /p/<token> )
+// Token = base64url("<brandFlag><catChar><id>"). brandFlag 1/0,
+// catChar r/c/t. Decoded by prezentare.html — no even-imobiliare.ro
+// in the path, neutral or branded content depending on brandFlag.
+// ============================================================
+function buildShareToken(prop, branded) {
+  const catChar = { rezidential: 'r', comercial: 'c', terenuri: 't' }[prop.categorie] || 'r';
+  const raw = (branded ? '1' : '0') + catChar + String(prop.id);
+  // utf8-safe base64url
+  const b64 = btoa(unescape(encodeURIComponent(raw)));
+  return b64.replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+}
+
+function shareUrl(prop, branded) {
+  const o = window.location.origin && window.location.origin.startsWith('http')
+    ? window.location.origin
+    : 'https://www.even-imobiliare.ro';
+  return `${o.replace(/\/$/, '')}/p/${buildShareToken(prop, branded)}`;
+}
+
+function openShareModal(id) {
+  const prop = (allPropsCache || []).find(p => String(p.id) === String(id));
+  if (!prop) return;
+  const branded = shareUrl(prop, true);
+  const neutral = shareUrl(prop, false);
+
+  const row = (label, hint, url, accent) => `
+    <div class="share-link-card" style="border:1px solid var(--gray-200,#e4e4e4);border-radius:10px;padding:16px;margin-top:14px">
+      <div style="display:flex;align-items:center;gap:8px;font-weight:600;color:${accent}">
+        <i class="fa-solid ${accent === 'var(--gold,#C8A96E)' ? 'fa-star' : 'fa-user-secret'}"></i> ${label}
+      </div>
+      <div style="font-size:12.5px;color:#777;margin:4px 0 10px">${hint}</div>
+      <div style="display:flex;gap:8px;align-items:stretch;flex-wrap:wrap">
+        <input type="text" readonly value="${escapeHtmlAdm(url)}" onclick="this.select()"
+          style="flex:1;min-width:200px;font-size:12.5px;padding:9px 11px;border:1px solid #ddd;border-radius:8px;background:#fafafa;color:#333">
+        <button type="button" class="apl-btn apl-btn-primary" style="white-space:nowrap" onclick="copyShareUrl(this,'${escapeHtmlAdm(url)}')">
+          <i class="fa-solid fa-copy"></i> Copiază
+        </button>
+        <a class="apl-btn apl-btn-ghost" href="${escapeHtmlAdm(url)}" target="_blank" rel="noopener" title="Deschide" style="white-space:nowrap">
+          <i class="fa-solid fa-arrow-up-right-from-square"></i>
+        </a>
+        <a class="apl-btn apl-btn-ghost" href="https://wa.me/?text=${encodeURIComponent(url)}" target="_blank" rel="noopener" title="Trimite pe WhatsApp" style="white-space:nowrap">
+          <i class="fa-brands fa-whatsapp"></i>
+        </a>
+      </div>
+    </div>`;
+
+  document.getElementById('shareBody').innerHTML =
+    row('Brand-uit (EVEN)', 'Cu logo EVEN, agent și buton de contact.', branded, 'var(--gold,#C8A96E)') +
+    row('Neutru (fără brand)', 'Doar proprietatea — fără logo, fără agent, fără website. Pentru colaboratori.', neutral, 'var(--navy,#1C2340)');
+
+  document.getElementById('shareModal').classList.add('open');
+}
+
+function closeShareModal() {
+  document.getElementById('shareModal').classList.remove('open');
+}
+
+async function copyShareUrl(btn, url) {
+  try {
+    await navigator.clipboard.writeText(url);
+    const old = btn.innerHTML;
+    btn.innerHTML = '<i class="fa-solid fa-check"></i> Copiat';
+    setTimeout(() => { btn.innerHTML = old; }, 1600);
+    showToast('Link copiat în clipboard.');
+  } catch {
+    prompt('Copiază manual linkul:', url);
+  }
 }
 
 // ---------- INIT ----------
