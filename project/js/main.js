@@ -47,32 +47,42 @@ function renderNavbar(activePage = '') {
   }
 }
 
-// Owner-only hidden access to admin panel.
-// Two ways in:
-//   1. Keyboard:  Ctrl/Cmd + Shift + A
-//   2. Triple-click the EVEN logomark
+// Owner-only hidden access to admin panel. Discreet on purpose.
+// Three ways in:
+//   1. Keyboard:        Ctrl/Cmd + Shift + A   (desktop)
+//   2. Triple-click the EVEN logomark          (desktop)
+//   3. Tap the footer copyright 5× quickly     (mobile-friendly — it's
+//      plain text, not a link, so taps never navigate away)
 function initAdminAccess() {
+  const goAdmin = () => { window.location.href = 'admin.html'; };
+
   document.addEventListener('keydown', (e) => {
     if (e.shiftKey && (e.ctrlKey || e.metaKey) && (e.key === 'A' || e.key === 'a')) {
       e.preventDefault();
-      window.location.href = 'admin.html';
+      goAdmin();
     }
   });
-  const logo = document.querySelector('.navbar .logo');
-  if (logo) {
-    let clicks = 0;
-    let timer = null;
-    logo.addEventListener('click', (e) => {
-      clicks += 1;
+
+  // A reusable "secret knock": N taps within a short window.
+  const secretKnock = (el, { taps = 5, windowMs = 1500 } = {}) => {
+    if (!el) return;
+    let count = 0, timer = null;
+    el.addEventListener('pointerup', (e) => {
+      count += 1;
       if (timer) clearTimeout(timer);
-      timer = setTimeout(() => { clicks = 0; }, 600);
-      if (clicks >= 3) {
-        e.preventDefault();
-        clicks = 0;
-        window.location.href = 'admin.html';
+      timer = setTimeout(() => { count = 0; }, windowMs);
+      if (count >= taps) {
+        count = 0;
+        if (e.cancelable) e.preventDefault();
+        goAdmin();
       }
     });
-  }
+  };
+
+  // Desktop: triple-click the navbar logomark.
+  secretKnock(document.querySelector('.navbar .logo'), { taps: 3, windowMs: 600 });
+  // Mobile: tap the footer copyright line 5× (generous window so it's easy).
+  secretKnock(document.querySelector('.footer-bottom'), { taps: 5, windowMs: 2500 });
 }
 
 // ---------- NAVBAR SCROLL TRANSFORM ----------
