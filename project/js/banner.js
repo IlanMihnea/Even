@@ -415,65 +415,118 @@ async function bnSubmitLead(e) {
 }
 
 // ============================================
-// TEASER MODE — Motel Izvoru Muntelui
-// Shown when no property is currently flagged
-// `banner = true` in the DB. Replace this with a
-// real listing whenever the prezentation is ready.
+// MOTEL PRESENTATION — Bicaz–Durău
+// Premium, full presentation for the property
+// printed on the physical QR banner. Pulls live
+// data (photos, price, description) from the DB
+// by ID so it stays in sync with the listing,
+// with the constants below as a safe fallback.
+// To point the banner at a different property,
+// change BANNER_PROPERTY_ID.
 // ============================================
+const BANNER_PROPERTY_ID = 'com-1780610064765';
+
 const MOTEL = {
-  loc:          'Izvoru Muntelui · Ramificație, Bicaz',
-  pretEUR:      399000,
-  ariaConstr:   446,
-  ariaDesf:     1414,
-  ariaUtil:     1038,
-  teren:        1000,
-  regim:        'S+P+3M',
-  camere:       25,
-  restaurantMp: 177,
-  terasaMp:     60,
-  mapsQ:        'Izvorul Muntelui Bicaz'
+  id:          BANNER_PROPERTY_ID,
+  loc:         'Bicaz – Durău · Neamț',
+  pretEUR:     400000,
+  ariaConstr:  446,      // amprentă la sol 446,14 mp
+  ariaDesf:    1414,
+  ariaUtil:    1200,
+  teren:       1000,
+  regim:       'S+P+3M',
+  camere:      20,
+  pot:         '44,6%',
+  cut:         '1,41',
+  subsolMp:    '209,60',
+  mansardaMp:  '114,49',
+  mapsQ:       'Bicaz Neamț'
 };
 
-function bnRenderMotelTeaser() {
+// Pulls the live listing so the QR page mirrors the published property.
+async function getMotelProperty() {
+  try {
+    const { data, error } = await _supabase
+      .from('properties').select('*').eq('id', BANNER_PROPERTY_ID).maybeSingle();
+    if (error) return null;
+    return data;
+  } catch (_) { return null; }
+}
+
+// Turns the narrative part of the listing description into HTML
+// paragraphs. Drops the SEO keyword line and stops at the "Detalii"
+// bullet list (those numbers already live in the curated specs above).
+function bnFormatDescription(text) {
+  if (!text) return '';
+  const lines = String(text).replace(/\r/g, '').split('\n');
+  let html = '';
+  for (let raw of lines) {
+    const line = raw.trim();
+    if (!line) continue;
+    // once the bullet/"Detalii" block starts, the rest is covered by our specs
+    if (/^detalii\s*:?$/i.test(line) || /^[-•]\s*/.test(line)) break;
+    // skip the keyword-stuffed first line (pipes)
+    if (!html && line.includes('|')) continue;
+    html += `<p class="bn-teaser-text">${bnEsc(line)}</p>`;
+  }
+  return html;
+}
+
+function bnRenderMotelTeaser(live) {
   const main = document.getElementById('bnContent');
   if (!main) return;
-  document.title = 'Motel la gri · Izvoru Muntelui · EVEN';
+  const p = live || {};
+  const titlu   = 'Motel + restaurant, Bicaz–Durău';
+  const pretEUR = p.pret_total != null ? p.pret_total : MOTEL.pretEUR;
+  const imagini = Array.isArray(p.imagini) ? p.imagini.filter(Boolean) : [];
+  document.title = `${titlu} · EVEN`;
   main.classList.add('bn-mode-teaser');
 
-  const waText = encodeURIComponent('Bună, am scanat QR-ul. Vreau detalii despre motelul din Izvoru Muntelui.');
+  const waText = encodeURIComponent('Bună, am scanat QR-ul. Vreau detalii despre motelul din Bicaz–Durău.');
   const waHref = `https://wa.me/${BANNER_CONTACT.whatsapp}?text=${waText}`;
   const mapsHref = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(MOTEL.mapsQ)}`;
+  const detailHref = `property-comercial.html?id=${encodeURIComponent(MOTEL.id)}`;
   const fmt = n => new Intl.NumberFormat('ro-RO').format(n);
+
+  // Gallery (reuses the shared hero+thumbs+lightbox machinery)
+  const galleryHTML = imagini.length
+    ? `<section class="bn-teaser-gallery"><div class="bn-gallery">${bnRenderGallery(imagini)}</div></section>`
+    : '';
+
+  // Description: prefer the live listing text, formatted; else nothing
+  const descHTML = p.descriere ? bnFormatDescription(p.descriere) : '';
 
   main.innerHTML = `
     <article class="bn-teaser">
 
       <!-- HERO -->
       <section class="bn-teaser-hero">
-        <span class="bn-teaser-eyebrow">Teaser · prezentare completă în curând</span>
+        <span class="bn-teaser-eyebrow">De vânzare · Investiție montană</span>
         <h1 class="bn-teaser-title">
-          Motel la gri,<br><em>Izvoru Muntelui</em>
+          Motel + restaurant,<br><em>Bicaz–Durău</em>
         </h1>
         <p class="bn-teaser-sub">
-          Investiție turistică · S+P+3M · ${fmt(MOTEL.ariaDesf)} mp construiți pe ${fmt(MOTEL.teren)} mp teren,
-          la pas de Cheile Bicazului.
+          Structură la gri · S+P+3M · ${fmt(MOTEL.ariaDesf)} mp desfășurați pe ${fmt(MOTEL.teren)} mp teren,
+          la intrarea pe drumul axial spre Durău.
         </p>
         <div class="bn-teaser-price-wrap">
           <span class="bn-teaser-price-label">Preț cerut</span>
           <div class="bn-teaser-price">
-            <span class="bn-teaser-price-num">${fmt(MOTEL.pretEUR)}</span>
+            <span class="bn-teaser-price-num">${fmt(pretEUR)}</span>
             <span class="bn-teaser-price-cur">€</span>
           </div>
         </div>
         <div class="bn-teaser-hero-cta">
           <a class="bn-btn bn-btn-primary" href="#bnLeadAnchor">
-            <i class="fa-solid fa-bell" aria-hidden="true"></i> Vreau prezentarea completă
+            <i class="fa-solid fa-calendar-check" aria-hidden="true"></i> Programează o vizionare
           </a>
           <a class="bn-btn bn-btn-ghost-dark" href="tel:${BANNER_CONTACT.phoneTel}">
             <i class="fa-solid fa-phone" aria-hidden="true"></i> Sună ${BANNER_CONTACT.phoneTxt}
           </a>
         </div>
       </section>
+
+      ${galleryHTML}
 
       <!-- STATS -->
       <section class="bn-stats" aria-label="Cifrele proiectului">
@@ -498,44 +551,71 @@ function bnRenderMotelTeaser() {
       <!-- STATUS -->
       <section class="bn-teaser-block">
         <span class="bn-eyebrow">Stadiu actual</span>
-        <h2 class="bn-teaser-h2">La <em>gri</em>, gata de finisat</h2>
+        <h2 class="bn-teaser-h2">La <em>gri</em>, gata de preluat și finisat</h2>
         <ul class="bn-status-list" role="list">
-          <li><i class="fa-solid fa-check" aria-hidden="true"></i><span>Structură de rezistență finalizată</span></li>
-          <li><i class="fa-solid fa-check" aria-hidden="true"></i><span>Acoperiș montat — învelitoare tablă Lindab</span></li>
-          <li><i class="fa-solid fa-check" aria-hidden="true"></i><span>Termopane montate (PVC + aluminiu la parter)</span></li>
-          <li><i class="fa-solid fa-check" aria-hidden="true"></i><span>Compartimentări interioare realizate pe toate nivelele</span></li>
-          <li><i class="fa-solid fa-hourglass-half" aria-hidden="true"></i><span>De finalizat: finisaje interioare/exterioare, instalații, dotări</span></li>
+          <li><i class="fa-solid fa-check" aria-hidden="true"></i><span>Construcție începută în 2004, lucrări continuate până acum ~6 ani</span></li>
+          <li><i class="fa-solid fa-check" aria-hidden="true"></i><span>Structură solidă, regim S+P+3M (subsol + parter + 3 mansarde)</span></li>
+          <li><i class="fa-solid fa-check" aria-hidden="true"></i><span>Compartimentare gândită pentru restaurant + cazare pe niveluri</span></li>
+          <li><i class="fa-solid fa-hourglass-half" aria-hidden="true"></i><span>Compartimentarea și finisajele rămân la latitudinea cumpărătorului</span></li>
         </ul>
       </section>
 
       <!-- DESTINATIE -->
       <section class="bn-teaser-block">
-        <span class="bn-eyebrow">Destinație</span>
-        <h2 class="bn-teaser-h2">Motel cu <em>restaurant</em>, în zonă turistică</h2>
+        <span class="bn-eyebrow">Compartimentare</span>
+        <h2 class="bn-teaser-h2">Restaurant cu vedere și <em>~${MOTEL.camere} camere</em></h2>
         <div class="bn-destinatie-grid">
           <div>
             <strong>Subsol</strong>
-            <span>Depozit, adăpost ALA, centrală termică, grupuri sanitare.</span>
+            <span>${MOTEL.subsolMp} mp — adăpost ALA, depozit și parte administrativă.</span>
           </div>
           <div>
-            <strong>Parter</strong>
-            <span>Restaurant ${MOTEL.restaurantMp} mp, bar, bucătărie, recepție, terasă ${MOTEL.terasaMp} mp.</span>
+            <strong>Parter + Etaj 1</strong>
+            <span>Restaurant, bar și bucătărie la parter; restaurant cu vedere deschisă la etaj 1.</span>
           </div>
           <div>
             <strong>Mansardele 1–3</strong>
-            <span>~${MOTEL.camere} camere de cazare cu băi proprii și balcoane.</span>
+            <span>~${MOTEL.camere} camere de cazare cu băi proprii, ${MOTEL.mansardaMp} mp/nivel.</span>
           </div>
         </div>
       </section>
+
+      <!-- DATE TEHNICE -->
+      <section class="bn-teaser-block">
+        <span class="bn-eyebrow">Date tehnice</span>
+        <h2 class="bn-teaser-h2">Cifrele <em>proiectului</em></h2>
+        <div class="bn-specs">
+          <div class="bn-spec"><i class="fa-solid fa-vector-square"></i><div>
+            <span class="bn-spec-val">${fmt(MOTEL.ariaDesf)} mp</span><span class="bn-spec-lbl">desfășurat total</span></div></div>
+          <div class="bn-spec"><i class="fa-solid fa-ruler-combined"></i><div>
+            <span class="bn-spec-val">${fmt(MOTEL.ariaConstr)} mp</span><span class="bn-spec-lbl">amprentă la sol</span></div></div>
+          <div class="bn-spec"><i class="fa-solid fa-map"></i><div>
+            <span class="bn-spec-val">${fmt(MOTEL.teren)} mp</span><span class="bn-spec-lbl">teren</span></div></div>
+          <div class="bn-spec"><i class="fa-solid fa-building"></i><div>
+            <span class="bn-spec-val">${MOTEL.regim}</span><span class="bn-spec-lbl">regim înălțime</span></div></div>
+          <div class="bn-spec"><i class="fa-solid fa-percent"></i><div>
+            <span class="bn-spec-val">${MOTEL.pot}</span><span class="bn-spec-lbl">POT</span></div></div>
+          <div class="bn-spec"><i class="fa-solid fa-layer-group"></i><div>
+            <span class="bn-spec-val">${MOTEL.cut}</span><span class="bn-spec-lbl">CUT</span></div></div>
+        </div>
+      </section>
+
+      ${descHTML ? `
+      <!-- DESCRIERE -->
+      <section class="bn-teaser-block">
+        <span class="bn-eyebrow">Despre proprietate</span>
+        <h2 class="bn-teaser-h2">Poveștea <em>investiției</em></h2>
+        ${descHTML}
+      </section>` : ''}
 
       <!-- LOCATIE -->
       <section class="bn-teaser-block">
         <span class="bn-eyebrow">Localizare</span>
         <h2 class="bn-teaser-h2">${bnEsc(MOTEL.loc.split('·')[0].trim())} · <em>${bnEsc(MOTEL.loc.split('·')[1].trim())}</em></h2>
         <p class="bn-teaser-text">
-          Pe DJ155F, la câțiva kilometri de Lacul Izvorul Muntelui și de intrarea în
-          Cheile Bicazului. Una dintre cele mai circulate zone turistice din Neamț —
-          flux constant de turiști români și străini tot anul.
+          Amplasat între râu și drum, chiar la intrarea pe drumul axial care duce spre
+          stațiunea Durău, cu acces bun către Bicaz — cel mai apropiat oraș. Zonă montană
+          turistică, cu flux constant tot anul.
         </p>
         <a class="bn-loc-link" href="${mapsHref}" target="_blank" rel="noopener">
           <i class="fa-solid fa-location-dot" aria-hidden="true"></i>
@@ -547,11 +627,11 @@ function bnRenderMotelTeaser() {
       <!-- LEAD FORM + DIRECT CONTACT -->
       <section class="bn-teaser-cta" id="bnLeadAnchor">
         <div class="bn-teaser-cta-card">
-          <span class="bn-eyebrow">Prezentarea completă</span>
-          <h2 class="bn-teaser-h2">Memoriu tehnic, planuri pe etaje, fotografii —<br><em>vin în curând</em></h2>
+          <span class="bn-eyebrow">Vizionare & detalii</span>
+          <h2 class="bn-teaser-h2">Vrei să vezi potențialul <em>cu ochii tăi</em>?</h2>
           <p class="bn-teaser-text">
-            Lasă-mi datele și te anunț personal când publicăm prezentarea completă.
-            Nu trimit altceva — doar acea singură notificare.
+            Lasă-mi datele și te contactez personal pentru o vizionare sau pentru
+            documentația tehnică completă a proiectului.
           </p>
           <form id="bnLeadForm" onsubmit="bnSubmitTeaserLead(event)" novalidate>
             <label class="bn-field">
@@ -571,7 +651,7 @@ function bnRenderMotelTeaser() {
               <textarea name="mesaj" rows="2" placeholder="Întrebări, context, orice vrei să știu"></textarea>
             </label>
             <button type="submit" class="bn-btn bn-btn-primary bn-btn-block">
-              <i class="fa-solid fa-bell" aria-hidden="true"></i> Anunță-mă când e gata
+              <i class="fa-solid fa-paper-plane" aria-hidden="true"></i> Trimite cererea
             </button>
           </form>
         </div>
@@ -586,15 +666,20 @@ function bnRenderMotelTeaser() {
           <a class="bn-btn bn-btn-wa" href="${waHref}" target="_blank" rel="noopener">
             <i class="fa-brands fa-whatsapp" aria-hidden="true"></i> WhatsApp
           </a>
-          <a class="bn-btn bn-btn-ghost-dark" href="mailto:${BANNER_CONTACT.email}?subject=${encodeURIComponent('Interes motel Izvoru Muntelui')}">
+          <a class="bn-btn bn-btn-ghost-dark" href="mailto:${BANNER_CONTACT.email}?subject=${encodeURIComponent('Interes motel Bicaz–Durău')}">
             <i class="fa-solid fa-envelope" aria-hidden="true"></i> Email
           </a>
         </aside>
       </section>
 
+      <a class="bn-full-link" href="${detailHref}">
+        <span><i class="fa-solid fa-file-lines"></i> Vezi anunțul complet pe site</span>
+        <i class="fa-solid fa-arrow-right"></i>
+      </a>
+
       <p class="bn-teaser-fineprint">
-        Anunț informativ. Datele tehnice provin din memoriul de proiect (Pr. nr. 394/2004,
-        SC CASS Proiect). Detaliile finale și documentația vor fi disponibile odată cu prezentarea completă.
+        Anunț informativ. Datele tehnice provin din memoriul de proiect.
+        Documentația finală este disponibilă la cerere.
       </p>
     </article>
 
@@ -621,10 +706,11 @@ async function bnSubmitTeaserLead(e) {
     email: data.email,
     telefon: data.telefon,
     mesaj: userMsg
-      ? userMsg + '\n\n— Înregistrat de pe teaser motel Izvoru Muntelui (banner QR)'
-      : 'Vreau să fiu anunțat când prezentarea completă a motelului din Izvoru Muntelui este gata.',
-    tip: 'contact',
-    sursa: 'banner-qr-teaser-motel'
+      ? userMsg + '\n\n— Înregistrat de pe pagina QR a motelului din Bicaz–Durău'
+      : 'Vreau o vizionare / detalii despre motelul din Bicaz–Durău (scanat de pe banner QR).',
+    property_id: BANNER_PROPERTY_ID,
+    tip: 'vizionare',
+    sursa: 'banner-qr-motel'
   };
 
   const orig = btn.innerHTML;
@@ -662,11 +748,10 @@ async function bnSubmitTeaserLead(e) {
 // ---------- INIT ----------
 document.addEventListener('DOMContentLoaded', async () => {
   try {
-    const p = await getBannerProperty();
-    if (p) bnRender(p);
-    else bnRenderMotelTeaser();
+    const live = await getMotelProperty();
+    bnRenderMotelTeaser(live);
   } catch (err) {
     console.error('Banner load error:', err);
-    bnRenderMotelTeaser();
+    bnRenderMotelTeaser(null);
   }
 });

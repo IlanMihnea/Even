@@ -739,12 +739,18 @@ async function initPropertyMap(p, category) {
   const mapEl = document.getElementById('pp-map');
   if (!mapEl || typeof L === 'undefined') return;
   const addr = [p.adresa, p.cartier, p.localitate, p.oras, p.judet].filter(Boolean).join(', ');
-  let lat, lng;
-  try {
-    const res  = await fetch(`https://nominatim.openstreetmap.org/search?format=json&limit=1&q=${encodeURIComponent(addr+', Romania')}`, { headers:{'Accept-Language':'ro'} });
-    const data = await res.json();
-    if (data && data[0]) { lat = +data[0].lat; lng = +data[0].lon; }
-  } catch(_) {}
+  let lat, lng, exact = false;
+  // Prefer the exact point the agent placed in admin; geocode only as fallback.
+  if (p.lat != null && p.lng != null) {
+    lat = +p.lat; lng = +p.lng; exact = true;
+  }
+  if (!exact) {
+    try {
+      const res  = await fetch(`https://nominatim.openstreetmap.org/search?format=json&limit=1&q=${encodeURIComponent(addr+', Romania')}`, { headers:{'Accept-Language':'ro'} });
+      const data = await res.json();
+      if (data && data[0]) { lat = +data[0].lat; lng = +data[0].lon; }
+    } catch(_) {}
+  }
   if (!lat) {
     const fb = { 'București':[44.4268,26.1025],'Cluj-Napoca':[46.7712,23.6236],'Timișoara':[45.7489,21.2087],'Brașov':[45.6427,25.5887],'Iași':[47.1585,27.6014] };
     [lat,lng] = fb[p.oras || p.localitate || 'București'] || fb['București'];

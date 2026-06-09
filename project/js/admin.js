@@ -1277,6 +1277,7 @@ function renderDynamicForm() {
         <div class="form-group"><label>Oraș</label><input type="text" name="oras"></div>
         <div class="form-group"><label>Cartier</label><input type="text" name="cartier"></div>
         <div class="form-group full"><label>Adresă</label><input type="text" name="adresa"></div>
+        ${mapPickerBlock()}
         <div class="form-group full"><label>Agent asignat (ID)</label>${agentSelector()}</div>
         <div class="form-group full"><label>Descriere</label><textarea name="descriere"></textarea></div>
         ${imageUploadBlock()}
@@ -1308,6 +1309,7 @@ function renderDynamicForm() {
         <div class="form-group"><label>Oraș</label><input type="text" name="oras"></div>
         <div class="form-group"><label>Cartier</label><input type="text" name="cartier"></div>
         <div class="form-group full"><label>Adresă</label><input type="text" name="adresa"></div>
+        ${mapPickerBlock()}
         <div class="form-group full"><label>Agent asignat</label>${agentSelector()}</div>
         <div class="form-group full"><label>Descriere</label><textarea name="descriere"></textarea></div>
         ${imageUploadBlock()}
@@ -1343,6 +1345,7 @@ function renderDynamicForm() {
         <div class="form-group"><label>Localitate</label><input type="text" name="localitate"></div>
         <div class="form-group"><label>Preț total (€)</label><input type="number" name="pretTotal"></div>
         <div class="form-group full"><label>Adresă</label><input type="text" name="adresa"></div>
+        ${mapPickerBlock()}
         <div class="form-group full"><label>Agent asignat</label>${agentSelector()}</div>
         <div class="form-group full"><label>Vecinătăți & descriere</label><textarea name="descriere"></textarea></div>
         ${imageUploadBlock()}
@@ -1350,8 +1353,118 @@ function renderDynamicForm() {
     `;
   }
   hydrateFormValues();
+  initMapPicker();
   renderImaginiPreview();
   renderPendingPreview();
+}
+
+// ---------- MAP PICKER (Leaflet + OpenStreetMap, no API key) ----------
+let _pickerMap = null;
+let _pickerMarker = null;
+
+function mapPickerBlock() {
+  return `
+    <div class="form-group full map-picker-group">
+      <label>Locație pe hartă <span class="map-picker-hint">— click pe hartă pentru a marca unde se află proprietatea</span></label>
+      <div class="map-picker-search">
+        <input type="text" id="mapPickerSearch" placeholder="Caută adresă sau localitate…"
+               onkeydown="if(event.key==='Enter'){event.preventDefault();geocodePicker();}">
+        <button type="button" class="apl-btn apl-btn-secondary apl-btn-sm" onclick="geocodePicker()">
+          <i class="fa-solid fa-magnifying-glass"></i> Caută
+        </button>
+      </div>
+      <div id="mapPicker" class="map-picker"></div>
+      <div class="map-picker-foot">
+        <span id="mapPickerCoords" class="map-picker-coords"></span>
+        <button type="button" class="map-picker-clear" onclick="clearMapPoint()">
+          <i class="fa-solid fa-xmark"></i> Șterge punctul
+        </button>
+      </div>
+      <input type="hidden" name="lat" value="">
+      <input type="hidden" name="lng" value="">
+    </div>`;
+}
+
+function _pickerLatEl() { return document.querySelector('#dynamicForm [name="lat"]'); }
+function _pickerLngEl() { return document.querySelector('#dynamicForm [name="lng"]'); }
+
+function updatePickerLabel() {
+  const out = document.getElementById('mapPickerCoords');
+  const lat = _pickerLatEl()?.value, lng = _pickerLngEl()?.value;
+  const clearBtn = document.querySelector('.map-picker-clear');
+  if (!out) return;
+  if (lat && lng) {
+    out.innerHTML = `<i class="fa-solid fa-location-dot"></i> ${lat}, ${lng}`;
+    if (clearBtn) clearBtn.style.display = '';
+  } else {
+    out.innerHTML = `<i class="fa-solid fa-location-dot"></i> Niciun punct selectat`;
+    if (clearBtn) clearBtn.style.display = 'none';
+  }
+}
+
+function initMapPicker() {
+  const host = document.getElementById('mapPicker');
+  if (!host || typeof L === 'undefined') return;
+
+  // Form re-renders on category switch — tear down any old instance first.
+  if (_pickerMap) { _pickerMap.remove(); _pickerMap = null; _pickerMarker = null; }
+
+  const latEl = _pickerLatEl(), lngEl = _pickerLngEl();
+  const hasPoint = latEl?.value && lngEl?.value;
+  const start = hasPoint ? [parseFloat(latEl.value), parseFloat(lngEl.value)] : [44.4268, 26.1025]; // București
+  const map = L.map(host, { scrollWheelZoom: false }).setView(start, hasPoint ? 15 : 11);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    maxZoom: 19, attribution: '© OpenStreetMap'
+  }).addTo(map);
+  _pickerMap = map;
+
+  map.on('click', e => setMapPoint(e.latlng.lat, e.latlng.lng));
+  if (hasPoint) setMapPoint(start[0], start[1], false);
+  updatePickerLabel();
+
+  // The modal may have just opened (or was display:none) — recalc tile layout.
+  setTimeout(() => map.invalidateSize(), 250);
+}
+
+function setMapPoint(lat, lng, recenter) {
+  const latEl = _pickerLatEl(), lngEl = _pickerLngEl();
+  if (!latEl || !lngEl || !_pickerMap) return;
+  latEl.value = lat.toFixed(6);
+  lngEl.value = lng.toFixed(6);
+  if (_pickerMarker) {
+    _pickerMarker.setLatLng([lat, lng]);
+  } else {
+    _pickerMarker = L.marker([lat, lng], { draggable: true }).addTo(_pickerMap)
+      .on('dragend', e => { const p = e.target.getLatLng(); setMapPoint(p.lat, p.lng); });
+  }
+  if (recenter) _pickerMap.panTo([lat, lng]);
+  updatePickerLabel();
+}
+
+function clearMapPoint() {
+  const latEl = _pickerLatEl(), lngEl = _pickerLngEl();
+  if (latEl) latEl.value = '';
+  if (lngEl) lngEl.value = '';
+  if (_pickerMarker && _pickerMap) { _pickerMap.removeLayer(_pickerMarker); _pickerMarker = null; }
+  updatePickerLabel();
+}
+
+async function geocodePicker() {
+  const inp = document.getElementById('mapPickerSearch');
+  const q = (inp?.value || '').trim();
+  if (!q || !_pickerMap) return;
+  try {
+    const res = await fetch(
+      `https://nominatim.openstreetmap.org/search?format=json&limit=1&countrycodes=ro&q=${encodeURIComponent(q)}`,
+      { headers: { 'Accept-Language': 'ro' } });
+    const arr = await res.json();
+    if (!arr.length) { showToast('Adresa nu a fost găsită. Marchează manual pe hartă.'); return; }
+    const lat = parseFloat(arr[0].lat), lng = parseFloat(arr[0].lon);
+    _pickerMap.setView([lat, lng], 16);
+    setMapPoint(lat, lng, false);
+  } catch (err) {
+    showToast('Căutarea adresei nu a funcționat. Marchează manual pe hartă.');
+  }
 }
 
 function agentSelector() {
@@ -1536,6 +1649,10 @@ async function submitNewProperty(e) {
     if (el.name === 'imaginiFiles') return;
     if (el.value) formData[el.name] = el.type === 'number' ? +el.value : el.value;
   });
+  // Map-pin coordinates come from hidden inputs as strings — store as numbers.
+  formData.lat = formData.lat ? parseFloat(formData.lat) : null;
+  formData.lng = formData.lng ? parseFloat(formData.lng) : null;
+
   const isEdit = !!editingProperty;
   formData.id = isEdit ? editingProperty.id : `${activeFormCategory.slice(0,3)}-${Date.now()}`;
 
@@ -1557,6 +1674,10 @@ async function submitNewProperty(e) {
     showToast(isEdit
       ? `Proprietate actualizată!`
       : `Proprietate adăugată în ${capitalize(activeFormCategory)}!`);
+    // Warn if a map point was placed but the geo columns aren't migrated yet.
+    if (formData.lat != null && typeof geoColumnsExist === 'function' && !(await geoColumnsExist())) {
+      showToast('⚠ Punctul pe hartă nu a fost salvat — rulează migrarea SQL (migration-geo-2026-06.sql).');
+    }
     await refreshStats();
     await renderTable();
   } catch (err) {

@@ -814,6 +814,15 @@ body[data-page="banner"] {
   margin-bottom: 8px;
 }
 
+/* GALLERY inside teaser */
+.bn-teaser-gallery { padding: 24px 16px 0; }
+.bn-teaser-gallery .bn-gallery { margin: 0; }
+
+/* TEASER specs reuse the .bn-specs grid; nudge spacing */
+.bn-teaser-block .bn-specs { margin: 0; }
+.bn-teaser-block .bn-teaser-text + .bn-teaser-text { margin-top: -2px; }
+.bn-teaser > .bn-full-link { margin: 26px 24px 0; }
+
 /* FINEPRINT */
 .bn-teaser-fineprint {
   margin: 28px 24px 0;

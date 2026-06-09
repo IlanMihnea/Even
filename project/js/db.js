@@ -30,6 +30,7 @@ function toRezidential(row) {
     oras: row.oras, cartier: row.cartier, adresa: row.adresa,
     descriere: row.descriere, imagini: row.imagini || [], facilitati: row.facilitati || [],
     agentId: row.agent_id, agent: normalizeAgent(row.agents), categorie: 'rezidential',
+    lat: row.lat, lng: row.lng,
     banner: row.banner === true, homeHero: row.home_hero === true,
     viewCount: row.view_count || 0, activ: row.activ
   };
@@ -44,6 +45,7 @@ function toComercial(row) {
     clasaCladire: row.clasa_cladire, oras: row.oras, cartier: row.cartier, adresa: row.adresa,
     descriere: row.descriere, imagini: row.imagini || [], specificatii: row.specificatii || {},
     agentId: row.agent_id, agent: normalizeAgent(row.agents), categorie: 'comercial',
+    lat: row.lat, lng: row.lng,
     banner: row.banner === true, homeHero: row.home_hero === true,
     viewCount: row.view_count || 0, activ: row.activ
   };
@@ -61,6 +63,7 @@ function toTeren(row) {
     descriere: row.descriere, vecinatati: row.vecinatati,
     imagini: row.imagini || [],
     agentId: row.agent_id, agent: normalizeAgent(row.agents), categorie: 'terenuri',
+    lat: row.lat, lng: row.lng,
     banner: row.banner === true, homeHero: row.home_hero === true,
     viewCount: row.view_count || 0, activ: row.activ
   };
@@ -266,10 +269,23 @@ async function getAllPropertiesAdmin() {
 
 // ---------- ADMIN WRITES ----------
 
+// Cached probe: do the lat/lng map columns exist yet? Lets the app keep
+// working (saving properties without coordinates) until the geo migration
+// (seed/migration-geo-2026-06.sql) is run in Supabase.
+let _geoColumnsKnown = null;
+async function geoColumnsExist() {
+  if (_geoColumnsKnown !== null) return _geoColumnsKnown;
+  const { error } = await _supabase.from('properties').select('lat').limit(1);
+  _geoColumnsKnown = !(error && error.code === '42703');
+  return _geoColumnsKnown;
+}
+
 async function upsertProperty(categorie, camelData) {
+  const row = { ...toSnakeProperty(categorie, camelData), categorie, activ: true };
+  if (!(await geoColumnsExist())) { delete row.lat; delete row.lng; }
   const { data, error } = await _supabase
     .from('properties')
-    .upsert({ ...toSnakeProperty(categorie, camelData), categorie, activ: true })
+    .upsert(row)
     .select()
     .single();
   if (error) throw error;
@@ -396,6 +412,7 @@ function toSnakeProperty(categorie, d) {
     id: d.id, titlu: d.titlu, regim: d.regim, oras: d.oras,
     cartier: d.cartier, adresa: d.adresa, descriere: d.descriere,
     imagini: d.imagini, facilitati: d.facilitati,
+    lat: d.lat, lng: d.lng,
     agent_id: d.agentId, activ: d.activ !== false
   };
   if (categorie === 'rezidential') return {
