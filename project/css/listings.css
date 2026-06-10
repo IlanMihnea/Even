@@ -26,17 +26,21 @@
 .prop-card {
   display: block;
   position: relative;
-  text-decoration: none;
-  color: inherit;
   background: transparent;
   overflow: visible;
-  transition:
-    transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+  transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
 }
 .prop-card:hover {
   transform: translateY(-3px);
-  color: inherit;
 }
+/* Inner link wraps all card content except the fav button */
+.prop-card-link {
+  display: block;
+  color: inherit;
+  text-decoration: none;
+}
+.prop-card-link:hover,
+.prop-card-link:focus { color: inherit; }
 
 /* Media block */
 .prop-card-media {

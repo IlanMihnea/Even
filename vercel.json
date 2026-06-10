@@ -1,10 +1,38 @@
 {
   "outputDirectory": "project",
   "rewrites": [
+    { "source": "/sitemap.xml", "destination": "/api/sitemap" },
+    { "source": "/property-rezidential.html", "destination": "/api/og-property?page=rezidential" },
+    { "source": "/property-comercial.html", "destination": "/api/og-property?page=comercial" },
+    { "source": "/property-teren.html", "destination": "/api/og-property?page=teren" },
     { "source": "/banner", "destination": "/banner.html" },
     { "source": "/p/:token", "destination": "/prezentare.html" }
   ],
   "functions": {
-    "api/contracts-sign.js": { "includeFiles": "api/_contracts/fonts/**" }
-  }
+    "api/contracts-sign.js": { "includeFiles": "api/_contracts/fonts/**" },
+    "api/og-property.js": { "includeFiles": "project/property-*.html" }
+  },
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        { "key": "X-Content-Type-Options", "value": "nosniff" },
+        { "key": "X-Frame-Options", "value": "SAMEORIGIN" },
+        { "key": "Referrer-Policy", "value": "strict-origin-when-cross-origin" },
+        { "key": "Permissions-Policy", "value": "camera=(), microphone=(), geolocation=()" }
+      ]
+    },
+    {
+      "source": "/((?!admin\\.html$).*)",
+      "headers": [
+        { "key": "Content-Security-Policy", "value": "default-src 'self'; script-src 'self' https://cdn.jsdelivr.net https://unpkg.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://unpkg.com https://cdnjs.cloudflare.com; font-src https://fonts.gstatic.com https://cdnjs.cloudflare.com; img-src 'self' data: blob: https://*.supabase.co https://*.tile.openstreetmap.org https://basemaps.cartocdn.com; connect-src 'self' https://*.supabase.co; media-src 'self'; frame-ancestors 'self'" }
+      ]
+    },
+    {
+      "source": "/(css|js|design|images)/(.*)",
+      "headers": [
+        { "key": "Cache-Control", "value": "public, max-age=86400, stale-while-revalidate=604800" }
+      ]
+    }
+  ]
 }

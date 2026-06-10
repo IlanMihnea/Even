@@ -74,7 +74,7 @@ function renderMosaic(p, opts) {
   const hasSides = imgs.length >= 2;
 
   return `
-    <div class="pp-mosaic" onclick="${imgs[0] ? 'openLightbox(0)' : ''}">
+    <div class="pp-mosaic"${imgs[0] ? ' data-action="open-lightbox" data-idx="0"' : ''}>
       <div class="pp-mosaic-main">
         ${mainImg}
         <div class="pp-mosaic-overlay" aria-hidden="true"></div>
@@ -85,16 +85,15 @@ function renderMosaic(p, opts) {
           <div class="pp-mosaic-corner pp-mosaic-corner-bl"></div>
           <div class="pp-mosaic-corner pp-mosaic-corner-br"></div>
         </div>
-        <div class="pp-mosaic-actions" onclick="event.stopPropagation()">
-          <button class="pp-mosaic-btn pp-fav-btn" data-prop-id="${id}"
-                  onclick="toggleFav(this)" aria-label="Salvează">
+        <div class="pp-mosaic-actions">
+          <button class="pp-mosaic-btn pp-fav-btn prop-card-fav" data-prop-id="${id}" aria-label="Salvează">
             <i class="fa-regular fa-heart"></i><span>Salvează</span>
           </button>
           ${total > 1 ? `
-          <button class="pp-mosaic-btn" onclick="openLightbox(0)" aria-label="Galerie">
+          <button class="pp-mosaic-btn" data-action="open-lightbox" data-idx="0" aria-label="Galerie">
             <i class="fa-solid fa-expand"></i><span>${total} foto</span>
           </button>` : ''}
-          <button class="pp-mosaic-btn" onclick="sharePage()" aria-label="Partajează">
+          <button class="pp-mosaic-btn" data-action="share" aria-label="Partajează">
             <i class="fa-solid fa-share-nodes"></i><span>Share</span>
           </button>
         </div>
@@ -109,8 +108,8 @@ function renderMosaic(p, opts) {
         </div>
       </div>
       ${hasSides ? `
-      <div class="pp-mosaic-side" onclick="event.stopPropagation(); openLightbox(1)">${side1}</div>
-      <div class="pp-mosaic-side" onclick="event.stopPropagation(); openLightbox(2)">${side2Html}</div>
+      <div class="pp-mosaic-side" data-action="open-lightbox" data-idx="1">${side1}</div>
+      <div class="pp-mosaic-side" data-action="open-lightbox" data-idx="2">${side2Html}</div>
       ` : ''}
     </div>`;
 }
@@ -190,13 +189,13 @@ function ensureLightbox() {
   el.setAttribute('role', 'dialog');
   el.setAttribute('aria-modal', 'true');
   el.innerHTML = `
-    <button class="pp-lightbox-close" aria-label="Închide" onclick="closeLightbox()">
+    <button class="pp-lightbox-close" aria-label="Închide" data-action="close-lightbox">
       <i class="fa-solid fa-xmark"></i>
     </button>
-    <button class="pp-lightbox-nav pp-lightbox-prev" aria-label="Anterior" onclick="prevLightbox()">
+    <button class="pp-lightbox-nav pp-lightbox-prev" aria-label="Anterior" data-action="prev-lightbox">
       <i class="fa-solid fa-chevron-left"></i>
     </button>
-    <button class="pp-lightbox-nav pp-lightbox-next" aria-label="Următor" onclick="nextLightbox()">
+    <button class="pp-lightbox-nav pp-lightbox-next" aria-label="Următor" data-action="next-lightbox">
       <i class="fa-solid fa-chevron-right"></i>
     </button>
     <div class="pp-lightbox-img-wrap">
@@ -316,11 +315,10 @@ function renderTitleRow(p, opts) {
           <span>${address}</span>
         </div>
         <div class="pp-title-actions">
-          <button class="pp-btn-ghost pp-fav-btn" data-prop-id="${p.id}"
-                  onclick="toggleFav(this)">
+          <button class="pp-btn-ghost pp-fav-btn prop-card-fav" data-prop-id="${p.id}">
             <i class="fa-regular fa-heart"></i> Salvează
           </button>
-          <button class="pp-btn-ghost" onclick="sharePage()">
+          <button class="pp-btn-ghost" data-action="share">
             <i class="fa-solid fa-share-nodes"></i> Partajează
           </button>
         </div>
@@ -363,7 +361,7 @@ function renderDescription(text) {
         <div class="pp-description">${html}</div>
         <div class="pp-description-fade" aria-hidden="true"></div>
       </div>
-      <button type="button" class="pp-description-toggle" onclick="toggleDescription(this)" hidden>
+      <button type="button" class="pp-description-toggle" data-action="toggle-description" hidden>
         <span class="pp-desc-toggle-label">Vezi mai mult</span>
         <i class="fa-solid fa-chevron-down"></i>
       </button>
@@ -433,7 +431,7 @@ function renderCtaStrip(p, agent) {
         <a href="${waLink(agent.telefon, p.titlu)}" target="_blank" rel="noopener" class="pp-cta-wa">
           <i class="fa-brands fa-whatsapp"></i> WhatsApp
         </a>
-        <a href="#ppForm" class="pp-cta-book" onclick="event.preventDefault(); document.getElementById('ppForm').scrollIntoView({behavior:'smooth',block:'center'})">
+        <a href="#ppForm" class="pp-cta-book" data-action="scroll-to-form">
           <i class="fa-solid fa-calendar-check"></i> Programează
         </a>
       </div>
@@ -706,7 +704,7 @@ function renderPlan(category) {
         <i class="fa-solid ${cfg.icon}"></i>
         <p>${cfg.txt}</p>
         <div class="pp-docs" style="margin-top:0">
-          <button class="pp-doc-btn" type="button" onclick="requestDoc('plan')">
+          <button class="pp-doc-btn" type="button" data-action="request-doc" data-doc="plan">
             <i class="fa-solid fa-file-pdf"></i> Solicită PDF
           </button>
         </div>
@@ -769,13 +767,13 @@ function renderDocs() {
       <span class="pp-section-eyebrow">— Documente disponibile</span>
       <h2 class="pp-section-h2">La <em>solicitare</em></h2>
       <div class="pp-docs">
-        <button class="pp-doc-btn" type="button" onclick="requestDoc('CF')">
+        <button class="pp-doc-btn" type="button" data-action="request-doc" data-doc="CF">
           <i class="fa-solid fa-file-lines"></i> Extras CF
         </button>
-        <button class="pp-doc-btn" type="button" onclick="requestDoc('CU')">
+        <button class="pp-doc-btn" type="button" data-action="request-doc" data-doc="CU">
           <i class="fa-solid fa-stamp"></i> Certificat Urbanism
         </button>
-        <button class="pp-doc-btn" type="button" onclick="requestDoc('PUZ')">
+        <button class="pp-doc-btn" type="button" data-action="request-doc" data-doc="PUZ">
           <i class="fa-solid fa-map"></i> PUZ / PUG zonă
         </button>
       </div>
@@ -863,8 +861,7 @@ function renderMobileBar(agent, p) {
       <a class="pp-mb-btn" href="tel:${escapeHtml(agent.telefon)}">
         <i class="fa-solid fa-phone"></i> Sună
       </a>
-      <button class="pp-mb-btn book" type="button"
-              onclick="document.getElementById('ppForm').scrollIntoView({behavior:'smooth',block:'center'})">
+      <button class="pp-mb-btn book" type="button" data-action="scroll-to-form">
         <i class="fa-solid fa-calendar-check"></i> Vizionare
       </button>
     </div>`;
@@ -1170,14 +1167,14 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   const id       = getQueryParam('id');
-  const category = (window.PROPERTY_PAGE || {}).category;
+  const category = document.body.dataset.propertyCategory;
 
   if (!id) {
     showFatal(contentEl, 'Link invalid — lipsește ID-ul proprietății.', null, 'index.html');
     return;
   }
   if (!category) {
-    showFatal(contentEl, 'Configurare pagină invalidă.', 'PROPERTY_PAGE.category nu este setat.', 'index.html');
+    showFatal(contentEl, 'Configurare pagină invalidă.', 'data-property-category nu este setat pe body.', 'index.html');
     return;
   }
   if (typeof getPropertyById !== 'function') {

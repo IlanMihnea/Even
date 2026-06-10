@@ -10,21 +10,62 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Favorite · EVEN</title>
   <meta name="description" content="Proprietățile salvate de tine — gata pentru revedere.">
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500;1,600&family=DM+Sans:wght@400;500;600;700&family=Mrs+Saint+Delafield&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600&family=DM+Sans:wght@400;500;600;700&family=Mrs+Saint+Delafield&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/icons.css">
   <link rel="stylesheet" href="css/main.css">
   <link rel="stylesheet" href="css/animations.css">
   <link rel="stylesheet" href="css/listings.css">
   <link rel="stylesheet" href="css/static-page.css">
+  <meta property="og:image" content="https://even-imobiliare.ro/design/og-default.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:title" content="Favorite · EVEN">
+  <meta property="og:description" content="Proprietățile salvate de tine — gata pentru revedere.">
 </head>
 <body data-page="favorite">
+  <a class="skip-link" href="#main">Sari la conținut</a>
 
-  <header id="navbar" class="navbar"></header>
+  <header id="navbar" class="navbar">
+    <div class="container nav-inner">
+      <a href="index.html" class="logo">
+        <img src="design/logomark-even.svg" class="logo-mark-svg" alt="">
+        <img src="design/logotype-even.svg" class="logo-type-svg" alt="EVEN">
+      </a>
+      <ul class="nav-links">
+        <li><a href="index.html" class="nav-link">Acasă</a></li>
+        <li><a href="listings-rezidential.html" class="nav-link">Rezidențial</a></li>
+        <li><a href="listings-comercial.html" class="nav-link">Comercial</a></li>
+        <li><a href="listings-terenuri.html" class="nav-link">Terenuri</a></li>
+        <li><a href="projects.html" class="nav-link">Proiecte Noi</a></li>
+        <li><a href="about.html" class="nav-link">Despre</a></li>
+      </ul>
+      <div class="nav-cta">
+        <a href="favorite.html" class="nav-fav" aria-label="Favorite" id="navFavLink">
+          <i class="fa-regular fa-heart"></i>
+          <span class="nav-fav-badge" id="navFavBadge" aria-hidden="true" hidden></span>
+        </a>
+        <a href="contact.html" class="btn btn-outline"><i class="fa-solid fa-phone"></i> Contact</a>
+        <button class="nav-toggle" id="navToggle" aria-label="Meniu"><i class="fa-solid fa-bars"></i></button>
+      </div>
+    </div>
+    <div class="nav-mobile" id="navMobile">
+      <a href="index.html">Acasă</a>
+      <a href="listings-rezidential.html">Rezidențial</a>
+      <a href="listings-comercial.html">Comercial</a>
+      <a href="listings-terenuri.html">Terenuri</a>
+      <a href="projects.html">Proiecte Noi</a>
+      <a href="about.html">Despre</a>
+      <a href="favorite.html" id="navMobileFavLink">Favorite</a>
+      <a href="contact.html">Contact</a>
+    </div>
+  </header>
 
   <div class="sp-bg-grain" aria-hidden="true"></div>
   <div class="sp-bg-light" aria-hidden="true"></div>
 
-  <section class="sp-masthead">
+  <section id="main" class="sp-masthead">
     <div class="sp-masthead-inner">
       <span class="sp-mast-mark">— Catalog personal —</span>
       <span class="sp-mast-title">Even · Favorite</span>
@@ -67,89 +108,63 @@
           <button class="sp-filter-tab" data-cat="comercial">Comercial</button>
           <button class="sp-filter-tab" data-cat="terenuri">Terenuri</button>
         </div>
-        <button class="sp-clear-btn" type="button" onclick="clearAllFavorites()">Șterge toate</button>
+        <button class="sp-clear-btn" type="button" data-action="clear-favorites">Șterge toate</button>
       </div>
       <div class="listings-grid" id="favGrid"></div>
     </div>
   </section>
 
-  <footer id="footer" class="footer"></footer>
+  <footer id="footer" class="footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <a href="index.html" class="logo">
+            <img src="design/logomark-even.svg" class="logo-mark-svg logo-svg-footer" alt="">
+            <img src="design/logotype-even.svg" class="logo-type-svg logo-svg-footer" alt="EVEN">
+          </a>
+          <p>Strategie înainte de anunț. Evaluare corectă. Implicare reală în fiecare tranzacție.</p>
+          <p class="footer-tagline">Imobiliare cu plan.</p>
+          <div class="footer-social"></div>
+        </div>
+        <div>
+          <h4>Categorii</h4>
+          <ul class="footer-links">
+            <li><a href="listings-rezidential.html">Rezidențial</a></li>
+            <li><a href="listings-comercial.html">Comercial</a></li>
+            <li><a href="listings-terenuri.html">Terenuri</a></li>
+            <li><a href="projects.html">Proiecte Noi</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4>Companie</h4>
+          <ul class="footer-links">
+            <li><a href="about.html">Despre noi</a></li>
+            <li><a href="about.html#echipa">Echipa</a></li>
+            <li><a href="contact.html">Contact</a></li>
+          </ul>
+        </div>
+        <div class="footer-contact">
+          <h4>Contact</h4>
+          <p><i class="fa-solid fa-location-dot"></i>Banul Antonache 71, Floreasca</p>
+          <p><i class="fa-solid fa-phone"></i>0745 609 366</p>
+          <p><i class="fa-solid fa-envelope"></i>ilan@even-imobiliare.ro</p>
+          <p><i class="fa-regular fa-clock"></i>Lun-Vin: 09:00-19:00</p>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        © 2026 EVEN Real Estate. Toate drepturile rezervate.
+        | <a href="terms.html" style="color: inherit">Termeni</a>
+        | <a href="privacy.html" style="color: inherit">Confidențialitate</a>
+        | <a href="verificat-even.html" style="color: inherit">Verificat de EVEN</a>
+        | <a href="favorite.html" style="color: inherit">Favorite</a>
+      </div>
+    </div>
+  </footer>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="js/db.js"></script>
   <script src="js/main.js"></script>
-  <script src="js/listings.js"></script>
-  <script>
-    let allFavs = [];
-    let activeCat = 'all';
-
-    async function loadFavorites() {
-      const ids = getFavs();
-      document.getElementById('favCount').textContent = `${ids.length} listing${ids.length === 1 ? '' : 's'}`;
-      if (ids.length === 0) {
-        document.getElementById('favEmpty').style.display = 'flex';
-        document.getElementById('favContainer').style.display = 'none';
-        return;
-      }
-      document.getElementById('favEmpty').style.display = 'none';
-      document.getElementById('favContainer').style.display = 'block';
-
-      // Fetch all properties from all 3 categories and filter by saved IDs
-      const [rez, com, ter] = await Promise.all([
-        getProperties('rezidential').catch(() => []),
-        getProperties('comercial').catch(() => []),
-        getProperties('terenuri').catch(() => []),
-      ]);
-      const all = [
-        ...rez.map(p => ({ ...p, _cat: 'rezidential' })),
-        ...com.map(p => ({ ...p, _cat: 'comercial' })),
-        ...ter.map(p => ({ ...p, _cat: 'terenuri' })),
-      ];
-      const idSet = new Set(ids.map(String));
-      allFavs = all.filter(p => idSet.has(String(p.id)));
-      renderFavGrid();
-    }
-
-    function renderFavGrid() {
-      const grid = document.getElementById('favGrid');
-      const filtered = activeCat === 'all'
-        ? allFavs
-        : allFavs.filter(p => p._cat === activeCat);
-      if (filtered.length === 0) {
-        grid.innerHTML = '<div class="empty-state" style="grid-column:1/-1"><h3>Nimic în această categorie.</h3><p>Schimbă filtrul sau adaugă proprietăți.</p></div>';
-        return;
-      }
-      grid.innerHTML = filtered.map(p => {
-        const link = ({
-          rezidential: `property-rezidential.html?id=${p.id}`,
-          comercial: `property-comercial.html?id=${p.id}`,
-          terenuri: `property-teren.html?id=${p.id}`
-        })[p._cat];
-        if (p._cat === 'rezidential') return renderRezCard(p, link);
-        if (p._cat === 'comercial') return renderComCard(p, link);
-        if (p._cat === 'terenuri') return renderTerCard(p, link);
-        return '';
-      }).join('');
-      if (typeof applyFavStates === 'function') applyFavStates(grid);
-    }
-
-    function clearAllFavorites() {
-      if (!confirm('Ștergi toate favoritele?')) return;
-      saveFavs([]);
-      loadFavorites();
-    }
-
-    document.addEventListener('DOMContentLoaded', () => {
-      document.querySelectorAll('.sp-filter-tab').forEach(btn => {
-        btn.addEventListener('click', () => {
-          document.querySelectorAll('.sp-filter-tab').forEach(b => b.classList.remove('active'));
-          btn.classList.add('active');
-          activeCat = btn.dataset.cat;
-          renderFavGrid();
-        });
-      });
-      loadFavorites();
-    });
-  </script>
+  <script src="js/cards.js"></script>
+  <script src="js/favorite.js"></script>
 </body>
 </html>

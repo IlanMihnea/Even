@@ -108,36 +108,9 @@ function loadHomeProjects() {
   return _homeProjectsPromise;
 }
 
-function projectCardHTML(p) {
-  const hasPret = p.intervalPret.min != null && p.intervalPret.min > 0;
-  const img = (p.imagini && p.imagini[0])
-    ? `<img src="${p.imagini[0]}" alt="${p.nume}" loading="lazy">`
-    : `<div class="img-placeholder"></div>`;
-  return `
-      <a class="project-card project-compact" href="project-detail.html?id=${p.id}">
-        <div class="project-card-img">
-          ${img}
-          <div class="status-tag">
-            <span class="status-dot status-${p.status}"></span> ${formatStatus(p.status)}
-          </div>
-          <div class="available-tag">${p.unitatiDisponibile} unități disponibile</div>
-        </div>
-        <div class="project-card-body">
-          <div class="project-dev">${p.dezvoltator}</div>
-          <h3>${p.nume}</h3>
-          <div class="project-loc"><i class="fa-solid fa-location-dot"></i> ${p.cartier}, ${p.oras}</div>
-          <div class="project-price-range">
-            ${hasPret
-              ? `${formatPrice(p.intervalPret.min)} - ${formatPrice(p.intervalPret.max)}<span>preț unitate</span>`
-              : `Preț la cerere<span>consultant dedicat</span>`}
-          </div>
-          <div class="project-meta">
-            <span>Livrare <strong>${formatLivrare(p.dataLivrare)}</strong></span>
-            <span>Progres <strong>${p.progres}%</strong></span>
-          </div>
-        </div>
-      </a>`;
-}
+// projectCardHTML, renderRezCard, renderComCard, renderTerCard, buildPropCard,
+// cardPhoto, favBtn, shortPropNum, pricePerSqm, formatStatus, formatLivrare
+// — definite în cards.js (încărcat înainte de acest fișier)
 
 // ---- Property cards for inline catalog results (com / teren / rez) ----
 let _homePropsCache = {};
@@ -150,77 +123,17 @@ function loadHomeProperties(cat) {
   return _homePropsCache[cat];
 }
 
-function homePropPhoto(imagini, titlu) {
-  return (imagini && imagini[0])
-    ? `<img src="${imagini[0]}" alt="${titlu || ''}" loading="lazy">`
-    : `<div class="img-placeholder"></div>`;
+// homePropPhoto → cardPhoto din cards.js
+function homePropPhoto(imagini, titlu) { return cardPhoto(imagini, titlu); }
 }
 
-function buildHomePropCard({ link, id, titlu, eyebrow, meta, price, sub, utilsHtml, photo }) {
-  return `
-    <a class="prop-card" href="${link}" aria-label="${titlu}">
-      <figure class="prop-card-media">
-        <div class="prop-card-img">${photo}</div>
-        <button class="prop-card-fav" type="button" data-prop-id="${id}"
-                onclick="event.preventDefault(); event.stopPropagation(); toggleFav(this)"
-                aria-label="Salvează la favorite">
-          <i class="fa-regular fa-heart"></i>
-        </button>
-      </figure>
-      <div class="prop-card-body">
-        <div class="prop-card-eyebrow">
-          <span>${eyebrow}</span>
-          <span class="prop-card-num">Nº ${shortPropNum(id)}</span>
-        </div>
-        <h3 class="prop-card-title">${titlu}</h3>
-        <p class="prop-card-meta">${meta}</p>
-        ${utilsHtml ? `<div class="prop-card-utils">${utilsHtml}</div>` : ''}
-        <div class="prop-card-foot">
-          <div>
-            <span class="prop-card-price">${price}</span>
-            ${sub ? `<span class="prop-card-price-sub">${sub}</span>` : ''}
-          </div>
-          <span class="prop-card-cta">Detalii <i class="fa-solid fa-arrow-right"></i></span>
-        </div>
-      </div>
-    </a>`;
-}
-
-function homeComCardHTML(p) {
-  const tipLabels = { birouri: 'Birouri', retail: 'Retail', depozit: 'Depozit', industrial: 'Industrial', showroom: 'Showroom', hotel: 'Hotel / Pensiune' };
-  const eyebrow = `${p.regim === 'vanzare' ? 'Vânzare' : 'Închiriere'} · ${tipLabels[p.tipSpatiu] || ''}`;
-  const meta = [
-    p.suprafataTotala ? `${p.suprafataTotala} m²` : null,
-    p.tipSpatiu !== 'hotel' && p.clasaCladire ? `Clasa ${p.clasaCladire}` : null,
-    p.etaj != null ? `Et. ${p.etaj}` : null
-  ].filter(Boolean).join('<span class="sep"> · </span>');
-  const price = p.pret ? `${p.pret} €<span class="per-month">/m²/lună</span>` : formatPrice(p.pretTotal);
-  const sub = p.pret && p.suprafataTotala ? `~ ${new Intl.NumberFormat('ro-RO').format(p.pret * p.suprafataTotala)} €/lună` : '';
-  return buildHomePropCard({ link: `property-comercial.html?id=${p.id}`, id: p.id, titlu: p.titlu, eyebrow, meta, price, sub, photo: homePropPhoto(p.imagini, p.titlu) });
-}
-
-function homeTerCardHTML(p) {
-  const tipLabels = { 'intravilan-rezidential': 'Intravilan rez.', 'intravilan-comercial': 'Intravilan com.', 'extravilan-agricol': 'Extravilan agricol', 'industrial': 'Industrial' };
-  const eyebrow = `${tipLabels[p.tip] || 'Teren'} · ${p.localitate || p.judet || ''}`;
-  const utilsAll = [
-    { k: 'apa', i: 'fa-droplet', t: 'Apă' }, { k: 'curent', i: 'fa-bolt', t: 'Curent' },
-    { k: 'gaz', i: 'fa-fire', t: 'Gaz' }, { k: 'canalizare', i: 'fa-toilet', t: 'Canal.' }
-  ];
-  const meta = [
-    p.suprafata ? `${p.suprafata} ${p.unitate || 'mp'}` : null,
-    p.frontStradal ? `Front ${p.frontStradal}m` : null,
-    p.accesDrum ? `Acces ${p.accesDrum}` : null
-  ].filter(Boolean).join('<span class="sep"> · </span>');
-  const utilsHtml = utilsAll.map(u => `<span class="prop-card-util ${(p.utilitati || []).includes(u.k) ? 'active' : ''}"><i class="fa-solid ${u.i}"></i>${u.t}</span>`).join('');
-  const price = formatPrice(p.pretTotal);
-  const sub = p.pretMp ? `${p.pretMp} €/m²` : '';
-  return buildHomePropCard({ link: `property-teren.html?id=${p.id}`, id: p.id, titlu: p.titlu, eyebrow, meta, price, sub, utilsHtml, photo: homePropPhoto(p.imagini, p.titlu) });
-}
+// buildHomePropCard → buildPropCard din cards.js
+function buildHomePropCard(args) { return buildPropCard(args); }
 
 function homePropCardHTML(p) {
-  if (p.categorie === 'comercial') return homeComCardHTML(p);
-  if (p.categorie === 'terenuri') return homeTerCardHTML(p);
-  return renderHomePropCard(p);
+  if (p.categorie === 'comercial') return renderComCard(p);
+  if (p.categorie === 'terenuri') return renderTerCard(p);
+  return renderRezCard(p);
 }
 
 // Inline results rendered directly under the active catalog tab, so
@@ -239,7 +152,15 @@ async function renderInlineResults(flux) {
     anchor.insertAdjacentElement('afterend', wrap);
   }
   const token = ++_inlineToken;
-  wrap.innerHTML = '<div class="flux-inline-loading">Se încarcă…</div>';
+  wrap.innerHTML = Array(4).fill(0).map(() => `
+    <div class="prop-card skeleton-card">
+      <div class="skeleton-img shimmer"></div>
+      <div class="skeleton-body">
+        <div class="skeleton-line w-80 shimmer"></div>
+        <div class="skeleton-line w-60 shimmer"></div>
+        <div class="skeleton-line w-40 shimmer" style="margin-top:16px"></div>
+      </div>
+    </div>`).join('');
   const target = (FLUX_CONFIGS[flux] || {}).target || '#';
   const footer = `<div class="flux-inline-foot"><a href="${target}" class="hp-link-arrow"><span>Vezi toate</span><i class="fa-solid fa-arrow-right"></i></a></div>`;
 
@@ -281,7 +202,7 @@ function renderFilters() {
   }).join('') + `
     <div class="form-group">
       <label>&nbsp;</label>
-      <button class="btn btn-gold btn-full" onclick="searchFlux()"><i class="fa-solid fa-magnifying-glass"></i> Caută</button>
+      <button class="btn btn-gold btn-full" data-action="search-flux"><i class="fa-solid fa-magnifying-glass"></i> Caută</button>
     </div>
   `;
 }
@@ -298,9 +219,15 @@ function searchFlux() {
 
 function setFluxTab(flux) {
   activeFlux = flux;
-  document.querySelectorAll('.flux-tab').forEach(t => {
-    t.classList.toggle('active', t.dataset.flux === flux);
+  const tabs = [...document.querySelectorAll('.flux-tab')];
+  tabs.forEach(t => {
+    const active = t.dataset.flux === flux;
+    t.classList.toggle('active', active);
+    t.setAttribute('aria-selected', String(active));
+    t.setAttribute('tabindex', active ? '0' : '-1');
   });
+  const panel = document.getElementById('fluxFilters');
+  if (panel) panel.setAttribute('aria-labelledby', `tab-${flux}`);
   renderFilters();
   renderInlineResults(flux);
 }
@@ -320,28 +247,28 @@ async function renderHeroFeature() {
 
   let tagTxt, metaParts, priceTxt;
   if (cat === 'rezidential') {
-    const tipLbl = (p.tip || '').charAt(0).toUpperCase() + (p.tip || '').slice(1);
+    const tipLbl = escapeHtml((p.tip || '').charAt(0).toUpperCase() + (p.tip || '').slice(1));
     tagTxt = `${tipLbl}${p.camere ? ' · ' + p.camere + ' camere' : ''}`;
     metaParts = [
       p.suprafata ? `<span><i class="fa-solid fa-vector-square"></i>${p.suprafata} m²</span>` : '',
       p.camere ? `<span><i class="fa-solid fa-bed"></i>${p.camere} cam.</span>` : '',
-      (p.cartier || p.oras) ? `<span><i class="fa-solid fa-location-dot"></i>${p.cartier || p.oras}</span>` : ''
+      (p.cartier || p.oras) ? `<span><i class="fa-solid fa-location-dot"></i>${escapeHtml(p.cartier || p.oras)}</span>` : ''
     ];
     priceTxt = formatPrice(p.pret) + (p.regim === 'inchiriere' ? '<span class="per-month">/lună</span>' : '');
   } else if (cat === 'comercial') {
-    const tipLbl = (p.tipSpatiu || 'Spațiu comercial').charAt(0).toUpperCase() + (p.tipSpatiu || 'Spațiu comercial').slice(1);
+    const tipLbl = escapeHtml((p.tipSpatiu || 'Spațiu comercial').charAt(0).toUpperCase() + (p.tipSpatiu || 'Spațiu comercial').slice(1));
     tagTxt = `${tipLbl}${p.clasaCladire ? ' · Clasa ' + p.clasaCladire : ''}`;
     metaParts = [
       p.suprafataTotala ? `<span><i class="fa-solid fa-vector-square"></i>${p.suprafataTotala} m²</span>` : '',
-      (p.cartier || p.oras) ? `<span><i class="fa-solid fa-location-dot"></i>${p.cartier || p.oras}</span>` : ''
+      (p.cartier || p.oras) ? `<span><i class="fa-solid fa-location-dot"></i>${escapeHtml(p.cartier || p.oras)}</span>` : ''
     ];
     priceTxt = p.pretTotal ? formatPrice(p.pretTotal) : (p.pret ? formatPrice(p.pret) + '<span class="per-month"> €/mp/lună</span>' : 'Preț la cerere');
   } else { // terenuri
-    const tipLbl = (p.tip || 'Teren').replace(/-/g, ' ');
+    const tipLbl = escapeHtml((p.tip || 'Teren').replace(/-/g, ' '));
     tagTxt = `Teren · ${tipLbl}`;
     metaParts = [
       p.suprafata ? `<span><i class="fa-solid fa-vector-square"></i>${p.suprafata} ${p.unitate || 'mp'}</span>` : '',
-      (p.localitate || p.judet) ? `<span><i class="fa-solid fa-location-dot"></i>${p.localitate || p.judet}</span>` : ''
+      (p.localitate || p.judet) ? `<span><i class="fa-solid fa-location-dot"></i>${escapeHtml(p.localitate || p.judet)}</span>` : ''
     ];
     priceTxt = p.pretTotal ? formatPrice(p.pretTotal) : 'Preț la cerere';
   }
@@ -357,11 +284,11 @@ async function renderHeroFeature() {
         <span>Selecție · Nº ${num}</span>
         <span class="hp-feature-mark">●</span>
       </div>
-      <div class="${imgClass}"${imgStyle} role="img" aria-label="${(p.titlu || '').replace(/"/g, '&quot;')}">
+      <div class="${imgClass}"${imgStyle} role="img" aria-label="${escapeHtml(p.titlu || '')}">
         <span class="hp-feature-tag">${tagTxt}</span>
       </div>
       <div class="hp-feature-body">
-        <h3 class="hp-feature-title">${p.titlu || ''}</h3>
+        <h3 class="hp-feature-title">${escapeHtml(p.titlu || '')}</h3>
         <div class="hp-feature-meta">${meta}</div>
         <div class="hp-feature-foot">
           <span class="hp-feature-price">${priceTxt}</span>
@@ -376,7 +303,7 @@ async function renderFeaturedProperties() {
   const grid = document.getElementById('featuredGrid');
   if (!grid) return;
   try {
-    const props = await getProperties('rezidential');
+    const props = await loadHomeProperties('rezidential');
     grid.innerHTML = props.slice(0, 4).map(p => renderHomePropCard(p)).join('');
     if (typeof applyFavStates === 'function') applyFavStates(grid);
     setTimeout(() => {
@@ -392,66 +319,9 @@ async function renderFeaturedProperties() {
   }
 }
 
-function shortPropNum(id) {
-  return String(id || '').replace(/-/g, '').slice(0, 4).toUpperCase() || '----';
-}
-
-function pricePerSqm(pret, suprafata) {
-  if (!pret || !suprafata) return '';
-  return new Intl.NumberFormat('ro-RO').format(Math.round(pret / suprafata)) + ' €/m²';
-}
-
-function renderHomePropCard(p) {
-  const link = `property-rezidential.html?id=${p.id}`;
-  const eyebrow = `${p.regim === 'vanzare' ? 'Vânzare' : 'Închiriere'} · ${p.cartier}`;
-  const meta = [
-    `${p.camere} cam.`,
-    `${p.suprafata} m²`,
-    p.etaj != null ? `Et. ${p.etaj}${p.etajTotal ? '/' + p.etajTotal : ''}` : null
-  ].filter(Boolean).join('<span class="sep"> · </span>');
-  const price = formatPrice(p.pret) + (p.regim === 'inchiriere' ? '<span class="per-month">/lună</span>' : '');
-  const sub = p.regim === 'vanzare' ? pricePerSqm(p.pret, p.suprafata) : '';
-  const photo = (p.imagini && p.imagini[0])
-    ? `<img src="${p.imagini[0]}" alt="${p.titlu}" loading="lazy">`
-    : `<div class="img-placeholder"></div>`;
-
-  return `
-    <a class="prop-card" href="${link}" aria-label="${p.titlu}">
-      <figure class="prop-card-media">
-        <div class="prop-card-img">${photo}</div>
-        <button class="prop-card-fav" type="button" data-prop-id="${p.id}"
-                onclick="event.preventDefault(); event.stopPropagation(); toggleFav(this)"
-                aria-label="Salvează la favorite">
-          <i class="fa-regular fa-heart"></i>
-        </button>
-      </figure>
-      <div class="prop-card-body">
-        <div class="prop-card-eyebrow">
-          <span>${eyebrow}</span>
-          <span class="prop-card-num">Nº ${shortPropNum(p.id)}</span>
-        </div>
-        <h3 class="prop-card-title">${p.titlu}</h3>
-        <p class="prop-card-meta">${meta}</p>
-        <div class="prop-card-foot">
-          <div>
-            <span class="prop-card-price">${price}</span>
-            ${sub ? `<span class="prop-card-price-sub">${sub}</span>` : ''}
-          </div>
-          <span class="prop-card-cta">Detalii <i class="fa-solid fa-arrow-right"></i></span>
-        </div>
-      </div>
-    </a>
-  `;
-}
-
-function formatStatus(s) {
-  return { 'pre-vanzare': 'Pre-vânzare', 'construire': 'În construcție', 'finalizat': 'Finalizat' }[s] || s;
-}
-
-function formatLivrare(d) {
-  const date = new Date(d);
-  return date.toLocaleDateString('ro-RO', { month: 'short', year: 'numeric' });
-}
+// shortPropNum, pricePerSqm, formatStatus, formatLivrare — în cards.js
+// renderHomePropCard → renderRezCard din cards.js
+function renderHomePropCard(p) { return renderRezCard(p); }
 
 function applyFluxTabVisibility(counts) {
   if (!counts) return;
@@ -573,15 +443,76 @@ function initHeroScrub() {
     }
   }
 
+  // Trigger full buffering at first scroll or load — preload="metadata" keeps initial load light
+  let bufferTriggered = false;
+  function triggerBuffer() {
+    if (bufferTriggered || mq.matches) return;
+    bufferTriggered = true;
+    video.preload = 'auto';
+    video.load();
+  }
+  window.addEventListener('scroll', triggerBuffer, { once: true, passive: true });
+  window.addEventListener('load', triggerBuffer, { once: true });
+
   applyMode();
   if (mq.addEventListener) mq.addEventListener('change', applyMode);
   else if (mq.addListener) mq.addListener(applyMode);
+}
+
+function initScrollReveal() {
+  const nums = document.querySelectorAll('.hp-figure-num[data-target]');
+  const run = el => {
+    const target = +el.dataset.target;
+    const dur = 1800, t0 = performance.now();
+    const tick = t => {
+      const p = Math.min((t - t0) / dur, 1);
+      el.textContent = Math.floor((1 - Math.pow(1 - p, 3)) * target);
+      if (p < 1) requestAnimationFrame(tick);
+      else el.textContent = target;
+    };
+    requestAnimationFrame(tick);
+  };
+  const ioFig = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) { run(e.target); ioFig.unobserve(e.target); }
+    });
+  }, { threshold: 0.4 });
+  nums.forEach(n => ioFig.observe(n));
+
+  const reveals = document.querySelectorAll('[data-reveal]');
+  const ioRev = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.classList.add('is-revealed');
+        ioRev.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.12, rootMargin: '0px 0px -80px 0px' });
+  reveals.forEach(el => ioRev.observe(el));
 }
 
 document.addEventListener('DOMContentLoaded', async () => {
   document.querySelectorAll('.flux-tab').forEach(tab => {
     tab.addEventListener('click', () => setFluxTab(tab.dataset.flux));
   });
+
+  // Roving tabindex keyboard nav (WAI-ARIA Tabs pattern)
+  const tabList = document.querySelector('.hp-catalog-tabs');
+  if (tabList) {
+    tabList.addEventListener('keydown', e => {
+      const tabs = [...tabList.querySelectorAll('.flux-tab:not([style*="display: none"])')];
+      const idx = tabs.indexOf(document.activeElement);
+      if (idx === -1) return;
+      let next = -1;
+      if (e.key === 'ArrowRight') next = (idx + 1) % tabs.length;
+      if (e.key === 'ArrowLeft')  next = (idx - 1 + tabs.length) % tabs.length;
+      if (next !== -1) {
+        e.preventDefault();
+        setFluxTab(tabs[next].dataset.flux);
+        tabs[next].focus();
+      }
+    });
+  }
   renderFilters();
   renderInlineResults(activeFlux);
 

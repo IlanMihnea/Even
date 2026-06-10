@@ -21,16 +21,56 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600&family=DM+Sans:wght@400;500;600;700&family=Mrs+Saint+Delafield&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="css/icons.css">
   <link rel="stylesheet" href="css/main.css">
   <link rel="stylesheet" href="css/animations.css">
   <link rel="stylesheet" href="css/listings.css">
   <link rel="stylesheet" href="css/homepage.css">
   <link rel="stylesheet" href="css/projects.css">
+  <meta property="og:image" content="https://even-imobiliare.ro/design/og-default.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"RealEstateAgent","name":"EVEN Imobiliare","url":"https://even-imobiliare.ro/","logo":"https://even-imobiliare.ro/design/logomark-even.svg","telephone":"+40745609366","email":"ilan@even-imobiliare.ro","address":{"@type":"PostalAddress","streetAddress":"Banul Antonache 71","addressLocality":"București","addressCountry":"RO"},"openingHours":"Mo-Fr 09:00-19:00"}
+  </script>
 </head>
 <body data-page="home">
+  <a class="skip-link" href="#main">Sari la conținut</a>
 
-  <header id="navbar" class="navbar"></header>
+  <header id="navbar" class="navbar">
+    <div class="container nav-inner">
+      <a href="index.html" class="logo">
+        <img src="design/logomark-even.svg" class="logo-mark-svg" alt="">
+        <img src="design/logotype-even.svg" class="logo-type-svg" alt="EVEN">
+      </a>
+      <ul class="nav-links">
+        <li><a href="index.html" class="nav-link active">Acasă</a></li>
+        <li><a href="listings-rezidential.html" class="nav-link">Rezidențial</a></li>
+        <li><a href="listings-comercial.html" class="nav-link">Comercial</a></li>
+        <li><a href="listings-terenuri.html" class="nav-link">Terenuri</a></li>
+        <li><a href="projects.html" class="nav-link">Proiecte Noi</a></li>
+        <li><a href="about.html" class="nav-link">Despre</a></li>
+      </ul>
+      <div class="nav-cta">
+        <a href="favorite.html" class="nav-fav" aria-label="Favorite" id="navFavLink">
+          <i class="fa-regular fa-heart"></i>
+          <span class="nav-fav-badge" id="navFavBadge" aria-hidden="true" hidden></span>
+        </a>
+        <a href="contact.html" class="btn btn-outline"><i class="fa-solid fa-phone"></i> Contact</a>
+        <button class="nav-toggle" id="navToggle" aria-label="Meniu"><i class="fa-solid fa-bars"></i></button>
+      </div>
+    </div>
+    <div class="nav-mobile" id="navMobile">
+      <a href="index.html">Acasă</a>
+      <a href="listings-rezidential.html">Rezidențial</a>
+      <a href="listings-comercial.html">Comercial</a>
+      <a href="listings-terenuri.html">Terenuri</a>
+      <a href="projects.html">Proiecte Noi</a>
+      <a href="about.html">Despre</a>
+      <a href="favorite.html" id="navMobileFavLink">Favorite</a>
+      <a href="contact.html">Contact</a>
+    </div>
+  </header>
 
   <!-- BACKGROUND ATMOSPHERE -->
   <div class="hp-bg-grain" aria-hidden="true"></div>
@@ -39,7 +79,7 @@
   <!-- =========================================
        MASTHEAD
        ========================================= -->
-  <section class="hp-masthead" aria-label="Issue masthead">
+  <section id="main" class="hp-masthead" aria-label="Issue masthead">
     <div class="hp-masthead-inner">
       <span class="hp-mast-mark">— Ediția curentă —</span>
       <span class="hp-mast-title">Even · Acasă</span>
@@ -56,8 +96,8 @@
 
     <!-- Desktop & tablet: video background. Mobile: hidden, înlocuit de .hp-hero-cover -->
     <div class="hp-hero-video" aria-hidden="true">
-      <video id="heroVideo" muted playsinline preload="auto">
-        <source src="design/landscape.mp4" type="video/mp4">
+      <video id="heroVideo" muted playsinline preload="metadata" poster="design/hero-poster.jpg">
+        <source src="design/landscape-web.mp4" type="video/mp4">
       </video>
       <div class="hp-hero-scrim"></div>
       <div class="hp-hero-vignette"></div>
@@ -94,40 +134,20 @@
             <span>Vorbește cu un agent</span>
           </a>
         </div>
-        <div class="hp-hero-trust hp-enter hp-enter-5">
-          <div class="hp-trust-item">
-            <span class="hp-trust-num">50<small>+</small></span>
-            <span class="hp-trust-label">Tranzacții finalizate</span>
-          </div>
-          <div class="hp-trust-rule" aria-hidden="true"></div>
-          <div class="hp-trust-item">
-            <span class="hp-trust-num">3</span>
-            <span class="hp-trust-label">Ani de activitate</span>
-          </div>
-        </div>
+
       </div>
 
       <aside class="hp-hero-feature hp-enter hp-enter-3" id="hpHeroFeature" aria-label="Selecție recomandată">
         <div class="hp-feature-card">
           <div class="hp-feature-eyebrow">
-            <span>Selecție · Nº 042</span>
+            <span>Selecția EVEN</span>
             <span class="hp-feature-mark">●</span>
           </div>
-          <div class="hp-feature-image" role="img" aria-label="Apartament Herăstrău">
-            <span class="hp-feature-tag">Apartament · 3 camere</span>
-          </div>
+          <div class="hp-feature-image" role="img" aria-label=""></div>
           <div class="hp-feature-body">
-            <h3 class="hp-feature-title">Vedere către parc.<br>Lumină de <em>dimineață</em>.</h3>
-            <div class="hp-feature-meta">
-              <span><i class="fa-solid fa-vector-square"></i>82 m²</span>
-              <span class="hp-meta-rule"></span>
-              <span><i class="fa-solid fa-bed"></i>3 cam.</span>
-              <span class="hp-meta-rule"></span>
-              <span><i class="fa-solid fa-location-dot"></i>Herăstrău</span>
-            </div>
+            <h3 class="hp-feature-title">Săptămâna aceasta<br>alegem o proprietate<br>de pus în ramă.</h3>
             <div class="hp-feature-foot">
-              <span class="hp-feature-price">185.000 €</span>
-              <span class="hp-feature-cta">Detalii <i class="fa-solid fa-arrow-up-right-from-square"></i></span>
+              <span class="hp-feature-price">În curând</span>
             </div>
           </div>
         </div>
@@ -157,26 +177,26 @@
     </header>
 
     <div class="hp-catalog-card">
-      <div class="hp-catalog-tabs" role="tablist">
-        <button class="flux-tab active" data-flux="rezidential" role="tab">
+      <div class="hp-catalog-tabs" role="tablist" aria-label="Categorii proprietăți">
+        <button class="flux-tab active" data-flux="rezidential" role="tab" id="tab-rezidential" aria-selected="true" aria-controls="fluxFilters" tabindex="0">
           <span class="hp-tab-num">I</span>
           <span class="hp-tab-label">Rezidențial</span>
         </button>
-        <button class="flux-tab" data-flux="comercial" role="tab">
+        <button class="flux-tab" data-flux="comercial" role="tab" id="tab-comercial" aria-selected="false" aria-controls="fluxFilters" tabindex="-1">
           <span class="hp-tab-num">II</span>
           <span class="hp-tab-label">Comercial</span>
         </button>
-        <button class="flux-tab" data-flux="terenuri" role="tab">
+        <button class="flux-tab" data-flux="terenuri" role="tab" id="tab-terenuri" aria-selected="false" aria-controls="fluxFilters" tabindex="-1">
           <span class="hp-tab-num">III</span>
           <span class="hp-tab-label">Terenuri</span>
         </button>
-        <button class="flux-tab" data-flux="proiecte" role="tab">
+        <button class="flux-tab" data-flux="proiecte" role="tab" id="tab-proiecte" aria-selected="false" aria-controls="fluxFilters" tabindex="-1">
           <span class="hp-tab-num">IV</span>
           <span class="hp-tab-label">Proiecte noi</span>
         </button>
       </div>
       <div class="hp-catalog-rule" aria-hidden="true"></div>
-      <div class="hp-catalog-filters flux-filters" id="fluxFilters"></div>
+      <div class="hp-catalog-filters flux-filters" id="fluxFilters" role="tabpanel"></div>
     </div>
   </section>
 
@@ -295,12 +315,12 @@
   </div>
 
   <!-- =========================================
-       Nº V — CUM LUCRĂM (process)
+       Nº IV — CUM LUCRĂM (process)
        ========================================= -->
   <section class="hp-chapter hp-process">
 
     <header class="hp-chapter-head" data-reveal>
-      <span class="hp-eyebrow">— Nº V — Cum lucrăm</span>
+      <span class="hp-eyebrow">— Nº IV — Cum lucrăm</span>
       <h2 class="hp-chapter-h2">Patru pași.<br>Un singur <em>obiectiv</em>.</h2>
       <p class="hp-chapter-lede">Cheia în mâna ta — fără ocoluri, fără pași extra.</p>
     </header>
@@ -336,11 +356,11 @@
   </section>
 
   <!-- =========================================
-       Nº VI — ÎN CIFRE (stats, dark band)
+       Nº V — ÎN CIFRE (stats, dark band)
        ========================================= -->
   <section class="hp-figures">
     <div class="hp-figures-frame" data-reveal>
-      <span class="hp-eyebrow hp-eyebrow-light">— Nº VI — În cifre</span>
+      <span class="hp-eyebrow hp-eyebrow-light">— Nº V — În cifre</span>
       <h2 class="hp-figures-h2">
         Trei ani.<br>
         Strategie, nu <em>simple anunțuri</em>.
@@ -381,12 +401,12 @@
   </section>
 
   <!-- =========================================
-       Nº VII — VOCI (testimonials)
+       Nº VI — VOCI (testimonials)
        ========================================= -->
   <section class="hp-chapter hp-voices">
 
     <header class="hp-chapter-head" data-reveal>
-      <span class="hp-eyebrow">— Nº VII — Voci</span>
+      <span class="hp-eyebrow">— Nº VI — Voci</span>
       <h2 class="hp-chapter-h2">Oameni mulțumiți.<br>Povești <em>adevărate</em>.</h2>
     </header>
 
@@ -488,46 +508,58 @@
     </div>
   </section>
 
-  <footer id="footer" class="footer"></footer>
+  <footer id="footer" class="footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <a href="index.html" class="logo">
+            <img src="design/logomark-even.svg" class="logo-mark-svg logo-svg-footer" alt="">
+            <img src="design/logotype-even.svg" class="logo-type-svg logo-svg-footer" alt="EVEN">
+          </a>
+          <p>Strategie înainte de anunț. Evaluare corectă. Implicare reală în fiecare tranzacție.</p>
+          <p class="footer-tagline">Imobiliare cu plan.</p>
+          <div class="footer-social"></div>
+        </div>
+        <div>
+          <h4>Categorii</h4>
+          <ul class="footer-links">
+            <li><a href="listings-rezidential.html">Rezidențial</a></li>
+            <li><a href="listings-comercial.html">Comercial</a></li>
+            <li><a href="listings-terenuri.html">Terenuri</a></li>
+            <li><a href="projects.html">Proiecte Noi</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4>Companie</h4>
+          <ul class="footer-links">
+            <li><a href="about.html">Despre noi</a></li>
+            <li><a href="about.html#echipa">Echipa</a></li>
+            <li><a href="contact.html">Contact</a></li>
+          </ul>
+        </div>
+        <div class="footer-contact">
+          <h4>Contact</h4>
+          <p><i class="fa-solid fa-location-dot"></i>Banul Antonache 71, Floreasca</p>
+          <p><i class="fa-solid fa-phone"></i>0745 609 366</p>
+          <p><i class="fa-solid fa-envelope"></i>ilan@even-imobiliare.ro</p>
+          <p><i class="fa-regular fa-clock"></i>Lun-Vin: 09:00-19:00</p>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        © 2026 EVEN Real Estate. Toate drepturile rezervate.
+        | <a href="terms.html" style="color: inherit">Termeni</a>
+        | <a href="privacy.html" style="color: inherit">Confidențialitate</a>
+        | <a href="verificat-even.html" style="color: inherit">Verificat de EVEN</a>
+        | <a href="favorite.html" style="color: inherit">Favorite</a>
+      </div>
+    </div>
+  </footer>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="js/db.js"></script>
   <script src="js/main.js"></script>
+  <script src="js/cards.js"></script>
   <script src="js/homepage.js"></script>
-  <script>
-    // Editorial reveal-on-scroll + figures counter (independent of homepage.js loaders)
-    document.addEventListener('DOMContentLoaded', () => {
-      const nums = document.querySelectorAll('.hp-figure-num[data-target]');
-      const run = el => {
-        const target = +el.dataset.target;
-        const dur = 1800, t0 = performance.now();
-        const tick = t => {
-          const p = Math.min((t - t0) / dur, 1);
-          el.textContent = Math.floor((1 - Math.pow(1 - p, 3)) * target);
-          if (p < 1) requestAnimationFrame(tick);
-          else el.textContent = target;
-        };
-        requestAnimationFrame(tick);
-      };
-      const ioFig = new IntersectionObserver((entries) => {
-        entries.forEach(e => {
-          if (e.isIntersecting) { run(e.target); ioFig.unobserve(e.target); }
-        });
-      }, { threshold: 0.4 });
-      nums.forEach(n => ioFig.observe(n));
-
-      const reveals = document.querySelectorAll('[data-reveal]');
-      const ioRev = new IntersectionObserver((entries) => {
-        entries.forEach(e => {
-          if (e.isIntersecting) {
-            e.target.classList.add('is-revealed');
-            ioRev.unobserve(e.target);
-          }
-        });
-      }, { threshold: 0.12, rootMargin: '0px 0px -80px 0px' });
-      reveals.forEach(el => ioRev.observe(el));
-    });
-  </script>
 
 </body>
 </html>

@@ -40,44 +40,44 @@ function renderProjectsList() {
   }
 
   grid.innerHTML = filtered.map(p => {
-    const photo = (p.imagini && p.imagini[0])
-      ? `<img src="${p.imagini[0]}" alt="${p.nume}" loading="lazy">`
-      : `<div class="img-placeholder"></div>`;
-    const eyebrow = `${statusLabel(p.status)} · ${p.cartier}`;
+    const photo = cardPhoto(p.imagini, p.nume);
+    const eyebrow = `${statusLabel(p.status)} · ${escapeHtml(p.cartier || '')}`;
     return `
-      <a class="prop-card pj-card" href="project-detail.html?id=${p.id}" aria-label="${p.nume}">
-        <figure class="prop-card-media">
-          <div class="prop-card-img">${photo}</div>
-        </figure>
-        <div class="prop-card-body">
-          <div class="prop-card-eyebrow">
-            <span>${eyebrow}</span>
-            <span class="prop-card-num">Nº ${shortPjNum(p.id)}</span>
-          </div>
-          <h3 class="prop-card-title">${p.nume}</h3>
-          <p class="pj-card-dev">${p.dezvoltator}</p>
-          <p class="prop-card-meta">
-            ${p.unitatiDisponibile}/${p.unitatiTotal} unități
-            <span class="sep"> · </span>
-            Livrare ${formatLivrareLong(p.dataLivrare)}
-            <span class="sep"> · </span>
-            Progres ${p.progres}%
-          </p>
-          <div class="pj-progress-bar" aria-hidden="true">
-            <span style="width:${Math.min(100, Math.max(0, p.progres))}%"></span>
-          </div>
-          <div class="prop-card-foot">
-            <div>
-              ${hasPrice(p.intervalPret.min)
-                ? `<span class="prop-card-price">${formatPrice(p.intervalPret.min)}</span>
-                   <span class="prop-card-price-sub">de la · până la ${formatPrice(p.intervalPret.max)}</span>`
-                : `<span class="prop-card-price">Preț la cerere</span>
-                   <span class="prop-card-price-sub">consultant dedicat</span>`}
+      <article class="prop-card pj-card">
+        <a class="prop-card-link" href="project-detail.html?id=${p.id}" aria-label="${escapeHtml(p.nume)}">
+          <figure class="prop-card-media">
+            <div class="prop-card-img">${photo}</div>
+          </figure>
+          <div class="prop-card-body">
+            <div class="prop-card-eyebrow">
+              <span>${eyebrow}</span>
+              <span class="prop-card-num">Nº ${shortPjNum(p.id)}</span>
             </div>
-            <span class="prop-card-cta">Detalii <i class="fa-solid fa-arrow-right"></i></span>
+            <h3 class="prop-card-title">${escapeHtml(p.nume)}</h3>
+            <p class="pj-card-dev">${escapeHtml(p.dezvoltator)}</p>
+            <p class="prop-card-meta">
+              ${p.unitatiDisponibile}/${p.unitatiTotal} unități
+              <span class="sep"> · </span>
+              Livrare ${formatLivrareLong(p.dataLivrare)}
+              <span class="sep"> · </span>
+              Progres ${p.progres}%
+            </p>
+            <div class="pj-progress-bar" aria-hidden="true">
+              <span style="width:${Math.min(100, Math.max(0, p.progres))}%"></span>
+            </div>
+            <div class="prop-card-foot">
+              <div>
+                ${hasPrice(p.intervalPret.min)
+                  ? `<span class="prop-card-price">${formatPrice(p.intervalPret.min)}</span>
+                     <span class="prop-card-price-sub">de la · până la ${formatPrice(p.intervalPret.max)}</span>`
+                  : `<span class="prop-card-price">Preț la cerere</span>
+                     <span class="prop-card-price-sub">consultant dedicat</span>`}
+              </div>
+              <span class="prop-card-cta">Detalii <i class="fa-solid fa-arrow-right"></i></span>
+            </div>
           </div>
-        </div>
-      </a>
+        </a>
+      </article>
     `;
   }).join('');
 }
@@ -118,9 +118,9 @@ function renderProjectDetail(p) {
     <div class="overlay"></div>
     <div class="project-hero-content">
       <div class="container">
-        <div class="dev-name">${p.dezvoltator}</div>
-        <h1>${p.nume}</h1>
-        <div class="project-loc"><i class="fa-solid fa-location-dot"></i> ${p.adresa}, ${p.cartier}, ${p.oras}</div>
+        <div class="dev-name">${escapeHtml(p.dezvoltator)}</div>
+        <h1>${escapeHtml(p.nume)}</h1>
+        <div class="project-loc"><i class="fa-solid fa-location-dot"></i> ${escapeHtml(p.adresa)}, ${escapeHtml(p.cartier)}, ${escapeHtml(p.oras)}</div>
       </div>
     </div>
   `;
@@ -158,16 +158,16 @@ function renderProjectDetail(p) {
 
   document.getElementById('projectGallery').innerHTML = renderGalleryProj(p.imagini);
 
-  const initials = p.dezvoltator.split(' ').map(s => s[0]).join('').slice(0, 2);
+  const initials = escapeHtml(p.dezvoltator.split(' ').map(s => s[0]).join('').slice(0, 2));
   document.getElementById('developerBlock').innerHTML = `
     <h2>Dezvoltator</h2>
     <div class="dev-block">
       <div class="dev-logo">${initials}</div>
       <div>
-        <h3 style="margin-bottom:6px">${p.dezvoltator}</h3>
+        <h3 style="margin-bottom:6px">${escapeHtml(p.dezvoltator)}</h3>
         <p style="font-size:14px;color:var(--gray-500);margin-bottom:8px">Proiecte anterioare:</p>
         <div style="display:flex;gap:8px;flex-wrap:wrap">
-          ${(p.dezvoltatorProiecte || []).map(pr => `<span class="badge badge-proiect">${pr}</span>`).join('')}
+          ${(p.dezvoltatorProiecte || []).map(pr => `<span class="badge badge-proiect">${escapeHtml(pr)}</span>`).join('')}
         </div>
       </div>
     </div>
@@ -196,7 +196,7 @@ function renderProjectDetail(p) {
   document.getElementById('interestForm').innerHTML = `
     <h2>Mă interesează acest proiect</h2>
     <p style="color:var(--gray-500);margin-bottom:20px">Lasă-ne datele tale și un consultant te va contacta în maxim 24 ore cu lista completă de unități și prețuri actualizate.</p>
-    <form onsubmit="submitInterest(event, '${p.nume}')" style="display:grid;grid-template-columns:1fr 1fr;gap:16px;max-width:720px">
+    <form data-submit-action="submit-interest" data-project-name="${escapeHtml(p.nume)}" style="display:grid;grid-template-columns:1fr 1fr;gap:16px;max-width:720px">
       <div class="form-group"><label>Nume</label><input type="text" required></div>
       <div class="form-group"><label>Telefon</label><input type="tel" required></div>
       <div class="form-group" style="grid-column:1/-1"><label>Email</label><input type="email" required></div>

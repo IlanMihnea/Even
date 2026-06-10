@@ -12,18 +12,59 @@
   <meta name="description" content="Apartament rezidențial verificat de EVEN. Galerie, plan, calculator rate ipotecare și programare vizionare.">
   <meta property="og:type" content="article">
   <meta name="theme-color" content="#1C2340">
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500;1,600&family=DM+Sans:wght@400;500;600;700&family=Mrs+Saint+Delafield&family=Syne:wght@600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600&family=DM+Sans:wght@400;500;600;700&family=Mrs+Saint+Delafield&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/icons.css">
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
   <link rel="stylesheet" href="css/main.css">
   <link rel="stylesheet" href="css/animations.css">
   <link rel="stylesheet" href="css/property.css">
+  <meta property="og:image" content="https://even-imobiliare.ro/design/og-default.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:title" content="Proprietate rezidențială verificată · EVEN">
+  <meta property="og:description" content="Apartament rezidențial verificat de EVEN. Galerie, plan, calculator rate ipotecare și programare vizionare.">
 </head>
-<body data-page="rezidential">
+<body data-page="rezidential" data-property-category="rezidential">
+  <a class="skip-link" href="#main">Sari la conținut</a>
 
-  <header id="navbar" class="navbar"></header>
+  <header id="navbar" class="navbar">
+    <div class="container nav-inner">
+      <a href="index.html" class="logo">
+        <img src="design/logomark-even.svg" class="logo-mark-svg" alt="">
+        <img src="design/logotype-even.svg" class="logo-type-svg" alt="EVEN">
+      </a>
+      <ul class="nav-links">
+        <li><a href="index.html" class="nav-link">Acasă</a></li>
+        <li><a href="listings-rezidential.html" class="nav-link active">Rezidențial</a></li>
+        <li><a href="listings-comercial.html" class="nav-link">Comercial</a></li>
+        <li><a href="listings-terenuri.html" class="nav-link">Terenuri</a></li>
+        <li><a href="projects.html" class="nav-link">Proiecte Noi</a></li>
+        <li><a href="about.html" class="nav-link">Despre</a></li>
+      </ul>
+      <div class="nav-cta">
+        <a href="favorite.html" class="nav-fav" aria-label="Favorite" id="navFavLink">
+          <i class="fa-regular fa-heart"></i>
+          <span class="nav-fav-badge" id="navFavBadge" aria-hidden="true" hidden></span>
+        </a>
+        <a href="contact.html" class="btn btn-outline"><i class="fa-solid fa-phone"></i> Contact</a>
+        <button class="nav-toggle" id="navToggle" aria-label="Meniu"><i class="fa-solid fa-bars"></i></button>
+      </div>
+    </div>
+    <div class="nav-mobile" id="navMobile">
+      <a href="index.html">Acasă</a>
+      <a href="listings-rezidential.html">Rezidențial</a>
+      <a href="listings-comercial.html">Comercial</a>
+      <a href="listings-terenuri.html">Terenuri</a>
+      <a href="projects.html">Proiecte Noi</a>
+      <a href="about.html">Despre</a>
+      <a href="favorite.html" id="navMobileFavLink">Favorite</a>
+      <a href="contact.html">Contact</a>
+    </div>
+  </header>
 
-  <section class="page-header flux-rezidential" style="padding: 24px 0">
+  <section id="main" class="page-header flux-rezidential" style="padding: 24px 0">
     <div class="container">
       <div class="breadcrumbs" id="breadcrumbs"></div>
     </div>
@@ -33,9 +74,53 @@
     <div class="container" id="detailContent"></div>
   </main>
 
-  <footer id="footer" class="footer"></footer>
+  <footer id="footer" class="footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <a href="index.html" class="logo">
+            <img src="design/logomark-even.svg" class="logo-mark-svg logo-svg-footer" alt="">
+            <img src="design/logotype-even.svg" class="logo-type-svg logo-svg-footer" alt="EVEN">
+          </a>
+          <p>Strategie înainte de anunț. Evaluare corectă. Implicare reală în fiecare tranzacție.</p>
+          <p class="footer-tagline">Imobiliare cu plan.</p>
+          <div class="footer-social"></div>
+        </div>
+        <div>
+          <h4>Categorii</h4>
+          <ul class="footer-links">
+            <li><a href="listings-rezidential.html">Rezidențial</a></li>
+            <li><a href="listings-comercial.html">Comercial</a></li>
+            <li><a href="listings-terenuri.html">Terenuri</a></li>
+            <li><a href="projects.html">Proiecte Noi</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4>Companie</h4>
+          <ul class="footer-links">
+            <li><a href="about.html">Despre noi</a></li>
+            <li><a href="about.html#echipa">Echipa</a></li>
+            <li><a href="contact.html">Contact</a></li>
+          </ul>
+        </div>
+        <div class="footer-contact">
+          <h4>Contact</h4>
+          <p><i class="fa-solid fa-location-dot"></i>Banul Antonache 71, Floreasca</p>
+          <p><i class="fa-solid fa-phone"></i>0745 609 366</p>
+          <p><i class="fa-solid fa-envelope"></i>ilan@even-imobiliare.ro</p>
+          <p><i class="fa-regular fa-clock"></i>Lun-Vin: 09:00-19:00</p>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        © 2026 EVEN Real Estate. Toate drepturile rezervate.
+        | <a href="terms.html" style="color: inherit">Termeni</a>
+        | <a href="privacy.html" style="color: inherit">Confidențialitate</a>
+        | <a href="verificat-even.html" style="color: inherit">Verificat de EVEN</a>
+        | <a href="favorite.html" style="color: inherit">Favorite</a>
+      </div>
+    </div>
+  </footer>
 
-  <script>window.PROPERTY_PAGE = { category: 'rezidential' };</script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
   <script src="js/db.js"></script>

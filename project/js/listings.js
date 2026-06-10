@@ -17,7 +17,7 @@ function getDetailPage() {
     rezidential: 'property-rezidential.html',
     comercial: 'property-comercial.html',
     terenuri: 'property-teren.html'
-  }[LISTING_CONFIG.category];
+  }[LISTING_CATEGORY];
 }
 
 // ---------- FILTRARE ----------
@@ -25,7 +25,7 @@ function applyFilters(items) {
   let result = [...items];
   const f = activeFilters;
 
-  if (LISTING_CONFIG.category === 'rezidential') {
+  if (LISTING_CATEGORY === 'rezidential') {
     if (f.regim) result = result.filter(p => p.regim === f.regim);
     if (f.tip) result = result.filter(p => p.tip === f.tip);
     if (f.oras) result = result.filter(p => p.oras.toLowerCase().includes(f.oras.toLowerCase()));
@@ -38,7 +38,7 @@ function applyFilters(items) {
     if (f.orientare) result = result.filter(p => p.orientare === f.orientare);
   }
 
-  if (LISTING_CONFIG.category === 'comercial') {
+  if (LISTING_CATEGORY === 'comercial') {
     if (f.regim) result = result.filter(p => p.regim === f.regim);
     if (f.tipSpatiu) result = result.filter(p => p.tipSpatiu === f.tipSpatiu);
     if (f.oras) result = result.filter(p => p.oras.toLowerCase().includes(f.oras.toLowerCase()));
@@ -49,7 +49,7 @@ function applyFilters(items) {
     if (f.inaltimeLibera) result = result.filter(p => p.inaltimeLibera >= +f.inaltimeLibera);
   }
 
-  if (LISTING_CONFIG.category === 'terenuri') {
+  if (LISTING_CATEGORY === 'terenuri') {
     if (f.tip) result = result.filter(p => p.tip === f.tip);
     if (f.judet) result = result.filter(p => p.judet.toLowerCase().includes(f.judet.toLowerCase()));
     if (f.suprafataMin) {
@@ -91,125 +91,16 @@ function applySort(items) {
 }
 
 // ---------- RENDER CARD ----------
+// renderRezCard / renderComCard / renderTerCard — definite în cards.js
+
+const LISTING_CATEGORY = document.body.dataset.listingCategory || '';
+
 function renderCard(p) {
   const detail = `${getDetailPage()}?id=${p.id}`;
-  if (LISTING_CONFIG.category === 'rezidential') return renderRezCard(p, detail);
-  if (LISTING_CONFIG.category === 'comercial') return renderComCard(p, detail);
-  if (LISTING_CONFIG.category === 'terenuri') return renderTerCard(p, detail);
+  if (LISTING_CATEGORY === 'rezidential') return renderRezCard(p, detail);
+  if (LISTING_CATEGORY === 'comercial')   return renderComCard(p, detail);
+  if (LISTING_CATEGORY === 'terenuri')    return renderTerCard(p, detail);
   return '';
-}
-
-function shortNum(id) {
-  return String(id || '').replace(/-/g, '').slice(0, 4).toUpperCase() || '----';
-}
-
-function cardPhoto(imagini, titlu) {
-  return (imagini && imagini[0])
-    ? `<img src="${imagini[0]}" alt="${titlu || ''}" loading="lazy">`
-    : `<div class="img-placeholder"></div>`;
-}
-
-function favBtn(id) {
-  return `
-    <button class="prop-card-fav" type="button" data-prop-id="${id}"
-            onclick="event.preventDefault(); event.stopPropagation(); toggleFav(this)"
-            aria-label="Salvează la favorite">
-      <i class="fa-regular fa-heart"></i>
-    </button>`;
-}
-
-function buildCard({ link, titlu, eyebrow, meta, price, sub, utilsHtml, photo, id }) {
-  return `
-    <a class="prop-card" href="${link}" aria-label="${titlu}">
-      <figure class="prop-card-media">
-        <div class="prop-card-img">${photo}</div>
-        ${favBtn(id)}
-      </figure>
-      <div class="prop-card-body">
-        <div class="prop-card-eyebrow">
-          <span>${eyebrow}</span>
-          <span class="prop-card-num">Nº ${shortNum(id)}</span>
-        </div>
-        <h3 class="prop-card-title">${titlu}</h3>
-        <p class="prop-card-meta">${meta}</p>
-        ${utilsHtml ? `<div class="prop-card-utils">${utilsHtml}</div>` : ''}
-        <div class="prop-card-foot">
-          <div>
-            <span class="prop-card-price">${price}</span>
-            ${sub ? `<span class="prop-card-price-sub">${sub}</span>` : ''}
-          </div>
-          <span class="prop-card-cta">Detalii <i class="fa-solid fa-arrow-right"></i></span>
-        </div>
-      </div>
-    </a>`;
-}
-
-function renderRezCard(p, link) {
-  const eyebrow = `${p.regim === 'vanzare' ? 'Vânzare' : 'Închiriere'} · ${p.cartier}`;
-  const meta = [
-    `${p.camere} cam.`,
-    `${p.suprafata} m²`,
-    p.etaj != null ? `Et. ${p.etaj}${p.etajTotal ? '/' + p.etajTotal : ''}` : null
-  ].filter(Boolean).join('<span class="sep"> · </span>');
-  const price = formatPrice(p.pret) + (p.regim === 'inchiriere' ? '<span class="per-month">/lună</span>' : '');
-  const sub = (p.regim === 'vanzare' && p.pret && p.suprafata)
-    ? `${new Intl.NumberFormat('ro-RO').format(Math.round(p.pret / p.suprafata))} €/m²`
-    : '';
-  return buildCard({
-    link, id: p.id, titlu: p.titlu, eyebrow, meta, price, sub,
-    photo: cardPhoto(p.imagini, p.titlu)
-  });
-}
-
-function renderComCard(p, link) {
-  const tipLabels = { birouri: 'Birouri', retail: 'Retail', depozit: 'Depozit', industrial: 'Industrial', showroom: 'Showroom', hotel: 'Hotel / Pensiune' };
-  const eyebrow = `${p.regim === 'vanzare' ? 'Vânzare' : 'Închiriere'} · ${tipLabels[p.tipSpatiu] || ''}`;
-  const meta = [
-    `${p.suprafataTotala} m²`,
-    p.tipSpatiu !== 'hotel' && p.clasaCladire ? `Clasa ${p.clasaCladire}` : null,
-    p.etaj != null ? `Et. ${p.etaj}` : null
-  ].filter(Boolean).join('<span class="sep"> · </span>');
-  const price = p.pret
-    ? `${p.pret} €<span class="per-month">/m²/lună</span>`
-    : formatPrice(p.pretTotal);
-  const sub = p.pret && p.suprafataTotala
-    ? `~ ${new Intl.NumberFormat('ro-RO').format(p.pret * p.suprafataTotala)} €/lună`
-    : '';
-  return buildCard({
-    link, id: p.id, titlu: p.titlu, eyebrow, meta, price, sub,
-    photo: cardPhoto(p.imagini, p.titlu)
-  });
-}
-
-function renderTerCard(p, link) {
-  const tipLabels = {
-    'intravilan-rezidential': 'Intravilan rez.',
-    'intravilan-comercial': 'Intravilan com.',
-    'extravilan-agricol': 'Extravilan agricol',
-    'industrial': 'Industrial'
-  };
-  const eyebrow = `${tipLabels[p.tip] || 'Teren'} · ${p.localitate || p.judet || ''}`;
-  const utilsAll = [
-    { k: 'apa', i: 'fa-droplet', t: 'Apă' },
-    { k: 'curent', i: 'fa-bolt', t: 'Curent' },
-    { k: 'gaz', i: 'fa-fire', t: 'Gaz' },
-    { k: 'canalizare', i: 'fa-toilet', t: 'Canal.' }
-  ];
-  const meta = [
-    `${p.suprafata} ${p.unitate}`,
-    p.frontStradal ? `Front ${p.frontStradal}m` : null,
-    p.accesDrum ? `Acces ${p.accesDrum}` : null
-  ].filter(Boolean).join('<span class="sep"> · </span>');
-  const utilsHtml = utilsAll.map(u => `
-    <span class="prop-card-util ${(p.utilitati || []).includes(u.k) ? 'active' : ''}">
-      <i class="fa-solid ${u.i}"></i>${u.t}
-    </span>`).join('');
-  const price = formatPrice(p.pretTotal);
-  const sub = p.pretMp ? `${p.pretMp} €/m²` : '';
-  return buildCard({
-    link, id: p.id, titlu: p.titlu, eyebrow, meta, price, sub, utilsHtml,
-    photo: cardPhoto(p.imagini, p.titlu)
-  });
 }
 
 // ---------- RENDER LISTĂ ----------
@@ -231,7 +122,10 @@ function renderList() {
       <div class="empty-state" style="grid-column: 1 / -1">
         <i class="fa-regular fa-folder-open"></i>
         <h3>Niciun rezultat</h3>
-        <p>Încearcă să relaxezi filtrele.</p>
+        <p>Încearcă să relaxezi filtrele sau spune-ne direct ce cauți.</p>
+        <a href="contact.html" class="btn btn-outline" style="margin-top:12px">
+          <i class="fa-solid fa-arrow-right"></i> Trimite-ne cererea
+        </a>
       </div>`;
   } else {
     grid.innerHTML = pageItems.map(renderCard).join('');
@@ -252,11 +146,11 @@ function renderList() {
 function renderPagination(totalPages) {
   const pag = document.getElementById('pagination');
   if (totalPages <= 1) { pag.innerHTML = ''; return; }
-  let html = `<button ${currentPage === 1 ? 'disabled' : ''} onclick="goToPage(${currentPage - 1})"><i class="fa-solid fa-chevron-left"></i></button>`;
+  let html = `<button ${currentPage === 1 ? 'disabled' : ''} data-action="go-to-page" data-page="${currentPage - 1}"><i class="fa-solid fa-chevron-left"></i></button>`;
   for (let i = 1; i <= totalPages; i++) {
-    html += `<button class="${i === currentPage ? 'active' : ''}" onclick="goToPage(${i})">${i}</button>`;
+    html += `<button class="${i === currentPage ? 'active' : ''}" data-action="go-to-page" data-page="${i}">${i}</button>`;
   }
-  html += `<button ${currentPage === totalPages ? 'disabled' : ''} onclick="goToPage(${currentPage + 1})"><i class="fa-solid fa-chevron-right"></i></button>`;
+  html += `<button ${currentPage === totalPages ? 'disabled' : ''} data-action="go-to-page" data-page="${currentPage + 1}"><i class="fa-solid fa-chevron-right"></i></button>`;
   pag.innerHTML = html;
 }
 
@@ -269,9 +163,9 @@ function goToPage(p) {
 // ---------- INIT FILTRE ----------
 function initFiltersUI() {
   const sidebar = document.getElementById('filterSidebar');
-  if (LISTING_CONFIG.category === 'rezidential') {
+  if (LISTING_CATEGORY === 'rezidential') {
     sidebar.innerHTML = `
-      <h3>Filtre <button class="reset-btn" onclick="resetFilters()">Resetează</button></h3>
+      <h3>Filtre <button class="reset-btn" data-action="reset-filters">Resetează</button></h3>
       <div class="filter-group">
         <div class="filter-group-title">Regim</div>
         <div class="pill-list" data-filter="regim">
@@ -339,9 +233,9 @@ function initFiltersUI() {
         <i class="fa-solid fa-chevron-down"></i>
       </button>
     `;
-  } else if (LISTING_CONFIG.category === 'comercial') {
+  } else if (LISTING_CATEGORY === 'comercial') {
     sidebar.innerHTML = `
-      <h3>Filtre <button class="reset-btn" onclick="resetFilters()">Resetează</button></h3>
+      <h3>Filtre <button class="reset-btn" data-action="reset-filters">Resetează</button></h3>
       <div class="filter-group">
         <div class="filter-group-title">Regim</div>
         <div class="pill-list" data-filter="regim">
@@ -397,9 +291,9 @@ function initFiltersUI() {
         <i class="fa-solid fa-chevron-down"></i>
       </button>
     `;
-  } else if (LISTING_CONFIG.category === 'terenuri') {
+  } else if (LISTING_CATEGORY === 'terenuri') {
     sidebar.innerHTML = `
-      <h3>Filtre <button class="reset-btn" onclick="resetFilters()">Resetează</button></h3>
+      <h3>Filtre <button class="reset-btn" data-action="reset-filters">Resetează</button></h3>
       <div class="filter-group">
         <div class="filter-group-title">Tip teren</div>
         <div class="pill-list" data-filter="tip">
@@ -611,7 +505,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:48px;color:var(--gray-500)"><i class="fa-solid fa-spinner fa-spin"></i> Se încarcă...</div>';
 
   try {
-    allItems = await getProperties(LISTING_CONFIG.category);
+    allItems = await getProperties(LISTING_CATEGORY);
   } catch (err) {
     console.error('Listings load error:', err);
     grid.innerHTML = '<div class="empty-state" style="grid-column:1/-1"><i class="fa-regular fa-circle-exclamation"></i><h3>Eroare la încărcare</h3><p>Încearcă să reîmprospătezi pagina.</p></div>';

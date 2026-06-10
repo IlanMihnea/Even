@@ -3,9 +3,25 @@
 // ============================================
 
 // ---------- NAVBAR ----------
+function initNavToggle() {
+  const toggle = document.getElementById('navToggle');
+  const mobile = document.getElementById('navMobile');
+  if (toggle && mobile) {
+    toggle.addEventListener('click', () => {
+      const isOpen = mobile.classList.toggle('open');
+      toggle.querySelector('i').className = isOpen
+        ? 'fa-solid fa-xmark'
+        : 'fa-solid fa-bars';
+      document.body.style.overflow = isOpen ? 'hidden' : '';
+    });
+  }
+}
+
 function renderNavbar(activePage = '') {
   const navbar = document.getElementById('navbar');
   if (!navbar) return;
+  // If already inlined by scripts/inline-chrome.js, just wire up events
+  if (navbar.children.length) { initNavToggle(); updateNavFavBadge(); return; }
   navbar.innerHTML = `
     <div class="container nav-inner">
       <a href="index.html" class="logo">
@@ -21,6 +37,10 @@ function renderNavbar(activePage = '') {
         <li><a href="about.html" class="nav-link ${activePage === 'about' ? 'active' : ''}">Despre</a></li>
       </ul>
       <div class="nav-cta">
+        <a href="favorite.html" class="nav-fav" aria-label="Favorite" id="navFavLink">
+          <i class="fa-regular fa-heart"></i>
+          <span class="nav-fav-badge" id="navFavBadge" aria-hidden="true" hidden></span>
+        </a>
         <a href="contact.html" class="btn btn-outline"><i class="fa-solid fa-phone"></i> Contact</a>
         <button class="nav-toggle" id="navToggle" aria-label="Meniu"><i class="fa-solid fa-bars"></i></button>
       </div>
@@ -32,18 +52,24 @@ function renderNavbar(activePage = '') {
       <a href="listings-terenuri.html">Terenuri</a>
       <a href="projects.html">Proiecte Noi</a>
       <a href="about.html">Despre</a>
+      <a href="favorite.html" id="navMobileFavLink">Favorite</a>
       <a href="contact.html">Contact</a>
     </div>
   `;
-  const toggle = document.getElementById('navToggle');
-  const mobile = document.getElementById('navMobile');
-  if (toggle && mobile) {
-    toggle.addEventListener('click', () => {
-      mobile.classList.toggle('open');
-      toggle.querySelector('i').className = mobile.classList.contains('open')
-        ? 'fa-solid fa-xmark'
-        : 'fa-solid fa-bars';
-    });
+  initNavToggle();
+  updateNavFavBadge();
+}
+
+function updateNavFavBadge() {
+  const count = getFavs().length;
+  const badge = document.getElementById('navFavBadge');
+  const mobileLink = document.getElementById('navMobileFavLink');
+  if (badge) {
+    badge.textContent = count;
+    badge.hidden = count === 0;
+  }
+  if (mobileLink) {
+    mobileLink.textContent = count > 0 ? `Favorite (${count})` : 'Favorite';
   }
 }
 
@@ -107,6 +133,8 @@ function initNavbarScroll() {
 function renderFooter() {
   const footer = document.getElementById('footer');
   if (!footer) return;
+  // If already inlined by scripts/inline-chrome.js, skip re-render
+  if (footer.children.length) return;
   footer.innerHTML = `
     <div class="container">
       <div class="footer-grid">
@@ -117,12 +145,7 @@ function renderFooter() {
           </a>
           <p>Strategie înainte de anunț. Evaluare corectă. Implicare reală în fiecare tranzacție.</p>
           <p class="footer-tagline">Imobiliare cu plan.</p>
-          <div class="footer-social">
-            <a href="#" aria-label="Facebook"><i class="fa-brands fa-facebook-f"></i></a>
-            <a href="#" aria-label="Instagram"><i class="fa-brands fa-instagram"></i></a>
-            <a href="#" aria-label="LinkedIn"><i class="fa-brands fa-linkedin-in"></i></a>
-            <a href="#" aria-label="YouTube"><i class="fa-brands fa-youtube"></i></a>
-          </div>
+          <div class="footer-social"></div>
         </div>
         <div>
           <h4>Categorii</h4>
@@ -139,7 +162,7 @@ function renderFooter() {
             <li><a href="about.html">Despre noi</a></li>
             <li><a href="about.html#echipa">Echipa</a></li>
             <li><a href="contact.html">Contact</a></li>
-            <li><a href="#">Carieră</a></li>
+
           </ul>
         </div>
         <div class="footer-contact">
@@ -217,6 +240,7 @@ function toggleFav(btn) {
     btn.classList.add('fav-active');
   }
   saveFavs(favs);
+  updateNavFavBadge();
   const icon = btn.querySelector('i');
   if (icon) icon.className = btn.classList.contains('fav-active') ? 'fa-solid fa-heart' : 'fa-regular fa-heart';
 }
@@ -231,6 +255,56 @@ function applyFavStates(scope = document) {
     }
   });
 }
+
+// ---------- ESCAPE HTML ----------
+function escapeHtml(s) {
+  return String(s ?? '').replace(/[&<>"']/g, c =>
+    ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+}
+
+// ---------- GLOBAL EVENT DELEGATION ----------
+document.addEventListener('click', e => {
+  // Fav buttons — highest priority
+  const fav = e.target.closest('.prop-card-fav');
+  if (fav) { toggleFav(fav); return; }
+
+  const el = e.target.closest('[data-action]');
+  if (!el) return;
+  const action = el.dataset.action;
+
+  if (action === 'accept-cookies')    { acceptCookies(); return; }
+  if (action === 'search-flux')       { if (typeof searchFlux   === 'function') searchFlux();   return; }
+  if (action === 'reset-filters')     { if (typeof resetFilters === 'function') resetFilters(); return; }
+  if (action === 'clear-favorites')   { if (typeof clearAllFavorites === 'function') clearAllFavorites(); return; }
+  if (action === 'go-to-page')        { if (typeof goToPage === 'function') goToPage(+el.dataset.page); return; }
+  if (action === 'open-lightbox')     { if (typeof openLightbox  === 'function') openLightbox(+(el.dataset.idx ?? 0)); return; }
+  if (action === 'close-lightbox')    { if (typeof closeLightbox === 'function') closeLightbox(); return; }
+  if (action === 'prev-lightbox')     { if (typeof prevLightbox  === 'function') prevLightbox(); return; }
+  if (action === 'next-lightbox')     { if (typeof nextLightbox  === 'function') nextLightbox(); return; }
+  if (action === 'share')             { if (typeof sharePage     === 'function') sharePage(); return; }
+  if (action === 'print-page')        { window.print(); return; }
+  if (action === 'toggle-description') { if (typeof toggleDescription === 'function') toggleDescription(el); return; }
+  if (action === 'request-doc')       { if (typeof requestDoc   === 'function') requestDoc(el.dataset.doc); return; }
+  if (action === 'scroll-to-form')    {
+    e.preventDefault();
+    const target = document.getElementById('ppForm');
+    if (target) target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    return;
+  }
+});
+
+document.addEventListener('submit', e => {
+  const form = e.target.closest('[data-submit-action]');
+  if (!form) return;
+  if (form.dataset.submitAction === 'submit-interest') {
+    e.preventDefault();
+    if (typeof submitInterest === 'function') submitInterest(e, form.dataset.projectName || '');
+  }
+  if (form.dataset.submitAction === 'submit-contact') {
+    e.preventDefault();
+    if (typeof submitContact === 'function') submitContact(e);
+  }
+});
 
 // ---------- UTILITARE ----------
 function formatPrice(n, suffix = '') {
@@ -360,6 +434,7 @@ function initCookieBanner() {
   banner.className = 'cookie-banner';
   banner.setAttribute('role', 'dialog');
   banner.setAttribute('aria-label', 'Consimțământ cookie-uri');
+  banner.setAttribute('aria-live', 'polite');
   banner.innerHTML = `
     <div class="cookie-banner-inner">
       <div class="cookie-banner-text">
@@ -367,7 +442,7 @@ function initCookieBanner() {
         <span>Folosim doar cookie-uri necesare pentru funcționare și salvarea preferințelor (favorite). Citește <a href="privacy.html">politica de confidențialitate</a>.</span>
       </div>
       <div class="cookie-banner-actions">
-        <button type="button" class="cookie-btn cookie-btn-primary" onclick="acceptCookies()">Am înțeles</button>
+        <button type="button" class="cookie-btn cookie-btn-primary" data-action="accept-cookies">Am înțeles</button>
       </div>
     </div>
   `;
