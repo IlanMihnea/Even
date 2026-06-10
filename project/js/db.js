@@ -382,16 +382,41 @@ async function getAllProjectsAdmin() {
 
 const PROPERTY_IMAGES_BUCKET = 'property-images';
 
+function resizeImage(file, maxW, quality) {
+  return new Promise((resolve, reject) => {
+    createImageBitmap(file).then(bmp => {
+      const scale = Math.min(1, maxW / bmp.width);
+      const w = Math.round(bmp.width * scale);
+      const h = Math.round(bmp.height * scale);
+      const canvas = document.createElement('canvas');
+      canvas.width = w; canvas.height = h;
+      canvas.getContext('2d').drawImage(bmp, 0, 0, w, h);
+      bmp.close();
+      canvas.toBlob(blob => blob ? resolve(blob) : reject(new Error('toBlob failed')), 'image/jpeg', quality);
+    }).catch(reject);
+  });
+}
+
 async function uploadPropertyImages(propertyId, files) {
   const urls = [];
   for (const file of files) {
-    const ext = (file.name.split('.').pop() || 'jpg').toLowerCase();
-    const path = `${propertyId}/${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
-    const { error } = await _supabase.storage
-      .from(PROPERTY_IMAGES_BUCKET)
-      .upload(path, file, { cacheControl: '3600', upsert: false, contentType: file.type });
-    if (error) throw error;
-    const { data } = _supabase.storage.from(PROPERTY_IMAGES_BUCKET).getPublicUrl(path);
+    const baseName = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}.jpg`;
+    const fullPath = `${propertyId}/${baseName}`;
+    const cardPath = `${propertyId}/card-${baseName}`;
+
+    const [fullBlob, cardBlob] = await Promise.all([
+      resizeImage(file, 1920, 0.82),
+      resizeImage(file, 800, 0.82),
+    ]);
+
+    const [{ error: e1 }, { error: e2 }] = await Promise.all([
+      _supabase.storage.from(PROPERTY_IMAGES_BUCKET).upload(fullPath, fullBlob, { cacheControl: '3600', upsert: false, contentType: 'image/jpeg' }),
+      _supabase.storage.from(PROPERTY_IMAGES_BUCKET).upload(cardPath, cardBlob, { cacheControl: '3600', upsert: false, contentType: 'image/jpeg' }),
+    ]);
+    if (e1) throw e1;
+    if (e2) throw e2;
+
+    const { data } = _supabase.storage.from(PROPERTY_IMAGES_BUCKET).getPublicUrl(fullPath);
     urls.push(data.publicUrl);
   }
   return urls;

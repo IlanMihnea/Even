@@ -1,0 +1,8 @@
+User-agent: *
+Allow: /
+Disallow: /admin.html
+Disallow: /banner.html
+Disallow: /prezentare.html
+Disallow: /sign.html
+Disallow: /brochure.html
+Sitemap: https://even-imobiliare.ro/sitemap.xml
