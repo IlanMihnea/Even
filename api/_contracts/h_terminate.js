@@ -8,10 +8,10 @@
 //     list shows it as denounced, with the effective date.
 // → 200 { ok: true, effectiveLocal }
 
-const supabase = require('./_supabase');
-const { buildTerminationDoc } = require('./_contracts/termination');
-const { renderPdf } = require('./_contracts/pdf');
-const { sendEmail, terminationEmail } = require('./_contracts/notify');
+const supabase = require('../_supabase');
+const { buildTerminationDoc } = require('./termination');
+const { renderPdf } = require('./pdf');
+const { sendEmail, terminationEmail } = require('./notify');
 
 function roLong(d) {
   return d.toLocaleDateString('ro-RO', { day: 'numeric', month: 'long', year: 'numeric' });

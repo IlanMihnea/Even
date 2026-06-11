@@ -5,7 +5,7 @@
 // admin can download it. The bucket stays private; the URL expires.
 // → 200 { url }
 
-const supabase = require('./_supabase');
+const supabase = require('../_supabase');
 
 module.exports = async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');

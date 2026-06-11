@@ -8,9 +8,9 @@
 // Creates the contract + signer rows, emails each signer their personal link.
 // → 201 { ok, contract_id, signers: [{ role, name, email, token, url }] }
 
-const supabase = require('./_supabase');
-const { buildBody, parseBody } = require('./_contracts/content');
-const { sendEmail, inviteEmail } = require('./_contracts/notify');
+const supabase = require('../_supabase');
+const { buildBody, parseBody } = require('./content');
+const { sendEmail, inviteEmail } = require('./notify');
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 

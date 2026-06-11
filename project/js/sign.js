@@ -159,7 +159,7 @@
     let data = SAMPLE;
     if (token) {
       try {
-        const res = await fetch(apiUrl('/api/contracts-get?token=' + encodeURIComponent(token)));
+        const res = await fetch(apiUrl('/api/contracts?action=get&token=' + encodeURIComponent(token)));
         if (!res.ok) throw new Error('not_found');
         data = await res.json();
       } catch (err) {
@@ -216,7 +216,7 @@
           result = remaining > 0 ? { status: 'partial', remaining, preview: true }
                                  : { status: 'signed', preview: true };
         } else {
-          const res = await fetch(apiUrl('/api/contracts-sign'), {
+          const res = await fetch(apiUrl('/api/contracts?action=sign'), {
             method: 'POST', headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(payload),
           });

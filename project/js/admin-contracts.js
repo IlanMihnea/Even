@@ -122,7 +122,7 @@ async function ctVoid(id, title) {
   if (!token) { ctNotify('Sesiune expirată. Reautentifică-te.', false); return; }
 
   try {
-    const res = await fetch(apiUrl('/api/contracts-void'), {
+    const res = await fetch(apiUrl('/api/contracts?action=void'), {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
       body: JSON.stringify({ id: id }),
@@ -137,20 +137,25 @@ async function ctVoid(id, title) {
 }
 
 // Download a stored PDF (notice / signed contract) via a short-lived signed URL.
+// Mobile-safe: open the tab synchronously inside the tap gesture, then redirect
+// it once the signed URL is ready (window.open after an await is popup-blocked
+// on iOS/Android).
 async function ctDownload(id, kind) {
-  const token = await adminToken();
-  if (!token) { ctNotify('Sesiune expirată. Reautentifică-te.', false); return; }
+  const win = window.open('', '_blank');
+  const fail = function (msg) { if (win) win.close(); ctNotify(msg, false); };
   try {
-    const res = await fetch(apiUrl('/api/contracts-file'), {
+    const token = await adminToken();
+    if (!token) return fail('Sesiune expirată. Reautentifică-te.');
+    const res = await fetch(apiUrl('/api/contracts?action=file'), {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
       body: JSON.stringify({ id: id, kind: kind }),
     });
     const out = await res.json();
     if (!res.ok) throw new Error(out.error || 'Eroare la descărcare');
-    window.open(out.url, '_blank');
+    if (win) win.location = out.url; else window.location.href = out.url;
   } catch (err) {
-    ctNotify('Eroare: ' + err.message, false);
+    fail('Eroare: ' + err.message);
   }
 }
 
@@ -180,7 +185,7 @@ async function submitTerminate(e) {
   const old = btn.innerHTML;
   btn.innerHTML = 'Se trimite...';
   try {
-    const res = await fetch(apiUrl('/api/contracts-terminate'), {
+    const res = await fetch(apiUrl('/api/contracts?action=terminate'), {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
       body: JSON.stringify({ id: _termContractId, reason: reason, noticeDays: noticeDays }),
@@ -287,7 +292,7 @@ async function submitContract(e) {
   const old = btn.innerHTML;
   btn.innerHTML = 'Se trimite...';
   try {
-    const res = await fetch(apiUrl('/api/contracts-create'), {
+    const res = await fetch(apiUrl('/api/contracts?action=create'), {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
       body: JSON.stringify(payload),

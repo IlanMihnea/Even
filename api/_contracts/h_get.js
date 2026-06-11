@@ -1,8 +1,8 @@
 // GET /api/contracts-get?token=...   (public — used by the signing page)
 // Returns the clauses + this signer's context. Never exposes other signers' CNP/CI.
 
-const supabase = require('./_supabase');
-const { partiesSection, buildBody } = require('./_contracts/content');
+const supabase = require('../_supabase');
+const { partiesSection, buildBody } = require('./content');
 
 module.exports = async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');

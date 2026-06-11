@@ -11,7 +11,7 @@
 // (denunțare/reziliere, art. IV.4 of the contract).
 // → 200 { ok: true }
 
-const supabase = require('./_supabase');
+const supabase = require('../_supabase');
 
 module.exports = async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');

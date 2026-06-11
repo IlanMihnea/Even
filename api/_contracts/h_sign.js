@@ -7,10 +7,10 @@
 // generates the single PDF with all signatures, stores it, emails it to all.
 // → 200 { status: 'partial', remaining } | { status: 'signed' }
 
-const supabase = require('./_supabase');
-const { buildContractDoc } = require('./_contracts/template');
-const { renderPdf, fingerprint } = require('./_contracts/pdf');
-const { sendEmail, signedCopyEmail } = require('./_contracts/notify');
+const supabase = require('../_supabase');
+const { buildContractDoc } = require('./template');
+const { renderPdf, fingerprint } = require('./pdf');
+const { sendEmail, signedCopyEmail } = require('./notify');
 
 function nowLocal() {
   return new Date().toLocaleString('ro-RO', { timeZone: 'Europe/Bucharest', dateStyle: 'long', timeStyle: 'short' });
