@@ -9,7 +9,7 @@
     { "source": "/p/:token", "destination": "/prezentare.html" }
   ],
   "functions": {
-    "api/contracts-sign.js": { "includeFiles": "api/_contracts/fonts/**" },
+    "api/contracts.js": { "includeFiles": "api/_contracts/fonts/**" },
     "api/og-property.js": { "includeFiles": "project/property-*.html" }
   },
   "headers": [
