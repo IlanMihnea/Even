@@ -86,6 +86,8 @@ function renderContractCard(c) {
   } else if (c.status !== 'signed' && c.status !== 'void') {
     actionBtn = '<button class="ct-void" title="Anulează contractul" onclick="ctVoid(\'' + c.id + '\', \'' + safeTitle + '\')"><i class="fa-solid fa-ban"></i></button>';
   }
+  // Permanent delete — available on any contract (incl. signed test/junk contracts).
+  const delBtn = '<button class="ct-del" title="Șterge definitiv" onclick="ctDelete(\'' + c.id + '\', \'' + safeTitle + '\')"><i class="fa-solid fa-trash"></i></button>';
 
   const termMark = term
     ? '<div class="ct-term-mark"><i class="fa-solid fa-file-circle-xmark"></i> Denunțat · efect din ' + escapeHtmlAdm(term.effectiveLocal || '—') +
@@ -101,7 +103,7 @@ function renderContractCard(c) {
     '<div class="ct-card-head"><div><h3>' + escapeHtmlAdm(c.title || 'Contract') + '</h3>' +
     '<span class="ct-date">' + new Date(c.created_at).toLocaleDateString('ro-RO') + '</span></div>' +
     '<div class="ct-card-meta">' + ctStatusBadge(c.status) + '<span class="ct-prog">' + signedN + '/' + signers.length + ' semnături</span>' +
-    actionBtn +
+    actionBtn + delBtn +
     '</div></div>' +
     termMark +
     '<div class="ct-srows">' + rows + '</div>' +
@@ -156,6 +158,31 @@ async function ctDownload(id, kind) {
     if (win) win.location = out.url; else window.location.href = out.url;
   } catch (err) {
     fail('Eroare: ' + err.message);
+  }
+}
+
+// Permanently delete a contract (any status). For junk/test contracts.
+// Removes the contract + signers + stored PDFs; every sign link goes dead.
+async function ctDelete(id, title) {
+  const label = title ? '„' + title + '"' : 'acest contract';
+  if (!confirm('ȘTERGERE DEFINITIVĂ — ' + label + ' va fi șters complet (contract, semnatari, PDF-uri). Linkurile devin invalide. Acțiunea NU poate fi anulată.\n\nContinui?')) return;
+  if (!confirm('Ești absolut sigur? Apasă OK ca să confirmi ștergerea definitivă.')) return;
+
+  const token = await adminToken();
+  if (!token) { ctNotify('Sesiune expirată. Reautentifică-te.', false); return; }
+
+  try {
+    const res = await fetch(apiUrl('/api/contracts?action=delete'), {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+      body: JSON.stringify({ id: id }),
+    });
+    const out = await res.json();
+    if (!res.ok) throw new Error(out.error || 'Eroare la ștergere');
+    await renderContracts();
+    ctNotify('Contract șters definitiv.', true);
+  } catch (err) {
+    ctNotify('Eroare: ' + err.message, false);
   }
 }
 

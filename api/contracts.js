@@ -17,6 +17,7 @@ const ACTIONS = {
   void: require('./_contracts/h_void'),
   terminate: require('./_contracts/h_terminate'),
   file: require('./_contracts/h_file'),
+  delete: require('./_contracts/h_delete'),
 };
 
 module.exports = function handler(req, res) {
