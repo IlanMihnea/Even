@@ -92,6 +92,11 @@ function renderContractCard(c) {
       '<button class="ct-dl" onclick="ctDownload(\'' + c.id + '\', \'notice\')"><i class="fa-solid fa-download"></i> Descarcă notificarea</button></div>'
     : '';
 
+  // Signed contracts: let the admin open/download the final signed PDF.
+  const signedBar = c.status === 'signed'
+    ? '<div class="ct-foot"><button class="ct-dl ct-dl-ink" onclick="ctDownload(\'' + c.id + '\', \'signed\')"><i class="fa-solid fa-file-pdf"></i> Descarcă contractul semnat</button></div>'
+    : '';
+
   return '<div class="ct-card' + (c.status === 'void' ? ' is-void' : '') + (term ? ' is-term' : '') + '">' +
     '<div class="ct-card-head"><div><h3>' + escapeHtmlAdm(c.title || 'Contract') + '</h3>' +
     '<span class="ct-date">' + new Date(c.created_at).toLocaleDateString('ro-RO') + '</span></div>' +
@@ -99,7 +104,8 @@ function renderContractCard(c) {
     actionBtn +
     '</div></div>' +
     termMark +
-    '<div class="ct-srows">' + rows + '</div></div>';
+    '<div class="ct-srows">' + rows + '</div>' +
+    signedBar + '</div>';
 }
 
 function ctCopy(url) {

@@ -49,6 +49,10 @@
 }
 .ct-dl:hover { background: rgba(154, 122, 60, 0.28); }
 
+.ct-foot { margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--gray-100); }
+.ct-dl-ink { background: rgba(28, 35, 64, 0.08); color: var(--ink, #1C2340); }
+.ct-dl-ink:hover { background: rgba(28, 35, 64, 0.16); }
+
 .ct-badge { font-size: 0.7rem; font-weight: 700; letter-spacing: 0.03em; padding: 4px 10px; border-radius: 999px; }
 .ct-badge-blue  { background: #e3edf5; color: #3B5A7A; }
 .ct-badge-gold  { background: #f5ecda; color: #9a7a3c; }
