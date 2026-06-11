@@ -45,10 +45,14 @@ module.exports = async function handler(req, res) {
   // find signer + its contract (to know whether personal data is required)
   const { data: signer, error } = await supabase
     .from('contract_signers')
-    .select('id, contract_id, role, name, email, status, client_data, contracts(data)')
+    .select('id, contract_id, role, name, email, status, client_data, contracts(data, status)')
     .eq('token', token)
     .single();
   if (error || !signer) return res.status(404).json({ error: 'Link invalid sau expirat' });
+
+  // a cancelled contract can no longer be signed
+  if (signer.contracts && signer.contracts.status === 'void')
+    return res.status(410).json({ error: 'Contractul a fost anulat și nu mai poate fi semnat.' });
 
   const collectData = !(signer.contracts && signer.contracts.data && signer.contracts.data.collectData === false);
 

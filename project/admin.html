@@ -568,6 +568,28 @@
     </div>
   </div>
 
+  <div class="modal" id="terminateModal">
+    <div class="modal-card" style="max-width:560px">
+      <div class="modal-close" onclick="closeTerminateModal()"><i class="fa-solid fa-xmark"></i></div>
+      <h2>Denunță contractul</h2>
+      <p class="modal-sub">Trimite o <b>notificare scrisă de denunțare unilaterală</b> către părți (art. IV.4.4). Notificarea PDF pleacă pe email tuturor semnatarilor. Contractul încetează de drept la finalul preavizului.</p>
+      <form onsubmit="submitTerminate(event)">
+        <p style="margin:0 0 14px;color:var(--gray-600)">Contract: <b id="tmTitle">—</b></p>
+        <div class="ct-grid">
+          <label class="ct-field"><span>Preaviz (zile)</span>
+            <input type="number" id="tmDays" min="1" value="30"></label>
+        </div>
+        <label class="ct-field"><span>Motivul denunțării (opțional)</span>
+          <textarea id="tmReason" rows="4" placeholder="Ex. neîndeplinirea obligațiilor / acord între părți / decizia agenției…"></textarea>
+        </label>
+        <div class="modal-actions">
+          <button type="button" class="apl-btn apl-btn-ghost" onclick="closeTerminateModal()">Renunță</button>
+          <button type="submit" class="apl-btn apl-btn-primary" id="tmSubmitBtn"><i class="fa-solid fa-paper-plane"></i> Trimite notificarea</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
   <!-- MODAL MATCH LIST -->
   <div class="modal" id="matchesModal">
     <div class="modal-card" style="max-width:600px">
@@ -663,7 +685,7 @@
         agentModal:'closeAgentModal', leadModal:'closeLeadModal',
         buyerModal:'closeBuyerModal', matchesModal:'closeMatchesModal',
         importModal:'closeImportModal', contractModal:'closeContractModal',
-        shareModal:'closeShareModal'
+        terminateModal:'closeTerminateModal', shareModal:'closeShareModal'
       };
       function closeTopModal(){
         const open = document.querySelector('.modal.open');

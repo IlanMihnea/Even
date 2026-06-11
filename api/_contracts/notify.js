@@ -60,6 +60,24 @@ function signedCopyEmail({ contractTitle }) {
   return shell('Contract semnat', body);
 }
 
+// Termination notice (denunțare) — sent to the parties when the agency ends a contract.
+function terminationEmail({ contractTitle, effectiveLocal, noticeDays }) {
+  const body = `
+    <p style="font-size:15px;line-height:1.6;color:#4a4640;margin:0 0 18px">
+      Vă transmitem notificarea de <b style="color:#1C2340">denunțare unilaterală</b> a contractului
+      <b style="color:#1C2340">${esc(contractTitle)}</b>.
+      Conform contractului, denunțarea produce efecte după un preaviz de ${esc(noticeDays || 30)} de zile,
+      respectiv începând cu data de <b style="color:#1C2340">${esc(effectiveLocal)}</b>.
+    </p>
+    <p style="font-size:14px;line-height:1.6;color:#4a4640;margin:0 0 18px">
+      Notificarea semnată este atașată în format PDF. Vă rugăm să confirmați primirea.
+    </p>
+    <p style="font-size:12px;line-height:1.5;color:#9a9590;margin:0">
+      Până la data încetării, obligațiile scadente ale părților rămân datorate.
+    </p>`;
+  return shell('Notificare de denunțare', body);
+}
+
 async function sendEmail({ to, subject, html, attachments }) {
   if (!process.env.RESEND_API_KEY) {
     console.warn('RESEND_API_KEY not set — skipping email to', to);
@@ -77,4 +95,4 @@ async function sendEmail({ to, subject, html, attachments }) {
   return res;
 }
 
-module.exports = { sendEmail, inviteEmail, signedCopyEmail };
+module.exports = { sendEmail, inviteEmail, signedCopyEmail, terminationEmail };

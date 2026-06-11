@@ -12,6 +12,43 @@
 .ct-card-meta { display: flex; align-items: center; gap: 10px; white-space: nowrap; }
 .ct-prog { font-size: 0.78rem; color: var(--gray-500); }
 
+.ct-void {
+  margin-left: 2px; border: 0; background: transparent; cursor: pointer;
+  color: var(--gray-400); font-size: 0.85rem; line-height: 1;
+  width: 28px; height: 28px; border-radius: 8px;
+  display: inline-flex; align-items: center; justify-content: center;
+  transition: background 0.15s, color 0.15s;
+}
+.ct-void:hover { background: #f7e4e2; color: var(--danger, #c0392b); }
+
+.ct-card.is-void { opacity: 0.6; }
+.ct-card.is-void h3 { text-decoration: line-through; }
+
+.ct-term {
+  margin-left: 2px; border: 0; background: transparent; cursor: pointer;
+  color: var(--gray-400); font-size: 0.85rem; line-height: 1;
+  width: 28px; height: 28px; border-radius: 8px;
+  display: inline-flex; align-items: center; justify-content: center;
+  transition: background 0.15s, color 0.15s;
+}
+.ct-term:hover { background: #f5ecda; color: #9a7a3c; }
+
+.ct-term-mark {
+  margin-top: 8px; font-size: 0.78rem; font-weight: 600;
+  color: #9a7a3c; background: #f5ecda; border-radius: 8px;
+  padding: 6px 10px; display: inline-flex; align-items: center; gap: 8px; flex-wrap: wrap;
+}
+.ct-card.is-term { opacity: 0.85; }
+
+.ct-dl {
+  border: 0; background: rgba(154, 122, 60, 0.16); cursor: pointer;
+  color: #9a7a3c; font-size: 0.72rem; font-weight: 700;
+  padding: 4px 9px; border-radius: 999px;
+  display: inline-flex; align-items: center; gap: 5px;
+  transition: background 0.15s;
+}
+.ct-dl:hover { background: rgba(154, 122, 60, 0.28); }
+
 .ct-badge { font-size: 0.7rem; font-weight: 700; letter-spacing: 0.03em; padding: 4px 10px; border-radius: 999px; }
 .ct-badge-blue  { background: #e3edf5; color: #3B5A7A; }
 .ct-badge-gold  { background: #f5ecda; color: #9a7a3c; }

@@ -47,7 +47,7 @@ async function renderContracts() {
   wrap.innerHTML = '<div style="color:var(--gray-400);padding:8px">Se încarcă...</div>';
   const { data, error } = await _supabase
     .from('contracts')
-    .select('id, title, status, created_at, contract_signers(role, name, status, position, token)')
+    .select('id, title, status, created_at, data, contract_signers(role, name, status, position, token)')
     .order('created_at', { ascending: false });
   if (error) { wrap.innerHTML = '<div style="color:var(--danger);padding:8px">Eroare la încărcare.</div>'; return; }
   if (!data || !data.length) { wrap.innerHTML = '<div class="ct-empty">Niciun contract încă. Apasă „Contract nou".</div>'; return; }
@@ -73,15 +73,123 @@ function renderContractCard(c) {
             : '<button class="apl-btn apl-btn-ghost apl-btn-sm" onclick="ctCopy(\'' + link + '\')"><i class="fa-regular fa-copy"></i> Copiază link</button>') +
       '</div>';
   }).join('');
-  return '<div class="ct-card">' +
+  const safeTitle = (c.title || 'Contract').replace(/'/g, "\\'");
+  const term = (c.data && c.data.termination) || null;
+
+  // Action button depends on state:
+  //  - signed (in force, not denounced) → "Denunță" (formal termination)
+  //  - draft/sent/partial → "Anulează" (void: kills links, cleans the list)
+  //  - signed+denounced or void → no button
+  let actionBtn = '';
+  if (c.status === 'signed' && !term) {
+    actionBtn = '<button class="ct-term" title="Denunță contractul (notificare scrisă)" onclick="openTerminate(\'' + c.id + '\', \'' + safeTitle + '\')"><i class="fa-solid fa-file-circle-xmark"></i></button>';
+  } else if (c.status !== 'signed' && c.status !== 'void') {
+    actionBtn = '<button class="ct-void" title="Anulează contractul" onclick="ctVoid(\'' + c.id + '\', \'' + safeTitle + '\')"><i class="fa-solid fa-ban"></i></button>';
+  }
+
+  const termMark = term
+    ? '<div class="ct-term-mark"><i class="fa-solid fa-file-circle-xmark"></i> Denunțat · efect din ' + escapeHtmlAdm(term.effectiveLocal || '—') +
+      '<button class="ct-dl" onclick="ctDownload(\'' + c.id + '\', \'notice\')"><i class="fa-solid fa-download"></i> Descarcă notificarea</button></div>'
+    : '';
+
+  return '<div class="ct-card' + (c.status === 'void' ? ' is-void' : '') + (term ? ' is-term' : '') + '">' +
     '<div class="ct-card-head"><div><h3>' + escapeHtmlAdm(c.title || 'Contract') + '</h3>' +
     '<span class="ct-date">' + new Date(c.created_at).toLocaleDateString('ro-RO') + '</span></div>' +
-    '<div class="ct-card-meta">' + ctStatusBadge(c.status) + '<span class="ct-prog">' + signedN + '/' + signers.length + ' semnături</span></div></div>' +
+    '<div class="ct-card-meta">' + ctStatusBadge(c.status) + '<span class="ct-prog">' + signedN + '/' + signers.length + ' semnături</span>' +
+    actionBtn +
+    '</div></div>' +
+    termMark +
     '<div class="ct-srows">' + rows + '</div></div>';
 }
 
 function ctCopy(url) {
   navigator.clipboard.writeText(url).then(function () { ctNotify('Link copiat ✓', true); }, function () { ctNotify('Nu am putut copia linkul', false); });
+}
+
+// Cancel a contract (void) without destroying evidence: the PDF + audit stay as
+// archive, but the links go dead and it shows as "Anulat".
+async function ctVoid(id, title) {
+  const label = title ? '„' + title + '"' : 'acest contract';
+  if (!confirm('Anulezi ' + label + '?\n\nContractul va fi marcat „Anulat", linkurile de semnare devin inactive, dar PDF-ul și dovada se păstrează ca arhivă.\n\nNotă: dacă era deja semnat, anularea NU îi anulează efectul juridic — pentru asta e nevoie de o notificare scrisă de denunțare.')) return;
+
+  const token = await adminToken();
+  if (!token) { ctNotify('Sesiune expirată. Reautentifică-te.', false); return; }
+
+  try {
+    const res = await fetch(apiUrl('/api/contracts-void'), {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+      body: JSON.stringify({ id: id }),
+    });
+    const out = await res.json();
+    if (!res.ok) throw new Error(out.error || 'Eroare la anulare');
+    await renderContracts();
+    ctNotify('Contract anulat.', true);
+  } catch (err) {
+    ctNotify('Eroare: ' + err.message, false);
+  }
+}
+
+// Download a stored PDF (notice / signed contract) via a short-lived signed URL.
+async function ctDownload(id, kind) {
+  const token = await adminToken();
+  if (!token) { ctNotify('Sesiune expirată. Reautentifică-te.', false); return; }
+  try {
+    const res = await fetch(apiUrl('/api/contracts-file'), {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+      body: JSON.stringify({ id: id, kind: kind }),
+    });
+    const out = await res.json();
+    if (!res.ok) throw new Error(out.error || 'Eroare la descărcare');
+    window.open(out.url, '_blank');
+  } catch (err) {
+    ctNotify('Eroare: ' + err.message, false);
+  }
+}
+
+// ── Denunțare unilaterală (signed contracts) ───────────────────────────────
+let _termContractId = null;
+
+function openTerminate(id, title) {
+  _termContractId = id;
+  document.getElementById('tmTitle').textContent = title || 'acest contract';
+  document.getElementById('tmReason').value = '';
+  document.getElementById('tmDays').value = '30';
+  document.getElementById('terminateModal').classList.add('open');
+}
+function closeTerminateModal() { document.getElementById('terminateModal').classList.remove('open'); }
+
+async function submitTerminate(e) {
+  e.preventDefault();
+  if (!_termContractId) return;
+  const btn = document.getElementById('tmSubmitBtn');
+  const reason = document.getElementById('tmReason').value.trim();
+  const noticeDays = parseInt(document.getElementById('tmDays').value, 10) || 30;
+
+  const token = await adminToken();
+  if (!token) { ctNotify('Sesiune expirată. Reautentifică-te.', false); return; }
+
+  btn.disabled = true;
+  const old = btn.innerHTML;
+  btn.innerHTML = 'Se trimite...';
+  try {
+    const res = await fetch(apiUrl('/api/contracts-terminate'), {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+      body: JSON.stringify({ id: _termContractId, reason: reason, noticeDays: noticeDays }),
+    });
+    const out = await res.json();
+    if (!res.ok) throw new Error(out.error || 'Eroare la denunțare');
+    closeTerminateModal();
+    await renderContracts();
+    ctNotify('Notificare de denunțare trimisă — efect din ' + (out.effectiveLocal || '—') + '.', true);
+  } catch (err) {
+    ctNotify('Eroare: ' + err.message, false);
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = old;
+  }
 }
 
 function openContractModal() {
