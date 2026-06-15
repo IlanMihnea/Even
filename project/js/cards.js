@@ -24,7 +24,25 @@ function cardPhoto(imagini, titlu) {
   if (!imagini || !imagini[0]) return `<div class="img-placeholder"></div>`;
   const full = imagini[0];
   const card = cardImageUrl(full);
-  return `<img src="${card}" alt="${escapeHtml(titlu || '')}" loading="lazy" width="800" height="600" onerror="this.onerror=null;this.src='${full.replace(/'/g, '%27')}'">`;
+  // Inline onerror handlers are blocked by our CSP (script-src lacks
+  // 'unsafe-inline'), so the fallback to the full image is wired through a
+  // delegated error listener below, via data-fallback.
+  return `<img src="${escapeHtml(card)}" alt="${escapeHtml(titlu || '')}" loading="lazy" width="800" height="600" data-fallback="${escapeHtml(full)}">`;
+}
+
+// CSP-safe image fallback. The card-* thumbnail is generated on admin upload
+// but missing for imported properties, so a thumbnail 404 must swap to the
+// full-size image. `error` events don't bubble, hence capture phase.
+if (typeof document !== 'undefined' && !window.__cardImgFallbackBound) {
+  window.__cardImgFallbackBound = true;
+  document.addEventListener('error', (e) => {
+    const img = e.target;
+    if (img && img.tagName === 'IMG' && img.dataset && img.dataset.fallback) {
+      const fb = img.dataset.fallback;
+      delete img.dataset.fallback; // prevent loops if the full image also fails
+      if (img.getAttribute('src') !== fb) img.src = fb;
+    }
+  }, true);
 }
 
 function favBtn(id) {
