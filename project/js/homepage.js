@@ -125,7 +125,6 @@ function loadHomeProperties(cat) {
 
 // homePropPhoto → cardPhoto din cards.js
 function homePropPhoto(imagini, titlu) { return cardPhoto(imagini, titlu); }
-}
 
 // buildHomePropCard → buildPropCard din cards.js
 function buildHomePropCard(args) { return buildPropCard(args); }
