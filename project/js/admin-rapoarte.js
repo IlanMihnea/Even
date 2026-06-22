@@ -104,10 +104,12 @@ function openPublicaModal() {
   document.getElementById('raportJsonInput').value = '';
   document.getElementById('raportPublicaResult').style.display = 'none';
   document.getElementById('raportPublicaErr').style.display = 'none';
+  _resetPreview();
   document.getElementById('raportPublicaModal').classList.add('open');
 }
 
 function closePublicaModal() {
+  _resetPreview();
   document.getElementById('raportPublicaModal').classList.remove('open');
 }
 
@@ -137,12 +139,16 @@ async function submitPublicaRaport() {
   btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Se publică...';
 
   try {
+    // Îmbogățim banda cu estimarea ponderată din obiectiv (câmp extra în JSONB, fără migrare)
+    const bandaSave = { ...parsed.banda };
+    if (parsed.obiectiv?.ponderat) bandaSave.val_ponderat = parsed.obiectiv.ponderat;
+
     const saved = await upsertCmaRaport({
       titlu: parsed.titlu,
       branded: parsed.branded !== false,
       subiect: parsed.subiect,
       comps: parsed.comps,
-      banda: parsed.banda,
+      banda: bandaSave,
       voce: parsed.voce || '',
     });
 
@@ -183,4 +189,72 @@ async function dezactivezaRaport(id) {
   } catch (e) {
     showToast('Eroare: ' + e.message);
   }
+}
+
+// ---------- PREVIEW & PDF ----------
+
+let _cmaPreviewData = null;
+
+function _resetPreview() {
+  _cmaPreviewData = null;
+  const bar  = document.getElementById('raportPreviewBar');
+  const body = document.getElementById('raportPreviewBody');
+  const card = document.getElementById('raportModalCard');
+  if (bar)  bar.style.display = 'none';
+  if (card) card.style.maxWidth = '680px';
+  if (body && window.CmaView) CmaView.destroy(body);
+}
+
+function onRaportJsonInput() {
+  const raw = (document.getElementById('raportJsonInput')?.value || '').trim();
+  if (!raw) { _resetPreview(); return; }
+
+  let data;
+  try { data = JSON.parse(raw); } catch { _resetPreview(); return; }
+
+  for (const f of CMA_REQUIRED) {
+    if (!data[f]) { _resetPreview(); return; }
+  }
+  if (!Array.isArray(data.comps) || !data.comps.length) { _resetPreview(); return; }
+
+  // Îmbogățire bandă cu estimarea ponderată din obiectiv
+  if (data.obiectiv?.ponderat && data.banda) {
+    data.banda.val_ponderat = data.obiectiv.ponderat;
+  }
+
+  _cmaPreviewData = data;
+
+  const bar  = document.getElementById('raportPreviewBar');
+  const body = document.getElementById('raportPreviewBody');
+  const card = document.getElementById('raportModalCard');
+  const tog  = document.getElementById('raportPreviewToggle');
+
+  if (card) card.style.maxWidth = '980px';
+  if (bar)  bar.style.display = 'block';
+  if (tog)  tog.textContent = '▲ Ascunde';
+  if (body) body.style.display = 'block';
+
+  if (body && window.CmaView) CmaView.render(data, body);
+}
+
+function toggleRaportPreview() {
+  const body = document.getElementById('raportPreviewBody');
+  const tog  = document.getElementById('raportPreviewToggle');
+  if (!body || !tog) return;
+  const hidden = body.style.display === 'none';
+  body.style.display = hidden ? 'block' : 'none';
+  tog.textContent = hidden ? '▲ Ascunde' : '▼ Arată';
+}
+
+async function printCmaReport() {
+  if (!_cmaPreviewData || !window.CmaView) return;
+
+  const root = document.getElementById('cma-print-root');
+  if (!root) return;
+
+  CmaView.render(_cmaPreviewData, root);
+
+  // Așteptăm ca Chart.js să termine redarea pe canvas
+  await new Promise(r => requestAnimationFrame(() => setTimeout(r, 450)));
+  window.print();
 }

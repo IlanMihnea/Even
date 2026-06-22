@@ -715,14 +715,14 @@
 
   <!-- MODAL PUBLICĂ RAPORT CMA -->
   <div class="modal" id="raportPublicaModal">
-    <div class="modal-card" style="max-width:680px">
+    <div class="modal-card" id="raportModalCard" style="max-width:680px;transition:max-width 0.25s ease">
       <div class="modal-close" onclick="closePublicaModal()"><i class="fa-solid fa-xmark"></i></div>
       <h2>Publică raport CMA</h2>
       <p class="modal-sub">Lipește JSON-ul canonic generat de skill-ul <code>comparabile</code> (blocul de la finalul raportului). Linkul primit se trimite proprietarului — <strong>nota internă nu apare pe pagina publică</strong>.</p>
 
       <div class="form-group full" style="margin-top:8px">
         <label style="font-size:12px;font-weight:600;letter-spacing:0.05em;text-transform:uppercase;color:var(--gray-600)">JSON canonic (din skill comparabile)</label>
-        <textarea id="raportJsonInput" rows="12"
+        <textarea id="raportJsonInput" rows="12" oninput="onRaportJsonInput()"
           style="font-family:monospace;font-size:12px;width:100%;border:1px solid var(--gray-300);border-radius:6px;padding:12px;resize:vertical;background:#fafafa"
           placeholder='{
   "titlu": "Apartament 2 camere · Lujerului",
@@ -748,6 +748,24 @@
             <i class="fa-regular fa-copy"></i> Copiază
           </button>
         </div>
+      </div>
+
+      <!-- Previzualizare CMA (apare automat când JSON-ul e valid) -->
+      <div id="raportPreviewBar" style="display:none;margin-top:20px;border-top:1px solid var(--gray-200);padding-top:18px">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+          <span style="font-size:11px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray-500)">
+            <i class="fa-solid fa-eye" style="margin-right:5px"></i>Previzualizare raport
+          </span>
+          <div style="display:flex;gap:8px">
+            <button type="button" class="apl-btn apl-btn-secondary apl-btn-sm" onclick="printCmaReport()">
+              <i class="fa-solid fa-download"></i> Descarcă PDF
+            </button>
+            <button type="button" id="raportPreviewToggle" class="apl-btn apl-btn-ghost apl-btn-sm" onclick="toggleRaportPreview()">
+              ▲ Ascunde
+            </button>
+          </div>
+        </div>
+        <div id="raportPreviewBody" style="max-height:60vh;overflow-y:auto;border-radius:14px;background:var(--gray-50)"></div>
       </div>
 
       <div class="modal-actions" style="margin-top:20px">
@@ -865,8 +883,13 @@
   <script src="js/admin.js?v=20260611"></script>
   <script src="js/admin-contracts.js?v=20260611"></script>
   <script src="js/admin-tranzactii.js?v=20260622"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <script src="js/cma-view.js?v=20260622"></script>
   <script src="js/admin-rapoarte.js?v=20260622"></script>
   <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
   <script src="js/admin-editor.js"></script>
+
+  <!-- Print root: vizibil doar la @media print, ascuns altfel -->
+  <div id="cma-print-root" aria-hidden="true" style="display:none"></div>
 </body>
 </html>
