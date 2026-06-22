@@ -10,6 +10,21 @@ const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBh
 const _supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 window._supabase = _supabase; // exposed for admin auth
 
+// Coloanele necesare pentru cardurile de listare. Exclude câmpurile grele nefolosite pe
+// card: descriere (text), facilitati, specificatii (JSONB), dotari (JSONB).
+// getPropertyById (pagina de detaliu) continuă să facă select('*') — acolo sunt necesare.
+const PROP_CARD_COLS = [
+  'id','categorie','titlu','regim','tip','tip_spatiu',
+  'pret','pret_total','pret_mp',
+  'camere','suprafata','suprafata_totala','suprafata_utila',
+  'etaj','etaj_total','an_constructie','orientare','parcare','balcon',
+  'locuri_parcare','inaltime_libera','clasa_cladire',
+  'unitate','front_stradal','utilitati','acces_drum','zonare_pug','cut','pot','vecinatati',
+  'oras','cartier','adresa','judet','localitate',
+  'imagini','agent_id','lat','lng',
+  'banner','home_hero','view_count','activ'
+].join(',');
+
 // ---------- NORMALIZERS ----------
 
 function normalizeAgent(a) {
@@ -258,7 +273,7 @@ async function getProperties(categorie) {
   const converters = { rezidential: toRezidential, comercial: toComercial, terenuri: toTeren };
   const { data, error } = await _supabase
     .from('properties')
-    .select('*, agents(*)')
+    .select(PROP_CARD_COLS)
     .eq('categorie', categorie)
     .eq('activ', true);
   if (error) throw error;
