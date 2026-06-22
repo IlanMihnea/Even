@@ -530,6 +530,80 @@ async function deletePropertyImage(url) {
   if (error) throw error;
 }
 
+// ── RAPOARTE CMA ──────────────────────────────────────────────
+
+function normalizeCmaRaport(r) {
+  if (!r) return null;
+  return {
+    id: r.id,
+    token: r.token,
+    titlu: r.titlu,
+    branded: r.branded !== false,
+    subiect: r.subiect || {},
+    comps: r.comps || [],
+    banda: r.banda || {},
+    voce: r.voce || '',
+    activ: r.activ !== false,
+    expiresAt: r.expires_at,
+    createdAt: r.created_at,
+  };
+}
+
+function generateCmaToken() {
+  const arr = new Uint8Array(10);
+  crypto.getRandomValues(arr);
+  return Array.from(arr).map(b => b.toString(16).padStart(2, '0')).join('');
+}
+
+async function getCmaRapoarte() {
+  const { data, error } = await _supabase
+    .from('rapoarte_cma')
+    .select('*')
+    .order('created_at', { ascending: false });
+  if (error) throw error;
+  return (data || []).map(normalizeCmaRaport);
+}
+
+async function getRaportByToken(token) {
+  const { data, error } = await _supabase
+    .from('rapoarte_cma')
+    .select('*')
+    .eq('token', token)
+    .single();
+  if (error) return null;
+  return normalizeCmaRaport(data);
+}
+
+async function upsertCmaRaport(r) {
+  const row = {
+    token: r.token || generateCmaToken(),
+    titlu: r.titlu,
+    branded: r.branded !== false,
+    subiect: r.subiect || {},
+    comps: r.comps || [],
+    banda: r.banda || {},
+    voce: r.voce || null,
+    activ: r.activ !== false,
+    expires_at: r.expiresAt || null,
+  };
+  if (r.id) row.id = r.id;
+  const { data, error } = await _supabase
+    .from('rapoarte_cma')
+    .upsert(row)
+    .select()
+    .single();
+  if (error) throw error;
+  return normalizeCmaRaport(data);
+}
+
+async function deactivateCmaRaport(id) {
+  const { error } = await _supabase
+    .from('rapoarte_cma')
+    .update({ activ: false })
+    .eq('id', id);
+  if (error) throw error;
+}
+
 // camelCase → snake_case for property upsert
 function toSnakeProperty(categorie, d) {
   const base = {

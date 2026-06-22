@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Analiză de piață</title>
+  <meta name="robots" content="noindex, nofollow">
+  <meta name="theme-color" content="#1C2340">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <style>
+    :root {
+      --navy: #1C2340;
+      --navy-soft: #243056;
+      --gold: #C8A96E;
+      --ink: #232323;
+      --muted: #6f6f6f;
+      --line: #e4e0d8;
+      --paper: #faf8f3;
+      --bg: #f3f1ec;
+      --green: #15803d;
+      --amber: #b45309;
+      --blue: #1d4ed8;
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0; background: var(--bg); color: var(--ink);
+      font-family: 'DM Sans', -apple-system, sans-serif;
+      -webkit-font-smoothing: antialiased;
+      line-height: 1.6;
+    }
+    img { display: block; max-width: 100%; }
+    a { color: inherit; }
+
+    /* topbar */
+    .topbar {
+      position: sticky; top: 0; z-index: 40;
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 14px clamp(18px, 5vw, 48px);
+      background: rgba(28,35,64,0.92);
+      backdrop-filter: blur(10px);
+      color: #fff;
+    }
+    .topbar.hidden { display: none; }
+    .tb-brand {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 24px; font-weight: 600; letter-spacing: 0.12em; line-height: 1;
+    }
+    .tb-brand small {
+      display: block; font-family: 'DM Sans', sans-serif;
+      font-size: 8.5px; letter-spacing: 0.4em; opacity: 0.8;
+      margin-top: 3px; font-weight: 400;
+    }
+    .tb-label {
+      font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase;
+      color: rgba(255,255,255,0.6); font-weight: 500;
+    }
+
+    /* layout */
+    .wrap { max-width: 1000px; margin: 0 auto; padding: 0 clamp(18px, 5vw, 48px); }
+    .page { padding: clamp(32px, 6vw, 64px) 0 80px; }
+
+    /* header */
+    .rpt-header {
+      margin-bottom: 40px;
+      padding-bottom: 32px;
+      border-bottom: 1px solid var(--line);
+    }
+    .rpt-eyebrow {
+      font-size: 11px; letter-spacing: 0.28em; text-transform: uppercase;
+      font-weight: 600; color: var(--gold); margin-bottom: 10px;
+    }
+    .rpt-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(26px, 4vw, 40px); font-weight: 500;
+      color: var(--navy); margin: 0 0 20px; line-height: 1.1;
+    }
+    .rpt-meta {
+      font-size: 12px; color: var(--muted); letter-spacing: 0.04em;
+    }
+
+    /* subiect facts */
+    .facts {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+      gap: 1px; background: var(--line);
+      border: 1px solid var(--line); border-radius: 10px; overflow: hidden;
+      margin-bottom: 40px;
+    }
+    .fact { background: #fff; padding: 18px 16px; }
+    .fact-label {
+      font-size: 10px; letter-spacing: 0.16em; text-transform: uppercase;
+      color: var(--muted); margin-bottom: 6px;
+    }
+    .fact-val {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 22px; font-weight: 600; color: var(--navy); line-height: 1;
+    }
+    .fact-val.highlight { color: var(--gold); }
+
+    /* section */
+    .section { margin-bottom: 48px; }
+    .section-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(20px, 3vw, 28px); font-weight: 500;
+      color: var(--navy); margin: 0 0 20px;
+    }
+    .section-eyebrow {
+      font-size: 11px; letter-spacing: 0.26em; text-transform: uppercase;
+      color: var(--gold); font-weight: 600; margin-bottom: 8px;
+    }
+
+    /* banda summary */
+    .banda-card {
+      background: var(--navy); color: #fff;
+      border-radius: 14px; padding: clamp(22px,4vw,40px);
+      margin-bottom: 40px;
+    }
+    .banda-card .section-eyebrow { color: var(--gold); }
+    .banda-range {
+      display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap;
+      margin: 16px 0 8px;
+    }
+    .banda-num {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(28px, 5vw, 44px); font-weight: 600; line-height: 1;
+    }
+    .banda-sep { color: rgba(255,255,255,0.4); font-size: 28px; }
+    .banda-sub { color: rgba(255,255,255,0.65); font-size: 13px; margin-top: 6px; }
+    .banda-pozitionare {
+      display: inline-block; margin-top: 16px;
+      background: rgba(200,169,110,0.18); border: 1px solid var(--gold);
+      color: var(--gold); font-size: 12px; letter-spacing: 0.1em;
+      text-transform: uppercase; font-weight: 600;
+      padding: 6px 14px; border-radius: 999px;
+    }
+
+    /* comps table */
+    .comps-table-wrap { overflow-x: auto; border-radius: 10px; border: 1px solid var(--line); }
+    table.comps {
+      width: 100%; border-collapse: collapse; font-size: 13.5px;
+      background: #fff;
+    }
+    table.comps thead th {
+      background: var(--navy); color: rgba(255,255,255,0.85);
+      font-size: 10.5px; letter-spacing: 0.12em; text-transform: uppercase;
+      font-weight: 600; padding: 12px 14px; text-align: left; white-space: nowrap;
+    }
+    table.comps tbody td {
+      padding: 12px 14px; border-bottom: 1px solid var(--line);
+      vertical-align: middle;
+    }
+    table.comps tbody tr:last-child td { border-bottom: none; }
+    table.comps tbody tr:hover td { background: var(--paper); }
+    .comp-sursa {
+      font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase;
+      font-weight: 600; padding: 3px 8px; border-radius: 4px;
+    }
+    .sursa-storia { background: #e0f2fe; color: #0369a1; }
+    .sursa-imobiliare { background: #fff7ed; color: #c2410c; }
+    .sursa-olx { background: #f0fdf4; color: #15803d; }
+    .comp-tip-vanz {
+      font-size: 10px; padding: 2px 7px; border-radius: 4px;
+      font-weight: 600;
+    }
+    .tip-privat { background: #f0fdf4; color: #15803d; }
+    .tip-agentie { background: #f8fafc; color: var(--muted); }
+    .incredere-badge {
+      font-size: 10px; padding: 2px 6px; border-radius: 4px; font-weight: 600;
+    }
+    .incredere-date { background: #dcfce7; color: #15803d; }
+    .incredere-prior { background: #fef9c3; color: #a16207; }
+    .incredere-inferenta { background: #eff6ff; color: #1d4ed8; }
+    .eur-mp-bold { font-weight: 700; color: var(--navy); }
+    .adj-val { font-weight: 600; }
+    .tag-vechi { color: var(--muted); font-size: 11px; }
+    .tag-nou { color: var(--green); font-size: 11px; font-weight: 600; }
+    .link-sursa { color: var(--gold); font-size: 11px; text-decoration: none; }
+    .link-sursa:hover { text-decoration: underline; }
+    .zile-vechi { color: #c2410c; font-weight: 600; }
+
+    /* grafice */
+    .chart-card {
+      background: #fff; border: 1px solid var(--line);
+      border-radius: 12px; padding: clamp(18px,3vw,32px);
+      margin-bottom: 28px;
+    }
+    .chart-title {
+      font-size: 13px; font-weight: 600; color: var(--navy);
+      letter-spacing: 0.04em; margin-bottom: 20px; text-transform: uppercase;
+    }
+    .chart-wrap { position: relative; height: 260px; }
+
+    /* voce EVEN */
+    .voce-card {
+      background: var(--paper); border: 1px solid var(--line);
+      border-left: 4px solid var(--gold);
+      border-radius: 0 12px 12px 0; padding: clamp(20px,3vw,32px);
+      margin-bottom: 40px;
+    }
+    .voce-label {
+      font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase;
+      font-weight: 600; color: var(--gold); margin-bottom: 12px;
+    }
+    .voce-text {
+      font-size: 15px; line-height: 1.8; color: #3a3a3a; white-space: pre-line;
+    }
+
+    /* onestitate */
+    .onestitate {
+      font-size: 12.5px; color: var(--muted); line-height: 1.7;
+      border-top: 1px solid var(--line); padding-top: 24px; margin-top: 40px;
+    }
+
+    /* footer */
+    footer {
+      text-align: center; padding: 40px 20px 56px; color: var(--muted); font-size: 12px;
+    }
+    .f-brand {
+      font-family: 'Cormorant Garamond', serif; font-size: 20px;
+      letter-spacing: 0.1em; color: var(--navy); margin-bottom: 6px;
+    }
+    footer.neutral .f-brand { display: none; }
+
+    /* state */
+    .state { padding: 100px 24px; text-align: center; color: var(--muted); }
+    .state .f-brand { font-family:'Cormorant Garamond',serif; font-size:26px; color:var(--navy); letter-spacing:0.1em; margin-bottom:10px; }
+    .state p { max-width: 36ch; margin: 0 auto; }
+
+    @media (max-width: 600px) {
+      .facts { grid-template-columns: repeat(2, 1fr); }
+      .chart-wrap { height: 200px; }
+    }
+  </style>
+</head>
+<body>
+
+  <div id="topbar"></div>
+
+  <div id="root">
+    <div class="state">
+      <div class="f-brand">EVEN</div>
+      <p>Se încarcă analiza...</p>
+    </div>
+  </div>
+
+  <footer id="footer" style="display:none">
+    <div class="f-brand branded-only">EVEN</div>
+    <div class="branded-only" style="font-size:11px;letter-spacing:0.18em;text-transform:uppercase;color:var(--gold);margin-bottom:4px">Imobiliare cu plan</div>
+    <div>Analiză comparativă de piață · even-imobiliare.ro</div>
+    <div style="margin-top:6px;font-size:11px">Prețurile cerute nu reflectă neapărat prețul obținut la tranzacție.</div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <script src="/js/db.js"></script>
+  <script src="/js/raport.js"></script>
+</body>
+</html>

@@ -69,7 +69,8 @@ async function showDashboard() {
     renderAgentsTable(),
     renderBuyersTable(),
     renderContracts(),
-    renderTranzactiiTable()
+    renderTranzactiiTable(),
+    renderRapoarteTable()
   ]);
   renderBannerPanel();
   renderHomeHeroPanel();

@@ -77,6 +77,9 @@
         <a class="apl-nav-link" data-route="tranzactii" href="#tranzactii">
           <i class="fa-solid fa-chart-line"></i><span>Tranzacții</span>
         </a>
+        <a class="apl-nav-link" data-route="rapoarte" href="#rapoarte">
+          <i class="fa-solid fa-chart-bar"></i><span>Rapoarte CMA</span>
+        </a>
         <a class="apl-nav-link" data-route="editor" href="#editor">
           <i class="fa-solid fa-wand-magic-sparkles"></i><span>Editor poze</span>
         </a>
@@ -340,6 +343,25 @@
             </select>
           </div>
           <div id="tranzactiiWrap" class="apl-tablewrap"></div>
+        </div>
+      </section>
+
+      <!-- VIEW: RAPOARTE CMA -->
+      <section class="apl-view" id="view-rapoarte" data-route="rapoarte">
+        <header class="apl-view-head">
+          <div>
+            <span class="apl-eyebrow">CMA</span>
+            <h1>Rapoarte CMA</h1>
+            <p class="apl-view-sub">Publică un raport interactiv de analiză comparativă și trimite linkul proprietarului. Nota internă de negociere <strong>nu apare</strong> pe pagina publicată.</p>
+          </div>
+          <div class="apl-view-actions">
+            <button class="apl-btn apl-btn-secondary" onclick="renderRapoarteTable()"><i class="fa-solid fa-rotate"></i> Reîncarcă</button>
+            <button class="apl-btn apl-btn-primary btn-gold" onclick="openPublicaModal()"><i class="fa-solid fa-paper-plane"></i> Publică raport nou</button>
+          </div>
+        </header>
+
+        <div class="apl-section">
+          <div id="rapoarteWrap" class="apl-tablewrap"></div>
         </div>
       </section>
 
@@ -691,6 +713,52 @@
     </div>
   </div>
 
+  <!-- MODAL PUBLICĂ RAPORT CMA -->
+  <div class="modal" id="raportPublicaModal">
+    <div class="modal-card" style="max-width:680px">
+      <div class="modal-close" onclick="closePublicaModal()"><i class="fa-solid fa-xmark"></i></div>
+      <h2>Publică raport CMA</h2>
+      <p class="modal-sub">Lipește JSON-ul canonic generat de skill-ul <code>comparabile</code> (blocul de la finalul raportului). Linkul primit se trimite proprietarului — <strong>nota internă nu apare pe pagina publică</strong>.</p>
+
+      <div class="form-group full" style="margin-top:8px">
+        <label style="font-size:12px;font-weight:600;letter-spacing:0.05em;text-transform:uppercase;color:var(--gray-600)">JSON canonic (din skill comparabile)</label>
+        <textarea id="raportJsonInput" rows="12"
+          style="font-family:monospace;font-size:12px;width:100%;border:1px solid var(--gray-300);border-radius:6px;padding:12px;resize:vertical;background:#fafafa"
+          placeholder='{
+  "titlu": "Apartament 2 camere · Lujerului",
+  "subiect": { "zona": "Sector 6 · Lujerului", "camere": 2, "mp_util": 54, ... },
+  "comps": [ { "sursa": "storia", "pret": 115000, ... } ],
+  "banda": { "eur_mp_jos": 2050, "eur_mp_median": 2200, "eur_mp_sus": 2380, ... },
+  "voce": "Text în vocea EVEN pentru proprietar.",
+  "branded": true
+}'></textarea>
+      </div>
+
+      <div id="raportPublicaErr" style="display:none;margin-top:8px;padding:10px 14px;background:#fef2f2;border:1px solid #fecaca;border-radius:6px;color:#b91c1c;font-size:13px"></div>
+
+      <div id="raportPublicaResult" style="display:none;margin-top:16px;padding:16px;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px">
+        <div style="font-size:12px;font-weight:600;color:#15803d;letter-spacing:0.06em;text-transform:uppercase;margin-bottom:8px">
+          <i class="fa-solid fa-circle-check"></i> Raport publicat cu succes
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+          <a id="raportLinkEl" href="#" target="_blank" rel="noopener"
+             style="font-size:13px;color:#1d4ed8;word-break:break-all"></a>
+          <button class="apl-btn apl-btn-secondary apl-btn-sm"
+            onclick="copyCmaLink(document.getElementById('raportLinkEl').href)">
+            <i class="fa-regular fa-copy"></i> Copiază
+          </button>
+        </div>
+      </div>
+
+      <div class="modal-actions" style="margin-top:20px">
+        <button type="button" class="apl-btn apl-btn-ghost" onclick="closePublicaModal()">Închide</button>
+        <button type="button" id="raportPublicaBtn" class="apl-btn apl-btn-primary btn-gold" onclick="submitPublicaRaport()">
+          <i class="fa-solid fa-paper-plane"></i> Publică
+        </button>
+      </div>
+    </div>
+  </div>
+
   <!-- TOAST -->
   <div class="toast" id="toast">
     <i class="fa-solid fa-circle-check"></i>
@@ -700,11 +768,11 @@
   <!-- ROUTER -->
   <script>
     (function(){
-      const ROUTES = ['cereri','proprietati','cumparatori','proiecte','agenti','contracte','tranzactii','editor','setari'];
+      const ROUTES = ['cereri','proprietati','cumparatori','proiecte','agenti','contracte','tranzactii','rapoarte','editor','setari'];
       const LABELS = {
         cereri:'Cereri', proprietati:'Proprietăți', cumparatori:'Cumpărători',
         proiecte:'Proiecte', agenti:'Agenți', contracte:'Contracte',
-        tranzactii:'Tranzacții', editor:'Editor poze', setari:'Setări'
+        tranzactii:'Tranzacții', rapoarte:'Rapoarte CMA', editor:'Editor poze', setari:'Setări'
       };
       function go(route){
         if(!ROUTES.includes(route)) route = 'cereri';
@@ -735,7 +803,8 @@
         buyerModal:'closeBuyerModal', matchesModal:'closeMatchesModal',
         importModal:'closeImportModal', contractModal:'closeContractModal',
         terminateModal:'closeTerminateModal', shareModal:'closeShareModal',
-        tranzactieModal:'closeTranzactieModal'
+        tranzactieModal:'closeTranzactieModal',
+        raportPublicaModal:'closePublicaModal'
       };
       function closeTopModal(){
         const open = document.querySelector('.modal.open');
@@ -796,6 +865,7 @@
   <script src="js/admin.js?v=20260611"></script>
   <script src="js/admin-contracts.js?v=20260611"></script>
   <script src="js/admin-tranzactii.js?v=20260622"></script>
+  <script src="js/admin-rapoarte.js?v=20260622"></script>
   <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
   <script src="js/admin-editor.js"></script>
 </body>
