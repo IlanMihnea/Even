@@ -4,8 +4,8 @@
 // Supabase Project URL and anon public key.
 // ============================================
 
-const SUPABASE_URL = 'https://fzlbdfwsejqsdcahwffx.supabase.co';
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ6bGJkZndzZWpxc2RjYWh3ZmZ4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc3NTA5MzQsImV4cCI6MjA5MzMyNjkzNH0.I0miwZ8B2tPgZrv0mAvgfHyFU9yVUhOWA27QMilKs4A';
+const SUPABASE_URL = 'https://ucovahbjvnjmhistjnqf.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVjb3ZhaGJqdm5qbWhpc3RqbnFmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIwODA5OTYsImV4cCI6MjA5NzY1Njk5Nn0.DV7BVm31TedKdsYQubmqDrgDnSO8MZV-PbPw97yEF3k';
 
 const _supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 window._supabase = _supabase; // exposed for admin auth
@@ -124,6 +124,105 @@ async function upsertBuyerProfile(b) {
 
 async function deleteBuyerProfile(id) {
   const { error } = await _supabase.from('buyer_profiles').delete().eq('id', id);
+  if (error) throw error;
+}
+
+// ── TRANZACȚII VÂNDUTE (ancora CMA) ──────────────────────────
+function normalizeTranzactie(t) {
+  if (!t) return null;
+  return {
+    id: t.id,
+    dataVanzare: t.data_vanzare,
+    oras: t.oras,
+    cartier: t.cartier,
+    adresa: t.adresa,
+    tip: t.tip,
+    camere: t.camere,
+    suprafataUtila: t.suprafata_utila,
+    suprafataTotala: t.suprafata_totala,
+    etaj: t.etaj,
+    etajTotal: t.etaj_total,
+    anConstructie: t.an_constructie,
+    compartimentare: t.compartimentare,
+    stare: t.stare,
+    mobilat: t.mobilat,
+    parcare: t.parcare,
+    locuriParcare: t.locuri_parcare,
+    balcon: t.balcon,
+    vedere: t.vedere,
+    orientare: t.orientare,
+    dotari: t.dotari || {},
+    pretCerut: t.pret_cerut,
+    pretVandut: t.pret_vandut,
+    tvaInclus: t.tva_inclus,
+    cotaTva: t.cota_tva,
+    moneda: t.moneda || 'EUR',
+    zilePePiata: t.zile_pe_piata,
+    nrVizionari: t.nr_vizionari,
+    finantare: t.finantare,
+    propertyId: t.property_id,
+    observatii: t.observatii,
+    createdAt: t.created_at
+  };
+}
+
+async function tranzactiiTableExists() {
+  try {
+    const { error } = await _supabase.from('tranzactii').select('id').limit(1);
+    return !error || error.code !== '42P01';
+  } catch { return false; }
+}
+
+async function getTranzactii(filter = {}) {
+  let q = _supabase.from('tranzactii').select('*').order('data_vanzare', { ascending: false });
+  if (filter.cartier) q = q.ilike('cartier', `%${filter.cartier}%`);
+  if (filter.camere) q = q.eq('camere', filter.camere);
+  const { data, error } = await q;
+  if (error) throw error;
+  return (data || []).map(normalizeTranzactie);
+}
+
+async function upsertTranzactie(t) {
+  const row = {
+    data_vanzare: t.dataVanzare,
+    oras: t.oras || 'București',
+    cartier: t.cartier || null,
+    adresa: t.adresa || null,
+    tip: t.tip || 'apartament',
+    camere: t.camere || null,
+    suprafata_utila: t.suprafataUtila,
+    suprafata_totala: t.suprafataTotala || null,
+    etaj: t.etaj != null ? t.etaj : null,
+    etaj_total: t.etajTotal || null,
+    an_constructie: t.anConstructie || null,
+    compartimentare: t.compartimentare || null,
+    stare: t.stare || null,
+    mobilat: t.mobilat || null,
+    parcare: t.parcare || false,
+    locuri_parcare: t.locuriParcare || 0,
+    balcon: t.balcon || false,
+    vedere: t.vedere || null,
+    orientare: t.orientare || null,
+    dotari: t.dotari && Object.keys(t.dotari).length ? t.dotari : null,
+    pret_cerut: t.pretCerut || null,
+    pret_vandut: t.pretVandut,
+    tva_inclus: t.tvaInclus != null ? t.tvaInclus : null,
+    cota_tva: t.cotaTva || 0.21,
+    moneda: t.moneda || 'EUR',
+    zile_pe_piata: t.zilePePiata || null,
+    nr_vizionari: t.nrVizionari || null,
+    finantare: t.finantare || null,
+    property_id: t.propertyId || null,
+    observatii: t.observatii || null,
+  };
+  if (t.id) row.id = t.id;
+  const { data, error } = await _supabase.from('tranzactii').upsert(row).select().single();
+  if (error) throw error;
+  return normalizeTranzactie(data);
+}
+
+async function deleteTranzactie(id) {
+  const { error } = await _supabase.from('tranzactii').delete().eq('id', id);
   if (error) throw error;
 }
 

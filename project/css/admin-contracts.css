@@ -123,6 +123,27 @@
 .ct-toast.show { opacity: 1; transform: translate(-50%, 0); }
 .ct-toast.err { background: var(--danger); }
 
+/* ── TRANZACȚII VÂNDUTE ─────────────────────────────────── */
+.trz-summary {
+  display: flex; align-items: center; gap: 16px; flex-wrap: wrap;
+  padding: 10px 0 14px; font-size: 0.85rem; color: var(--gray-500);
+}
+.trz-summary b { color: var(--apl-text); }
+.trz-form-grid { display: flex; flex-direction: column; gap: 20px; }
+.trz-form-group { border: 1px solid var(--gray-200); border-radius: 8px; padding: 16px 18px; }
+.trz-form-group-title {
+  font-size: 0.72rem; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 0.05em; color: var(--gray-400); margin-bottom: 14px;
+}
+.req { color: var(--danger); }
+.ct-field select {
+  height: 38px; padding: 0 10px; border: 1px solid var(--gray-200);
+  border-radius: 6px; background: #fff; font-size: 0.875rem;
+  color: var(--apl-text); cursor: pointer;
+}
+.ct-field select:focus { outline: 2px solid var(--apl-blue); outline-offset: -1px; }
+.ct-field textarea { min-height: 72px; }
+
 @media (max-width: 600px) {
   .ct-grid { grid-template-columns: 1fr; }
   .ct-s-main { grid-template-columns: 1fr 1fr auto; }

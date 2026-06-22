@@ -74,6 +74,9 @@
         <a class="apl-nav-link" data-route="contracte" href="#contracte">
           <i class="fa-solid fa-file-signature"></i><span>Contracte</span>
         </a>
+        <a class="apl-nav-link" data-route="tranzactii" href="#tranzactii">
+          <i class="fa-solid fa-chart-line"></i><span>Tranzacții</span>
+        </a>
         <a class="apl-nav-link" data-route="editor" href="#editor">
           <i class="fa-solid fa-wand-magic-sparkles"></i><span>Editor poze</span>
         </a>
@@ -311,6 +314,35 @@
         </div>
       </section>
 
+      <!-- VIEW: TRANZACȚII VÂNDUTE -->
+      <section class="apl-view" id="view-tranzactii" data-route="tranzactii">
+        <header class="apl-view-head">
+          <div>
+            <span class="apl-eyebrow">CMA</span>
+            <h1>Tranzacții vândute</h1>
+            <p class="apl-view-sub">Prețuri reale obținute — ancora 🟢 pentru analiza comparativă de piață. Private, nevizibile publicului.</p>
+          </div>
+          <div class="apl-view-actions">
+            <button class="apl-btn apl-btn-secondary" onclick="renderTranzactiiTable()"><i class="fa-solid fa-rotate"></i> Reîncarcă</button>
+            <button class="apl-btn apl-btn-primary btn-gold" onclick="openTranzactieModal()"><i class="fa-solid fa-plus"></i> Adaugă tranzacție</button>
+          </div>
+        </header>
+
+        <div class="apl-section">
+          <div class="apl-filterbar apl-filterbar-block">
+            <input type="text" id="tranzactiiSearchInput" class="apl-input apl-input-search" placeholder="Caută zonă, stare, observații..." oninput="renderTranzactiiTable()">
+            <select id="tranzactiiCamereFilter" class="apl-select" onchange="renderTranzactiiTable()">
+              <option value="">Camere · toate</option>
+              <option value="1">1 cameră</option>
+              <option value="2">2 camere</option>
+              <option value="3">3 camere</option>
+              <option value="4">4 camere</option>
+            </select>
+          </div>
+          <div id="tranzactiiWrap" class="apl-tablewrap"></div>
+        </div>
+      </section>
+
       <!-- VIEW: EDITOR POZE -->
       <section class="apl-view" id="view-editor" data-route="editor">
         <header class="apl-view-head">
@@ -522,6 +554,22 @@
     </div>
   </div>
 
+  <!-- MODAL TRANZACȚIE -->
+  <div class="modal" id="tranzactieModal">
+    <div class="modal-card" style="max-width:680px">
+      <div class="modal-close" onclick="closeTranzactieModal()"><i class="fa-solid fa-xmark"></i></div>
+      <h2 id="tranzactieModalTitle">Tranzacție vândută nouă</h2>
+      <p class="modal-sub">Prețul obținut devine ancora 🟢 în analiza CMA. Câmpurile marcate cu <span class="req">*</span> sunt obligatorii.</p>
+      <form onsubmit="submitTranzactie(event)">
+        <div id="tranzactieForm"></div>
+        <div class="modal-actions">
+          <button type="button" class="apl-btn apl-btn-ghost" onclick="closeTranzactieModal()">Anulează</button>
+          <button type="submit" class="apl-btn apl-btn-primary"><i class="fa-solid fa-check"></i> Salvează</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
   <!-- MODAL CONTRACT NOU -->
   <div class="modal" id="contractModal">
     <div class="modal-card" style="max-width:780px">
@@ -652,10 +700,11 @@
   <!-- ROUTER -->
   <script>
     (function(){
-      const ROUTES = ['cereri','proprietati','cumparatori','proiecte','agenti','contracte','editor','setari'];
+      const ROUTES = ['cereri','proprietati','cumparatori','proiecte','agenti','contracte','tranzactii','editor','setari'];
       const LABELS = {
         cereri:'Cereri', proprietati:'Proprietăți', cumparatori:'Cumpărători',
-        proiecte:'Proiecte', agenti:'Agenți', contracte:'Contracte', editor:'Editor poze', setari:'Setări'
+        proiecte:'Proiecte', agenti:'Agenți', contracte:'Contracte',
+        tranzactii:'Tranzacții', editor:'Editor poze', setari:'Setări'
       };
       function go(route){
         if(!ROUTES.includes(route)) route = 'cereri';
@@ -685,7 +734,8 @@
         agentModal:'closeAgentModal', leadModal:'closeLeadModal',
         buyerModal:'closeBuyerModal', matchesModal:'closeMatchesModal',
         importModal:'closeImportModal', contractModal:'closeContractModal',
-        terminateModal:'closeTerminateModal', shareModal:'closeShareModal'
+        terminateModal:'closeTerminateModal', shareModal:'closeShareModal',
+        tranzactieModal:'closeTranzactieModal'
       };
       function closeTopModal(){
         const open = document.querySelector('.modal.open');
@@ -745,6 +795,7 @@
   <script src="js/main.js?v=20260611"></script>
   <script src="js/admin.js?v=20260611"></script>
   <script src="js/admin-contracts.js?v=20260611"></script>
+  <script src="js/admin-tranzactii.js?v=20260622"></script>
   <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
   <script src="js/admin-editor.js"></script>
 </body>
