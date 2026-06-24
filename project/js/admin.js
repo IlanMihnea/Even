@@ -1748,8 +1748,8 @@ function initBookmarklet() {
   el.href = code;
 }
 
-function checkImportHash() {
-  const hash = location.hash;
+function checkImportHash(hash) {
+  hash = hash || location.hash;
   if (!hash.startsWith('#import=')) return;
   history.replaceState(null, '', location.pathname + location.search);
   let data;
@@ -2400,11 +2400,13 @@ async function copyShareUrl(btn, url) {
 
 // ---------- INIT ----------
 document.addEventListener('DOMContentLoaded', async () => {
+  // Capture hash before showDashboard() overwrites it with the section name (#cereri etc.)
+  const initialHash = location.hash;
   initBookmarklet();
   const loggedIn = await checkLogin();
   if (loggedIn) {
     await showDashboard();
-    checkImportHash();
+    checkImportHash(initialHash);
   } else {
     document.getElementById('loginScreen').style.display = 'flex';
     document.getElementById('dashboard').style.display = 'none';
