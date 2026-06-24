@@ -1718,8 +1718,8 @@ function switchImportTab(tab) {
 function initBookmarklet() {
   const el = document.getElementById('importBookmarkletLink');
   if (!el) return;
-  // Bookmarklet: runs on imobiliare.ro page, sends HTML to our API, opens admin with result.
-  // Built as a string to avoid escaping issues in HTML attribute.
+  // Extracts only JSON-LD + description div (not full outerHTML) to keep payload small.
+  // Navigates current tab to admin instead of window.open to avoid popup blocker.
   const code = 'javascript:(function(){'
     + 'var url=location.href;'
     + 'if(!/imobiliare\\.ro\\/oferta\\//i.test(url)){alert("Deschide un anun\\u021B imobiliare.ro mai \\u00EEnt\\u00E2i.");return;}'
@@ -1727,18 +1727,21 @@ function initBookmarklet() {
     + 's.style.cssText="position:fixed;top:12px;right:12px;background:#1C2340;color:#fff;padding:12px 18px;border-radius:8px;font:600 13px/1.4 sans-serif;z-index:99999;box-shadow:0 4px 16px rgba(0,0,0,.5)";'
     + 's.textContent="EVEN: se extrag datele\\u2026";'
     + 'document.body.appendChild(s);'
+    + 'var ld=Array.from(document.querySelectorAll("script[type=\'application/ld+json\']")).map(function(e){return e.outerHTML;}).join("");'
+    + 'var dd=document.getElementById("truncatedDescription");'
+    + 'var dh=dd?dd.outerHTML:"";'
+    + 'var ns=Array.from(document.querySelectorAll("noscript")).filter(function(n){return/whitespace-pre-line/.test(n.innerHTML);}).map(function(n){return n.outerHTML;}).join("");'
     + 'fetch("https://www.even-imobiliare.ro/api/import-imobiliare",{'
     +   'method:"POST",'
     +   'headers:{"Content-Type":"application/json"},'
-    +   'body:JSON.stringify({html:document.documentElement.outerHTML,url:url})'
+    +   'body:JSON.stringify({html:ld+dh+ns,url:url})'
     + '})'
     + '.then(function(r){return r.json();})'
     + '.then(function(d){'
     +   'if(d.error){s.style.background="#c0392b";s.textContent="Eroare: "+d.error;setTimeout(function(){s.remove();},5000);return;}'
     +   'var enc=btoa(unescape(encodeURIComponent(JSON.stringify(d))));'
-    +   'window.open("https://www.even-imobiliare.ro/admin.html#import="+enc,"_blank");'
-    +   's.textContent="\\u2713 Gata! Admin deschis.";'
-    +   'setTimeout(function(){s.remove();},3000);'
+    +   's.textContent="\\u2713 Gata!";'
+    +   'setTimeout(function(){window.location.href="https://www.even-imobiliare.ro/admin.html#import="+enc;},600);'
     + '})'
     + '.catch(function(e){s.style.background="#c0392b";s.textContent="Eroare: "+e.message;setTimeout(function(){s.remove();},5000);});'
     + '})();';
