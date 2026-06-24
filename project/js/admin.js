@@ -1701,13 +1701,76 @@ function showToast(msg) {
 // ---------- IMPORT IMOBILIARE.RO ----------
 let importedDraft = null;
 
+function switchImportTab(tab) {
+  const isBkm = tab === 'bookmarklet';
+  document.getElementById('importTabBkm').style.display    = isBkm ? '' : 'none';
+  document.getElementById('importTabUrl').style.display    = isBkm ? 'none' : '';
+  const bBtn = document.getElementById('importTabBkmBtn');
+  const uBtn = document.getElementById('importTabUrlBtn');
+  const activeColor   = 'var(--primary, #1C2340)';
+  const inactiveColor = 'var(--gray-500)';
+  bBtn.style.color        = isBkm ? activeColor : inactiveColor;
+  bBtn.style.borderColor  = isBkm ? activeColor : 'transparent';
+  uBtn.style.color        = isBkm ? inactiveColor : activeColor;
+  uBtn.style.borderColor  = isBkm ? 'transparent' : activeColor;
+}
+
+function initBookmarklet() {
+  const el = document.getElementById('importBookmarkletLink');
+  if (!el) return;
+  // Bookmarklet: runs on imobiliare.ro page, sends HTML to our API, opens admin with result.
+  // Built as a string to avoid escaping issues in HTML attribute.
+  const code = 'javascript:(function(){'
+    + 'var url=location.href;'
+    + 'if(!/imobiliare\\.ro\\/oferta\\//i.test(url)){alert("Deschide un anun\\u021B imobiliare.ro mai \\u00EEnt\\u00E2i.");return;}'
+    + 'var s=document.createElement("div");'
+    + 's.style.cssText="position:fixed;top:12px;right:12px;background:#1C2340;color:#fff;padding:12px 18px;border-radius:8px;font:600 13px/1.4 sans-serif;z-index:99999;box-shadow:0 4px 16px rgba(0,0,0,.5)";'
+    + 's.textContent="EVEN: se extrag datele\\u2026";'
+    + 'document.body.appendChild(s);'
+    + 'fetch("https://www.even-imobiliare.ro/api/import-imobiliare",{'
+    +   'method:"POST",'
+    +   'headers:{"Content-Type":"application/json"},'
+    +   'body:JSON.stringify({html:document.documentElement.outerHTML,url:url})'
+    + '})'
+    + '.then(function(r){return r.json();})'
+    + '.then(function(d){'
+    +   'if(d.error){s.style.background="#c0392b";s.textContent="Eroare: "+d.error;setTimeout(function(){s.remove();},5000);return;}'
+    +   'var enc=btoa(unescape(encodeURIComponent(JSON.stringify(d))));'
+    +   'window.open("https://www.even-imobiliare.ro/admin.html#import="+enc,"_blank");'
+    +   's.textContent="\\u2713 Gata! Admin deschis.";'
+    +   'setTimeout(function(){s.remove();},3000);'
+    + '})'
+    + '.catch(function(e){s.style.background="#c0392b";s.textContent="Eroare: "+e.message;setTimeout(function(){s.remove();},5000);});'
+    + '})();';
+  el.href = code;
+}
+
+function checkImportHash() {
+  const hash = location.hash;
+  if (!hash.startsWith('#import=')) return;
+  history.replaceState(null, '', location.pathname + location.search);
+  let data;
+  try {
+    data = JSON.parse(decodeURIComponent(escape(atob(hash.slice(8)))));
+  } catch (e) {
+    console.error('EVEN: hash import invalid', e);
+    return;
+  }
+  importedDraft = data;
+  renderImportPreview(data);
+  document.getElementById('importPreview').style.display = 'block';
+  switchImportTab('bookmarklet');
+  document.getElementById('importModal').classList.add('open');
+}
+
 function openImportModal() {
   importedDraft = null;
-  document.getElementById('importUrlInput').value = '';
+  const urlInput = document.getElementById('importUrlInput');
+  if (urlInput) urlInput.value = '';
   document.getElementById('importPreview').style.display = 'none';
   document.getElementById('importPreviewBody').innerHTML = '';
+  switchImportTab('bookmarklet');
   document.getElementById('importModal').classList.add('open');
-  setTimeout(() => document.getElementById('importUrlInput').focus(), 100);
 }
 function closeImportModal() {
   document.getElementById('importModal').classList.remove('open');
@@ -2334,9 +2397,11 @@ async function copyShareUrl(btn, url) {
 
 // ---------- INIT ----------
 document.addEventListener('DOMContentLoaded', async () => {
+  initBookmarklet();
   const loggedIn = await checkLogin();
   if (loggedIn) {
     await showDashboard();
+    checkImportHash();
   } else {
     document.getElementById('loginScreen').style.display = 'flex';
     document.getElementById('dashboard').style.display = 'none';

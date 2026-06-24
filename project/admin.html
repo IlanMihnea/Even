@@ -684,19 +684,65 @@
     <div class="modal-card" style="max-width:720px">
       <div class="modal-close" onclick="closeImportModal()"><i class="fa-solid fa-xmark"></i></div>
       <h2>Import de pe imobiliare.ro</h2>
-      <p class="modal-sub">Lipește linkul anunțului. Extrag datele și ți le arăt înainte să confirmi.</p>
+      <p class="modal-sub">Extrage automat datele unui anunț fără să tastezi nimic.</p>
 
-      <div class="form-group full" style="margin-top:8px">
-        <label>URL anunț imobiliare.ro</label>
-        <input type="url" id="importUrlInput" placeholder="https://www.imobiliare.ro/oferta/...">
-      </div>
-      <div class="modal-actions" style="justify-content:flex-start;margin-top:12px">
-        <button type="button" class="apl-btn apl-btn-ghost" onclick="closeImportModal()">Anulează</button>
-        <button type="button" id="importFetchBtn" class="apl-btn apl-btn-primary" onclick="runImportFetch()">
-          <i class="fa-solid fa-magnifying-glass"></i> Extrage datele
+      <div style="display:flex;gap:0;border-bottom:2px solid var(--gray-200);margin:16px 0 20px">
+        <button type="button" id="importTabBkmBtn"
+          style="border:none;background:none;padding:8px 16px;cursor:pointer;font:600 .85rem var(--font-body);color:var(--gray-500);border-bottom:2px solid transparent;margin-bottom:-2px;transition:color .15s,border-color .15s"
+          onclick="switchImportTab('bookmarklet')">
+          <i class="fa-solid fa-bookmark"></i> Bookmarklet
+          <span style="background:#3EC17A;color:#fff;font-size:.6rem;padding:1px 5px;border-radius:10px;margin-left:4px;vertical-align:middle;font-weight:700;letter-spacing:.04em">NOU</span>
+        </button>
+        <button type="button" id="importTabUrlBtn"
+          style="border:none;background:none;padding:8px 16px;cursor:pointer;font:600 .85rem var(--font-body);color:var(--gray-500);border-bottom:2px solid transparent;margin-bottom:-2px;transition:color .15s,border-color .15s"
+          onclick="switchImportTab('url')">
+          <i class="fa-solid fa-link"></i> URL direct
         </button>
       </div>
 
+      <!-- TAB BOOKMARKLET -->
+      <div id="importTabBkm">
+        <p style="margin-top:0;color:var(--gray-600);font-size:.9rem">
+          Trage butonul de mai jos în <strong>bara de bookmark-uri</strong> a browserului — o singură dată.
+          Apoi, când ești pe pagina unui anunț imobiliare.ro, apasă-l și datele vin singure.
+        </p>
+        <div style="display:flex;align-items:center;gap:16px;padding:16px 20px;background:var(--gray-50);border:1px dashed var(--gray-300);border-radius:8px;margin:12px 0">
+          <a id="importBookmarkletLink" href="#"
+             style="display:inline-flex;align-items:center;gap:6px;background:#1C2340;color:#fff;padding:9px 18px;border-radius:6px;font-weight:600;font-size:.85rem;text-decoration:none;white-space:nowrap;cursor:grab;user-select:none;flex-shrink:0"
+             onclick="return false">
+            <i class="fa-solid fa-star"></i> EVEN Import
+          </a>
+          <span style="color:var(--gray-500);font-size:.85rem;line-height:1.4">
+            ← Trage până în bara de bookmark-uri<br>
+            <span style="font-size:.78rem;color:var(--gray-400)">(sau fă clic-dreapta → Adaugă la bookmark-uri)</span>
+          </span>
+        </div>
+        <ol style="color:var(--gray-600);font-size:.85rem;padding-left:20px;margin:12px 0;line-height:1.7">
+          <li>Deschide pagina anunțului pe imobiliare.ro</li>
+          <li>Apasă bookmark-ul <strong>EVEN Import</strong> din bara ta</li>
+          <li>Datele se importă automat și admin-ul se deschide</li>
+        </ol>
+      </div>
+
+      <!-- TAB URL DIRECT -->
+      <div id="importTabUrl" style="display:none">
+        <p style="margin-top:0;color:var(--gray-500);font-size:.82rem;display:flex;align-items:center;gap:6px">
+          <i class="fa-solid fa-triangle-exclamation" style="color:#f39c12"></i>
+          imobiliare.ro blochează uneori IP-ul serverului (403). Dacă nu funcționează, folosește bookmarklet-ul.
+        </p>
+        <div class="form-group full" style="margin-top:8px">
+          <label>URL anunț imobiliare.ro</label>
+          <input type="url" id="importUrlInput" placeholder="https://www.imobiliare.ro/oferta/...">
+        </div>
+        <div class="modal-actions" style="justify-content:flex-start;margin-top:12px">
+          <button type="button" class="apl-btn apl-btn-ghost" onclick="closeImportModal()">Anulează</button>
+          <button type="button" id="importFetchBtn" class="apl-btn apl-btn-primary" onclick="runImportFetch()">
+            <i class="fa-solid fa-magnifying-glass"></i> Extrage datele
+          </button>
+        </div>
+      </div>
+
+      <!-- PREVIEW (shared) -->
       <div id="importPreview" class="apl-import-preview" style="display:none">
         <h3><i class="fa-solid fa-eye"></i> Previzualizare</h3>
         <div id="importPreviewBody"></div>

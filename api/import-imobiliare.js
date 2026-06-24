@@ -215,24 +215,31 @@ module.exports = async function handler(req, res) {
   let body = req.body;
   if (typeof body === 'string') { try { body = JSON.parse(body); } catch {} }
   const url = body && body.url;
+  // html can be sent by the client-side bookmarklet (bypasses server IP block)
+  const htmlFromClient = body && typeof body.html === 'string' && body.html.length > 200 ? body.html : null;
+
   if (!url || !/^https?:\/\/(www\.)?imobiliare\.ro\/oferta\//i.test(url)) {
     return res.status(400).json({ error: 'URL invalid. Trebuie să fie un link imobiliare.ro/oferta/...' });
   }
 
   let html;
-  try {
-    const r = await fetch(url, {
-      headers: {
-        'User-Agent': UA,
-        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
-        'Accept-Language': 'ro-RO,ro;q=0.9,en;q=0.8',
-      },
-      redirect: 'follow',
-    });
-    if (!r.ok) return res.status(502).json({ error: `imobiliare.ro a răspuns cu ${r.status}` });
-    html = await r.text();
-  } catch (e) {
-    return res.status(502).json({ error: 'Nu am putut accesa pagina: ' + e.message });
+  if (htmlFromClient) {
+    html = htmlFromClient;
+  } else {
+    try {
+      const r = await fetch(url, {
+        headers: {
+          'User-Agent': UA,
+          'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+          'Accept-Language': 'ro-RO,ro;q=0.9,en;q=0.8',
+        },
+        redirect: 'follow',
+      });
+      if (!r.ok) return res.status(502).json({ error: `imobiliare.ro a răspuns cu ${r.status}` });
+      html = await r.text();
+    } catch (e) {
+      return res.status(502).json({ error: 'Nu am putut accesa pagina: ' + e.message });
+    }
   }
 
   // Extract JSON-LD
