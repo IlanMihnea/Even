@@ -194,6 +194,16 @@ CREATE TRIGGER properties_updated_at
   BEFORE UPDATE ON properties
   FOR EACH ROW EXECUTE FUNCTION update_updated_at();
 
+-- ── RLS — CITIRE PUBLICĂ PROIECTE ────────────────────────────
+ALTER TABLE projects ENABLE ROW LEVEL SECURITY;
+ALTER TABLE project_units ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "projects_public_read" ON projects;
+CREATE POLICY "projects_public_read" ON projects FOR SELECT USING (activ = true);
+
+DROP POLICY IF EXISTS "project_units_public_read" ON project_units;
+CREATE POLICY "project_units_public_read" ON project_units FOR SELECT USING (true);
+
 -- ── STORAGE ──────────────────────────────────────────────────
 -- Run once in Supabase Dashboard → SQL Editor.
 -- Bucket pentru imagini proprietăți (public read, write doar autentificat).
