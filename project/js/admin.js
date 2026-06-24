@@ -1718,30 +1718,33 @@ function switchImportTab(tab) {
 function initBookmarklet() {
   const el = document.getElementById('importBookmarkletLink');
   if (!el) return;
-  // Extracts only JSON-LD + description div (not full outerHTML) to keep payload small.
-  // Navigates current tab to admin instead of window.open to avoid popup blocker.
+  // Opens admin tab first (sync = no popup blocker), then fetches data and sends via postMessage.
+  // Admin signals back "even_admin_ready" when loaded; bookmarklet replies with "even_import".
   const code = 'javascript:(function(){'
     + 'var url=location.href;'
     + 'if(!/imobiliare\\.ro\\/oferta\\//i.test(url)){alert("Deschide un anun\\u021B imobiliare.ro mai \\u00EEnt\\u00E2i.");return;}'
     + 'var s=document.createElement("div");'
     + 's.style.cssText="position:fixed;top:12px;right:12px;background:#1C2340;color:#fff;padding:12px 18px;border-radius:8px;font:600 13px/1.4 sans-serif;z-index:99999;box-shadow:0 4px 16px rgba(0,0,0,.5)";'
-    + 's.textContent="EVEN: se extrag datele\\u2026";'
-    + 'document.body.appendChild(s);'
+    + 's.textContent="EVEN: deschid admin\\u2026";document.body.appendChild(s);'
+    + 'var adminWin=window.open("https://www.even-imobiliare.ro/admin.html","_blank");'
+    + 'var importData=null,adminReady=false;'
+    + 'window.addEventListener("message",function onMsg(e){'
+    +   'if(e.data&&e.data.type==="even_admin_ready"){'
+    +     'adminReady=true;'
+    +     'if(importData){adminWin.postMessage({type:"even_import",data:importData},"https://www.even-imobiliare.ro");window.removeEventListener("message",onMsg);}'
+    +   '}'
+    + '});'
     + 'var ld=Array.from(document.querySelectorAll("script[type=\'application/ld+json\']")).map(function(e){return e.outerHTML;}).join("");'
-    + 'var dd=document.getElementById("truncatedDescription");'
-    + 'var dh=dd?dd.outerHTML:"";'
+    + 'var dd=document.getElementById("truncatedDescription");var dh=dd?dd.outerHTML:"";'
     + 'var ns=Array.from(document.querySelectorAll("noscript")).filter(function(n){return/whitespace-pre-line/.test(n.innerHTML);}).map(function(n){return n.outerHTML;}).join("");'
-    + 'fetch("https://www.even-imobiliare.ro/api/import-imobiliare",{'
-    +   'method:"POST",'
-    +   'headers:{"Content-Type":"application/json"},'
-    +   'body:JSON.stringify({html:ld+dh+ns,url:url})'
-    + '})'
+    + 's.textContent="EVEN: se extrag datele\\u2026";'
+    + 'fetch("https://www.even-imobiliare.ro/api/import-imobiliare",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({html:ld+dh+ns,url:url})})'
     + '.then(function(r){return r.json();})'
     + '.then(function(d){'
     +   'if(d.error){s.style.background="#c0392b";s.textContent="Eroare: "+d.error;setTimeout(function(){s.remove();},5000);return;}'
-    +   'var enc=btoa(unescape(encodeURIComponent(JSON.stringify(d))));'
-    +   's.textContent="\\u2713 Gata!";'
-    +   'setTimeout(function(){window.location.href="https://www.even-imobiliare.ro/admin.html#import="+enc;},600);'
+    +   'importData=d;'
+    +   'if(adminReady){adminWin.postMessage({type:"even_import",data:d},"https://www.even-imobiliare.ro");}'
+    +   's.textContent="\\u2713 Date trimise!";setTimeout(function(){s.remove();},3000);'
     + '})'
     + '.catch(function(e){s.style.background="#c0392b";s.textContent="Eroare: "+e.message;setTimeout(function(){s.remove();},5000);});'
     + '})();';
@@ -2400,13 +2403,26 @@ async function copyShareUrl(btn, url) {
 
 // ---------- INIT ----------
 document.addEventListener('DOMContentLoaded', async () => {
-  // Capture hash before showDashboard() overwrites it with the section name (#cereri etc.)
-  const initialHash = location.hash;
   initBookmarklet();
+
+  // Receive import data sent via postMessage from the bookmarklet
+  window.addEventListener('message', function(e) {
+    if (!e.data || e.data.type !== 'even_import' || !e.data.data) return;
+    const d = e.data.data;
+    importedDraft = d;
+    renderImportPreview(d);
+    document.getElementById('importPreview').style.display = 'block';
+    switchImportTab('bookmarklet');
+    document.getElementById('importModal').classList.add('open');
+  });
+
   const loggedIn = await checkLogin();
   if (loggedIn) {
     await showDashboard();
-    checkImportHash(initialHash);
+    // Signal the bookmarklet (on imobiliare.ro) that admin is ready to receive import data
+    if (window.opener) {
+      try { window.opener.postMessage({ type: 'even_admin_ready' }, '*'); } catch (_) {}
+    }
   } else {
     document.getElementById('loginScreen').style.display = 'flex';
     document.getElementById('dashboard').style.display = 'none';
