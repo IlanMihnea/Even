@@ -194,7 +194,43 @@ CREATE TRIGGER properties_updated_at
   BEFORE UPDATE ON properties
   FOR EACH ROW EXECUTE FUNCTION update_updated_at();
 
--- ── RLS — CITIRE PUBLICĂ PROIECTE ────────────────────────────
+-- ── RLS — PROPERTIES ─────────────────────────────────────────
+ALTER TABLE properties ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "properties_public_read" ON properties;
+CREATE POLICY "properties_public_read" ON properties FOR SELECT USING (activ = true);
+
+DROP POLICY IF EXISTS "properties_anon_insert" ON properties;
+CREATE POLICY "properties_anon_insert" ON properties FOR INSERT WITH CHECK (true);
+
+DROP POLICY IF EXISTS "properties_anon_update" ON properties;
+CREATE POLICY "properties_anon_update" ON properties FOR UPDATE USING (true) WITH CHECK (true);
+
+DROP POLICY IF EXISTS "properties_anon_delete" ON properties;
+CREATE POLICY "properties_anon_delete" ON properties FOR DELETE USING (true);
+
+-- ── RLS — AGENTS ─────────────────────────────────────────────
+ALTER TABLE agents ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "agents_public_read" ON agents;
+CREATE POLICY "agents_public_read" ON agents FOR SELECT USING (true);
+
+DROP POLICY IF EXISTS "agents_anon_write" ON agents;
+CREATE POLICY "agents_anon_write" ON agents FOR ALL USING (true) WITH CHECK (true);
+
+-- ── RLS — LEADS ──────────────────────────────────────────────
+ALTER TABLE leads ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "leads_anon_insert" ON leads;
+CREATE POLICY "leads_anon_insert" ON leads FOR INSERT WITH CHECK (true);
+
+DROP POLICY IF EXISTS "leads_admin_read" ON leads;
+CREATE POLICY "leads_admin_read" ON leads FOR SELECT USING (true);
+
+DROP POLICY IF EXISTS "leads_admin_update" ON leads;
+CREATE POLICY "leads_admin_update" ON leads FOR UPDATE USING (true) WITH CHECK (true);
+
+-- ── RLS — PROIECTE ───────────────────────────────────────────
 ALTER TABLE projects ENABLE ROW LEVEL SECURITY;
 ALTER TABLE project_units ENABLE ROW LEVEL SECURITY;
 
