@@ -1,39 +1,42 @@
 /* ============================================================
-   ADMIN — Apple-style dashboard
-   Pure neutral: white / gray / black + system blue accent.
-   Self-contained; overrides main.css inside body[data-page="admin"].
+   ADMIN — minimal EVEN dashboard
+   Warm neutral: Linen page / Paper cards / Midnight ink + Sage accent.
+   One sans typeface (DM Sans), no serif. Self-contained; overrides
+   main.css inside body[data-page="admin"].
    ============================================================ */
 
 body[data-page="admin"]{
-  /* tokens */
-  --apl-bg:        #ffffff;
-  --apl-bg-2:      #fbfbfd;
-  --apl-bg-3:      #f5f5f7;
-  --apl-bg-elev:   #ffffff;
-  --apl-text:      #1d1d1f;
-  --apl-text-2:    #424245;
-  --apl-text-3:    #515154;  /* bumped from #6e6e73 — body secondary, 7.4:1 on #fff */
-  --apl-text-4:    #6e6e73;  /* bumped from #86868b — meta, 5.6:1 on #fff (was 3.4 — fail AA) */
-  --apl-border:    #d2d2d7;
-  --apl-border-2:  #e5e5ea;
-  --apl-border-3:  #f0f0f3;
-  --apl-blue:      #0071e3;
-  --apl-blue-2:    #0077ed;
-  --apl-blue-soft: #e8f1fd;
-  --apl-red:       #ff3b30;
-  --apl-red-soft:  #ffeae8;
-  --apl-green:     #248a3d;  /* darkened from #34c759 for AA on white */
-  --apl-green-soft:#e3f7e8;
-  --apl-orange:    #ff9500;
-  --apl-purple:    #af52de;
+  /* tokens — token NAMES kept stable; only values reskinned to EVEN */
+  --apl-bg:        #FAF8F2;   /* Paper — card / input surface (lighter than page) */
+  --apl-bg-2:      #F6F3EB;   /* warm off-Paper — table head, hover, panels */
+  --apl-bg-3:      #F1F0EC;   /* Linen — page background + recessed controls */
+  --apl-bg-elev:   #FAF8F2;   /* Paper — elevated cards / modals */
+  --apl-text:      #1C2340;   /* Midnight — primary ink */
+  --apl-text-2:    #3A4055;   /* secondary ink */
+  --apl-text-3:    #5B6072;   /* body secondary */
+  --apl-text-4:    #6E7066;   /* warm meta — AA on Paper */
+  --apl-border:    #DCD7CA;   /* warm border */
+  --apl-border-2:  #E6E2D8;
+  --apl-border-3:  #ECE8DE;
+  --apl-blue:      #1C2340;   /* accent → Midnight (primary, active, focus) */
+  --apl-blue-2:    #2A335A;   /* accent hover */
+  --apl-blue-soft: #E5EAE6;   /* Sage-tinted soft fill for selected/badges */
+  --apl-red:       #A8593D;   /* Burnt Sienna — danger */
+  --apl-red-soft:  #F3E4DC;
+  --apl-green:     #5A7A52;   /* Moss — success */
+  --apl-green-soft:#E7EFE4;
+  --apl-orange:    #B0731C;   /* warm amber — warning */
+  --apl-purple:    #5a3da7;
 
-  --apl-focus: 0 0 0 3px rgba(0,113,227,.35);
+  --apl-sage:      #7A9B92;   /* structural accent — quiet, never CTA */
+
+  --apl-focus: 0 0 0 3px rgba(28,35,64,.28);
 
   /* remap EVEN tokens within admin scope so JS-injected inline styles
-     (color:var(--navy), background:var(--gray-50), etc.) inherit Apple palette */
+     (color:var(--navy), background:var(--gray-50), etc.) inherit this palette */
   --navy:     var(--apl-text);
   --midnight: var(--apl-text);
-  --gold:     var(--apl-blue);
+  --gold:     var(--apl-text);
   --gold-light: var(--apl-blue-2);
   --gray-50:  var(--apl-bg-2);
   --gray-100: var(--apl-border-3);
@@ -49,12 +52,12 @@ body[data-page="admin"]{
   --apl-r-lg: 14px;
   --apl-r-xl: 18px;
 
-  --apl-shadow-pop: 0 4px 24px rgba(0,0,0,0.06), 0 1px 3px rgba(0,0,0,0.04);
-  --apl-shadow-modal: 0 24px 80px rgba(0,0,0,0.22), 0 4px 12px rgba(0,0,0,0.08);
+  --apl-shadow-pop: 0 4px 20px rgba(28,35,64,0.06), 0 1px 3px rgba(28,35,64,0.04);
+  --apl-shadow-modal: 0 24px 70px rgba(28,35,64,0.20), 0 4px 12px rgba(28,35,64,0.08);
 
   --apl-side-w: 248px;
 
-  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Inter', 'Segoe UI', Roboto, sans-serif;
+  font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   background: var(--apl-bg-3);
@@ -111,8 +114,8 @@ body[data-page="admin"] > footer{ display: none !important; }
   align-items: center;
   justify-content: center;
   background:
-    radial-gradient(1200px 600px at 20% 0%, #f1f4fb 0%, transparent 60%),
-    radial-gradient(900px 500px at 100% 100%, #f4f1ec 0%, transparent 60%),
+    radial-gradient(1200px 600px at 20% 0%, #FAF8F2 0%, transparent 60%),
+    radial-gradient(900px 500px at 100% 100%, #E8E5DC 0%, transparent 60%),
     var(--apl-bg-3);
   padding: 40px 20px;
 }
@@ -170,7 +173,7 @@ body[data-page="admin"] > footer{ display: none !important; }
 .apl-field input:focus{
   outline: none;
   border-color: var(--apl-blue);
-  box-shadow: 0 0 0 4px rgba(0,113,227,.12);
+  box-shadow: 0 0 0 4px rgba(28,35,64,.12);
 }
 .login-hint{ display: none; }
 
@@ -265,11 +268,11 @@ body[data-page="admin"] > footer{ display: none !important; }
 .apl-nav-link:hover{ background: rgba(0,0,0,0.04); color: var(--apl-text); }
 .apl-nav-link:hover i{ color: var(--apl-text-2); }
 .apl-nav-link.is-active{
-  background: var(--apl-bg-3);
-  color: var(--apl-text);
+  background: var(--apl-text);
+  color: var(--apl-bg);
   font-weight: 600;
 }
-.apl-nav-link.is-active i{ color: var(--apl-blue); }
+.apl-nav-link.is-active i{ color: var(--apl-bg); }
 .apl-nav-badge{
   margin-left: auto;
   min-width: 20px;
@@ -355,7 +358,7 @@ body[data-page="admin"] > footer{ display: none !important; }
   position: sticky;
   top: 0;
   z-index: 40;
-  background: rgba(255,255,255,0.78);
+  background: rgba(250,248,242,0.82);
   backdrop-filter: saturate(180%) blur(20px);
   -webkit-backdrop-filter: saturate(180%) blur(20px);
   border-bottom: 1px solid var(--apl-border-2);
@@ -406,7 +409,7 @@ body[data-page="admin"] > footer{ display: none !important; }
   gap: 16px;
   margin: -32px -40px 24px;
   padding: 22px 40px 16px;
-  background: rgba(245,245,247,0.78);
+  background: rgba(241,240,236,0.82);
   backdrop-filter: saturate(180%) blur(20px);
   -webkit-backdrop-filter: saturate(180%) blur(20px);
   border-bottom: 1px solid var(--apl-border-3);
@@ -643,7 +646,7 @@ body[data-page="admin"] .btn-full{ width: 100%; padding: 11px 18px; font-size: 1
 .admin-filter-bar select:focus{
   outline: none;
   border-color: var(--apl-blue);
-  box-shadow: 0 0 0 3px rgba(0,113,227,.18);
+  box-shadow: 0 0 0 3px rgba(28,35,64,.18);
 }
 .apl-input-search{
   flex: 1;
@@ -906,7 +909,7 @@ body[data-page="admin"] .btn-full{ width: 100%; padding: 11px 18px; font-size: 1
 }
 .chip-input:focus-within{
   border-color: var(--apl-blue);
-  box-shadow: 0 0 0 3px rgba(0,113,227,.15);
+  box-shadow: 0 0 0 3px rgba(28,35,64,.15);
 }
 .chip{
   display: inline-flex; align-items: center; gap: 6px;
@@ -989,7 +992,7 @@ body[data-page="admin"] .btn-full{ width: 100%; padding: 11px 18px; font-size: 1
 .banner-url-row{
   display: flex; flex-direction: column; gap: 4px;
   padding: 12px 14px;
-  background: #1d1d1f;
+  background: var(--apl-text);
   border-radius: var(--apl-r-md);
 }
 .banner-url-label{
@@ -1107,7 +1110,7 @@ body[data-page="admin"] .btn-full{ width: 100%; padding: 11px 18px; font-size: 1
 .form-group textarea:focus{
   outline: none;
   border-color: var(--apl-blue);
-  box-shadow: 0 0 0 3px rgba(0,113,227,.15);
+  box-shadow: 0 0 0 3px rgba(28,35,64,.15);
 }
 .form-group textarea{ resize: vertical; min-height: 80px; }
 
@@ -1252,7 +1255,7 @@ body[data-page="admin"] .btn-full{ width: 100%; padding: 11px 18px; font-size: 1
   bottom: 28px;
   right: 28px;
   padding: 12px 18px;
-  background: rgba(29,29,31,0.92);
+  background: rgba(28,35,64,0.94);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   color: #fff;
@@ -1350,15 +1353,16 @@ body[data-page="admin"] .btn-full{ width: 100%; padding: 11px 18px; font-size: 1
   gap: 10px;
   cursor: pointer;
   padding: 12px 14px;
-  border: 1px solid var(--apl-border, #e3e6ee);
-  border-radius: 10px;
-  background: var(--apl-bg-soft, #f7f8fc);
+  border: 1px solid var(--apl-border);
+  border-radius: var(--apl-r-md);
+  background: var(--apl-bg-2);
   font-weight: 600;
+  color: var(--apl-text);
   user-select: none;
 }
-.export-imo-toggle input{ width: 18px; height: 18px; accent-color: var(--primary, #1C2340); cursor: pointer; }
-.export-imo-toggle:has(input:checked){ border-color: var(--primary, #1C2340); background: #eef1fb; }
-.export-imo-toggle i{ color: var(--primary, #1C2340); margin-right: 2px; }
+.export-imo-toggle input{ width: 18px; height: 18px; accent-color: var(--apl-text); cursor: pointer; }
+.export-imo-toggle:has(input:checked){ border-color: var(--apl-text); background: var(--apl-blue-soft); }
+.export-imo-toggle i{ color: var(--apl-sage); margin-right: 2px; }
 
 /* Chip „pe imobiliare.ro" în tabelul de proprietăți */
 .imo-chip{
@@ -1369,12 +1373,12 @@ body[data-page="admin"] .btn-full{ width: 100%; padding: 11px 18px; font-size: 1
   font-weight: 600;
   padding: 2px 8px;
   border-radius: 999px;
-  color: #1C2340;
-  background: #eef1fb;
-  border: 1px solid #d6ddf5;
+  color: var(--apl-text);
+  background: var(--apl-blue-soft);
+  border: 1px solid #cdd9d3;
   white-space: nowrap;
 }
-.imo-chip i{ font-size: 10px; }
+.imo-chip i{ font-size: 10px; color: var(--apl-sage); }
 
 @media (max-width: 640px){
   .modal{ padding: 14px; }
