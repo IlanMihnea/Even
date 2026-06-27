@@ -827,12 +827,15 @@ async function renderTable() {
             const viewChip = (row.viewCount > 0)
               ? `<span class="views-chip" title="Vizualizări pe site"><i class="fa-solid fa-eye"></i> ${row.viewCount}</span>`
               : '';
+            const imoChip = (row.activ !== false && row.exportImobiliare)
+              ? `<span class="imo-chip" title="Inclusă în feed-ul preluat de imobiliare.ro"><i class="fa-solid fa-tower-broadcast"></i> imobiliare.ro</span>`
+              : '';
             return `
             <tr style="${row.activ === false ? 'opacity:0.5' : ''}">
               ${columns.map(c => `<td>${c.render ? c.render(row[c.key], row) : (row[c.key] ?? '-')}</td>`).join('')}
               <td>
                 ${row.activ === false ? '<span style="color:#999;font-size:12px">arhivat</span>' : '<span style="color:var(--success);font-size:12px">activ</span>'}
-                <div style="display:flex;gap:6px;margin-top:4px;flex-wrap:wrap">${matchBadge}${viewChip}</div>
+                <div style="display:flex;gap:6px;margin-top:4px;flex-wrap:wrap">${matchBadge}${viewChip}${imoChip}</div>
               </td>
               <td>
                 <div class="table-actions">
@@ -1283,6 +1286,7 @@ function renderDynamicForm() {
         <div class="form-group full"><label>Agent asignat (ID)</label>${agentSelector()}</div>
         <div class="form-group full"><label>Descriere</label><textarea name="descriere"></textarea></div>
         ${imageUploadBlock()}
+        ${exportImobiliareBlock()}
       </div>
     `;
   } else if (activeFormCategory === 'comercial') {
@@ -1315,6 +1319,7 @@ function renderDynamicForm() {
         <div class="form-group full"><label>Agent asignat</label>${agentSelector()}</div>
         <div class="form-group full"><label>Descriere</label><textarea name="descriere"></textarea></div>
         ${imageUploadBlock()}
+        ${exportImobiliareBlock()}
       </div>
     `;
   } else if (activeFormCategory === 'terenuri') {
@@ -1351,6 +1356,7 @@ function renderDynamicForm() {
         <div class="form-group full"><label>Agent asignat</label>${agentSelector()}</div>
         <div class="form-group full"><label>Vecinătăți & descriere</label><textarea name="descriere"></textarea></div>
         ${imageUploadBlock()}
+        ${exportImobiliareBlock()}
       </div>
     `;
   }
@@ -1473,6 +1479,20 @@ function agentSelector() {
   const agents = allAgentsCache;
   if (!agents.length) return '<select name="agentId"><option value="">— niciun agent —</option></select>';
   return `<select name="agentId"><option value="">— niciun agent —</option>${agents.map(a => `<option value="${a.id}">${escapeHtmlAdm(a.nume)}</option>`).join('')}</select>`;
+}
+
+// Toggle de opt-in: include proprietatea în feed-ul /api/feed-imobiliare pe care
+// imobiliare.ro îl trage automat. Bifat = se publică pe portal la următorul sync.
+function exportImobiliareBlock() {
+  return `
+    <div class="form-group full">
+      <label class="export-imo-toggle">
+        <input type="checkbox" name="exportImobiliare">
+        <span><i class="fa-solid fa-tower-broadcast"></i> Publică automat pe imobiliare.ro</span>
+      </label>
+      <div class="imagini-hint">Bifat, anunțul intră în feed-ul preluat de imobiliare.ro. Apare/se actualizează pe portal la următoarea sincronizare (câteva ore). Debifezi → e retras automat.</div>
+    </div>
+  `;
 }
 
 function imageUploadBlock() {
@@ -1631,7 +1651,9 @@ function hydrateFormValues() {
   if (!form) return;
   Object.entries(editingProperty).forEach(([k, v]) => {
     const el = form.querySelector(`[name="${k}"]`);
-    if (el && v != null && typeof v !== 'object') el.value = v;
+    if (!el || v == null || typeof v === 'object') return;
+    if (el.type === 'checkbox') el.checked = !!v;
+    else el.value = v;
   });
   // Agent
   if (editingProperty.agentId) {
@@ -1649,6 +1671,7 @@ async function submitNewProperty(e) {
   const formData = {};
   e.target.querySelectorAll('[name]').forEach(el => {
     if (el.name === 'imaginiFiles') return;
+    if (el.type === 'checkbox') { formData[el.name] = el.checked; return; }
     if (el.value) formData[el.name] = el.type === 'number' ? +el.value : el.value;
   });
   // Map-pin coordinates come from hidden inputs as strings — store as numbers.

@@ -22,7 +22,8 @@ const PROP_CARD_COLS = [
   'unitate','front_stradal','utilitati','acces_drum','zonare_pug','cut','pot','vecinatati',
   'oras','cartier','adresa','judet','localitate',
   'imagini','agent_id','lat','lng',
-  'banner','home_hero','view_count','activ'
+  'banner','home_hero','view_count','activ',
+  'export_imobiliare','imobiliare_ref'
 ].join(',');
 
 // ---------- NORMALIZERS ----------
@@ -47,7 +48,8 @@ function toRezidential(row) {
     agentId: row.agent_id, agent: normalizeAgent(row.agents), categorie: 'rezidential',
     lat: row.lat, lng: row.lng,
     banner: row.banner === true, homeHero: row.home_hero === true,
-    viewCount: row.view_count || 0, activ: row.activ
+    viewCount: row.view_count || 0, activ: row.activ,
+    exportImobiliare: row.export_imobiliare === true, imobiliareRef: row.imobiliare_ref
   };
 }
 
@@ -62,7 +64,8 @@ function toComercial(row) {
     agentId: row.agent_id, agent: normalizeAgent(row.agents), categorie: 'comercial',
     lat: row.lat, lng: row.lng,
     banner: row.banner === true, homeHero: row.home_hero === true,
-    viewCount: row.view_count || 0, activ: row.activ
+    viewCount: row.view_count || 0, activ: row.activ,
+    exportImobiliare: row.export_imobiliare === true, imobiliareRef: row.imobiliare_ref
   };
 }
 
@@ -80,7 +83,8 @@ function toTeren(row) {
     agentId: row.agent_id, agent: normalizeAgent(row.agents), categorie: 'terenuri',
     lat: row.lat, lng: row.lng,
     banner: row.banner === true, homeHero: row.home_hero === true,
-    viewCount: row.view_count || 0, activ: row.activ
+    viewCount: row.view_count || 0, activ: row.activ,
+    exportImobiliare: row.export_imobiliare === true, imobiliareRef: row.imobiliare_ref
   };
 }
 
@@ -626,7 +630,8 @@ function toSnakeProperty(categorie, d) {
     cartier: d.cartier, adresa: d.adresa, descriere: d.descriere,
     imagini: d.imagini, facilitati: d.facilitati,
     lat: d.lat, lng: d.lng,
-    agent_id: d.agentId, activ: d.activ !== false
+    agent_id: d.agentId, activ: d.activ !== false,
+    export_imobiliare: !!d.exportImobiliare
   };
   if (categorie === 'rezidential') return {
     ...base, tip: d.tip, pret: d.pret, camere: d.camere, suprafata: d.suprafata,

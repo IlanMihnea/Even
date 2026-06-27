@@ -1343,6 +1343,39 @@ body[data-page="admin"] .btn-full{ width: 100%; padding: 11px 18px; font-size: 1
 }
 .map-picker-clear:hover{ background: var(--apl-red-soft); }
 
+/* Toggle „Publică pe imobiliare.ro" din formularul de proprietate */
+.export-imo-toggle{
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  padding: 12px 14px;
+  border: 1px solid var(--apl-border, #e3e6ee);
+  border-radius: 10px;
+  background: var(--apl-bg-soft, #f7f8fc);
+  font-weight: 600;
+  user-select: none;
+}
+.export-imo-toggle input{ width: 18px; height: 18px; accent-color: var(--primary, #1C2340); cursor: pointer; }
+.export-imo-toggle:has(input:checked){ border-color: var(--primary, #1C2340); background: #eef1fb; }
+.export-imo-toggle i{ color: var(--primary, #1C2340); margin-right: 2px; }
+
+/* Chip „pe imobiliare.ro" în tabelul de proprietăți */
+.imo-chip{
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 999px;
+  color: #1C2340;
+  background: #eef1fb;
+  border: 1px solid #d6ddf5;
+  white-space: nowrap;
+}
+.imo-chip i{ font-size: 10px; }
+
 @media (max-width: 640px){
   .modal{ padding: 14px; }
   .modal-card{ padding: 22px 18px; border-radius: 14px; }
