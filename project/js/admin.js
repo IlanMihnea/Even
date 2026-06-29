@@ -1310,8 +1310,8 @@ function renderDynamicForm() {
           <label>Clasă clădire</label>
           <select name="clasaCladire"><option>A</option><option>B</option><option>C</option></select>
         </div>
-        <div class="form-group"><label>Preț €/mp/lună (chirie)</label><input type="number" name="pret"></div>
-        <div class="form-group"><label>Preț total € (vânzare)</label><input type="number" name="pretTotal"></div>
+        <div class="form-group"><label>Preț €/mp/lună (chirie)</label><input type="number" step="0.01" name="pret"></div>
+        <div class="form-group"><label>Preț total € (vânzare)</label><input type="number" step="0.01" name="pretTotal"></div>
         <div class="form-group"><label>Oraș</label><input type="text" name="oras"></div>
         <div class="form-group"><label>Cartier</label><input type="text" name="cartier"></div>
         <div class="form-group full"><label>Adresă</label><input type="text" name="adresa"></div>
